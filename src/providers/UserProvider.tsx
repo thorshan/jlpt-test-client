@@ -1,0 +1,114 @@
+import { useEffect, useState } from "react";
+import { userApi } from "../api/userApi";
+import axios from "axios";
+import { UserContext } from "../context/UserContext";
+
+interface UserData {
+  _id?: string;
+  name: string;
+  token: string;
+  level?: string;
+}
+
+interface ValidationError {
+  message: string;
+  errors: Record<string, string[]>;
+}
+
+export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+  // 1. Instant Synchronous Hydration
+  const [user, setUser] = useState<UserData | null>(() => {
+    try {
+      const saved = localStorage.getItem("jlpt_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
+      return null;
+    }
+  });
+
+  const [isVerifying, setIsVerifying] = useState(true);
+
+  // 2. Definitive Logout function (defined before useEffect)
+  const logout = async () => {
+    // 1. Capture the ID first so we don't lose it
+    const userId = user?._id;
+
+    // 2. Immediate UI response (Optimistic UI)
+    // This makes the app feel "snappy" on mobile
+    setUser(null);
+    localStorage.removeItem("jlpt_user");
+
+    // 3. Backend cleanup
+    if (userId) {
+      try {
+        await userApi.clearUser(userId);
+      } catch (error) {
+        console.error("Failed to clear session on server:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const verifyUserWithServer = async () => {
+      // Get the most current data from localStorage for verification
+      const saved = localStorage.getItem("jlpt_user");
+      const localUser = saved ? JSON.parse(saved) : null;
+
+      if (localUser?._id) {
+        try {
+          await userApi.getUser(localUser._id);
+          // Sync state just in case localStorage was changed in another tab
+          setUser(localUser);
+        } catch (error) {
+          if (
+            axios.isAxiosError<ValidationError, Record<string, unknown>>(error)
+          ) {
+            console.log(error.status);
+            console.error(error.response);
+            if (error.response?.status === 404) {
+              logout();
+            }
+          } else {
+            console.error(error);
+          }
+        }
+      } else {
+        // No user found in storage at all
+        setUser(null);
+      }
+
+      setIsVerifying(false);
+    };
+
+    verifyUserWithServer();
+    // Empty dependency is fine here because we want this only on "App Mount/Refresh"
+  }, []);
+
+  const login = (data: UserData) => {
+    setUser(data);
+    localStorage.setItem("jlpt_user", JSON.stringify(data));
+  };
+
+  const updateUser = (updates: Partial<UserData>) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const newData = { ...prev, ...updates };
+      localStorage.setItem("jlpt_user", JSON.stringify(newData));
+      return newData;
+    });
+  };
+
+  return (
+    <UserContext.Provider
+      value={{ user, isVerifying, login, logout, updateUser }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
+};
