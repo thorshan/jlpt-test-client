@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { examApi } from "../api/examApi";
-import { sectionApi, type Section } from "../api/sectionApi";
+import { sectionApi } from "../api/sectionApi";
 import { LoadingScreen } from "../components/LoadingScreen";
+import axios from "axios";
 
 interface Exam {
   _id: string;
@@ -18,6 +19,20 @@ interface ExamForm {
   desc: string;
   passingScore: number;
   sections: string[];
+}
+
+interface Section {
+  _id: string;
+  title: string;
+  desc: string;
+  duration: number;
+  questions: string[];
+  minPassedMark: number;
+}
+
+interface ValidationError {
+  message: string;
+  errors: Record<string, string[]>;
 }
 
 const Exams = () => {
@@ -43,8 +58,13 @@ const Exams = () => {
       ]);
       setExams(examRes.data?.data || []);
       setAvailableSections(sectionRes.data?.data || []);
-    } catch (err: any) {
-      console.error("Fetch error:", err.message);
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
     } finally {
       setLoading(false);
     }
@@ -69,8 +89,13 @@ const Exams = () => {
         setExams((prev) => [...prev, res.data.data]);
       }
       resetForm();
-    } catch (err: any) {
-      alert("Error saving exam: " + err.message);
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
     }
   };
 
@@ -81,10 +106,12 @@ const Exams = () => {
       title: exam.title,
       desc: exam.desc,
       passingScore: exam.passingScore,
-      // Safe check: convert populated objects to IDs if necessary
-      sections: exam.sections.map((s: any) =>
-        typeof s === "string" ? s : s._id,
-      ),
+      sections: exam.sections.map((s: string | Section): string => {
+        if (typeof s === "string") {
+          return s;
+        }
+        return s._id;
+      }),
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -94,8 +121,13 @@ const Exams = () => {
     try {
       await examApi.deleteExam(id);
       setExams((prev) => prev.filter((ex) => ex._id !== id));
-    } catch (err) {
-      alert("Delete failed");
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
     }
   };
 

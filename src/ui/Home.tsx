@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useUser } from "../context/UserContext";
-import { useTranslation } from "../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import {
   LogOut,
@@ -12,6 +10,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { LangToggler } from "../components/LangToggler";
+import { useUser } from "../hooks/useUser";
+import { useTranslation } from "../hooks/useTranslation";
 
 // Mock Data - In production, fetch this from your API
 const PAST_EXAMS = [

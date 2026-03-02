@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   Instagram,
   Youtube,
@@ -10,11 +10,10 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "../context/LanguageContext";
 import { LangToggler } from "../components/LangToggler";
-import { useUser } from "../context/UserContext";
+import { useTranslation } from "../hooks/useTranslation";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -22,7 +21,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" } },
 };
@@ -76,7 +75,7 @@ const Index = () => {
             variants={itemVariants}
             className="inline-block px-4 py-1.5 rounded-full border border-sky-500/20 bg-sky-500/5 text-sky-400 text-[10px] md:text-xs font-black tracking-widest uppercase"
           >
-            {t("version")} 1.0
+            VERSION 1.0
           </motion.div>
 
           <motion.h1

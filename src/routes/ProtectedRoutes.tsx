@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { LoadingScreen } from "../components/LoadingScreen";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../hooks/useUser";
 
 export const ProtectedRoutes = ({
   children,

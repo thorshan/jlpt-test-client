@@ -7,7 +7,7 @@ interface LanguageContextType {
   setLanguage: (code: LanguageCode) => void;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(
+export const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined,
 );
 
@@ -45,11 +45,4 @@ export const LanguageProvider = ({
       {children}
     </LanguageContext.Provider>
   );
-};
-
-export const useTranslation = () => {
-  const context = useContext(LanguageContext);
-  if (!context)
-    throw new Error("useTranslation must be used within LanguageProvider");
-  return context;
 };

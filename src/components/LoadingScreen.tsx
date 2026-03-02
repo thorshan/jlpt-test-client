@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { useTranslation } from "../context/LanguageContext";
+
+import { type Variants } from "framer-motion";
+import { useTranslation } from "../hooks/useTranslation";
 
 export const LoadingScreen = () => {
   const { t } = useTranslation();
 
-  // Animation variants for the blue path (drawing effect)
-  const pathVariants = {
+  const pathVariants: Variants = {
     initial: { pathLength: 0, opacity: 0 },
     animate: {
       pathLength: 1,
@@ -18,7 +19,7 @@ export const LoadingScreen = () => {
   };
 
   // Animation variants for the JLPT text (breathing effect)
-  const textVariants = {
+  const textVariants: Variants = {
     animate: {
       opacity: [0.3, 1, 0.3],
       transition: {

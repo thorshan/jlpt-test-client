@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { sectionApi, type Section } from "../api/sectionApi";
 import { questionApi, type Question } from "../api/questionApi";
 import { LoadingScreen } from "../components/LoadingScreen";
+import axios from "axios";
+
+interface ValidationError {
+  message: string;
+  errors: Record<string, string[]>;
+}
 
 const Sections = () => {
   const [sections, setSections] = useState<Section[]>([]);
@@ -26,8 +32,13 @@ const Sections = () => {
       ]);
       setSections(secRes.data.data);
       setAllQuestions(qRes.data.data);
-    } catch (err: any) {
-      console.error(err.message);
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
     } finally {
       setLoading(false);
     }
@@ -50,8 +61,13 @@ const Sections = () => {
         setSections((prev) => [...prev, res.data.data]);
       }
       resetForm();
-    } catch (err: any) {
-      alert(err.message);
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
     }
   };
 

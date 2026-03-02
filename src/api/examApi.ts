@@ -10,6 +10,7 @@ export interface Section {
 
 export interface Exam {
   _id: string;
+  level: string;
   title: string;
   desc: string;
   passingScore: number;

@@ -7,6 +7,8 @@ export const userApi = {
   updateUser: (id: string, level: string) =>
     apiClient.put(`/users/${id}`, { level }),
 
+  getUser: (id: string) => apiClient.get(`/users/${id}`),
+
   getAllUsers: () => apiClient.get("/users"),
 
   clearUser: (id: string) => apiClient.delete(`/users/${id}`),

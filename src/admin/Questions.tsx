@@ -5,13 +5,31 @@ import {
   QuestionModule,
   QuestionCategory,
 } from "../api/questionApi";
+import axios from "axios";
+
+interface QuestionForm {
+  refText: string;
+  text: string;
+  options: string[];
+  correctOptionIndex: number;
+  module: QuestionModule;
+  category: QuestionCategory;
+  point: number;
+  refImage?: string;
+  refAudio?: string;
+}
+
+interface ValidationError {
+  message: string;
+  errors: Record<string, string[]>;
+}
 
 const Questions = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<QuestionForm>({
     refText: "",
     text: "",
     options: ["", "", "", ""],
@@ -28,8 +46,13 @@ const Questions = () => {
     try {
       const res = await questionApi.getQuestions();
       setQuestions(res.data?.data || []);
-    } catch (err: any) {
-      console.error(err.message);
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
     } finally {
       setLoading(false);
     }
@@ -62,8 +85,13 @@ const Questions = () => {
         }
       }
       resetForm();
-    } catch (err: any) {
-      alert(err.message);
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
     }
   };
 
@@ -96,8 +124,15 @@ const Questions = () => {
       try {
         await questionApi.deleteQuestion(id);
         setQuestions((prev) => prev.filter((q) => q._id !== id));
-      } catch (err: any) {
-        alert("Delete failed");
+      } catch (error) {
+        if (
+          axios.isAxiosError<ValidationError, Record<string, unknown>>(error)
+        ) {
+          console.log(error.status);
+          console.error(error.response);
+        } else {
+          console.error(error);
+        }
       }
     }
   };

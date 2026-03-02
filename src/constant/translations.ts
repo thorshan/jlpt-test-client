@@ -28,7 +28,6 @@ export const translations = {
       "Built for the global community. All materials are for educational use. Visit the",
     official_link: "Official JLPT Site",
     footer_tag: "Built for Study • No Data Collected • 2026",
-    version: "Version",
     generate_token: "Generate Access Token",
     name_label: "Name",
     name_placeholder: "Enter Your Name",
@@ -367,6 +366,9 @@ export const translations = {
       "如果您连续7天未访问，系统将自动删除您的记录以保护隐私。",
   },
   ru: {
+    integrity_desc:
+      "Создано для мирового сообщества. Все материалы предназначены для образовательных целей. Посетите сайт.",
+    select_language: "Выберите язык",
     welcome: "С возвращением",
     start_test: "Начать практику",
     logout: "Выйти",
@@ -425,6 +427,9 @@ export const translations = {
       "Если вы не заходите 7 дней, система удаляет запись для конфиденциальности.",
   },
   id: {
+    integrity_desc:
+      "Ginawa para sa pandaigdigang komunidad. Ang lahat ng materyales ay para sa gamit pang-edukasyon. Bisitahin ang",
+    select_language: "Pilih Bahasa",
     welcome: "Selamat datang",
     start_test: "Mulai Latihan",
     logout: "Keluar",
@@ -484,6 +489,9 @@ export const translations = {
       "Jika tidak berkunjung selama 7 hari, sistem akan menghapus data demi privasi.",
   },
   ph: {
+    integrity_desc:
+      "Ginawa para sa pandaigdigang komunidad. Ang lahat ng materyales ay para sa gamit pang-edukasyon. Bisitahin ang",
+    select_language: "Pumili ng Wika",
     welcome: "Maligayang pagdating",
     start_test: "Simulan ang Practice",
     logout: "Mag-logout",
@@ -540,3 +548,5 @@ export const translations = {
       "Kung hindi bibisita sa loob ng 7 araw, awtomatikong buburahin ang iyong record.",
   },
 };
+
+export type LanguageCode = keyof typeof translations;

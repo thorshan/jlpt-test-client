@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import {
   Key,
@@ -11,8 +10,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "../hooks/useTranslation";
+import { useUser } from "../hooks/useUser";
 
 const UserManual = () => {
   const { t } = useTranslation();

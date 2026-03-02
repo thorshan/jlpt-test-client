@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { examApi } from "../api/examApi";
 import { sectionApi } from "../api/sectionApi";
 import { questionApi } from "../api/questionApi";
+import axios from "axios";
+
+interface ValidationError {
+  message: string;
+  errors: Record<string, string[]>;
+}
 
 const Dashboard = () => {
   const [stats, setStats] = useState({ exams: 0, sections: 0, questions: 0 });
@@ -19,8 +25,15 @@ const Dashboard = () => {
           sections: s.data.data.length,
           questions: q.data.data.length,
         });
-      } catch (err) {
-        console.error("Stats fetch error");
+      } catch (error) {
+        if (
+          axios.isAxiosError<ValidationError, Record<string, unknown>>(error)
+        ) {
+          console.log(error.status);
+          console.error(error.response);
+        } else {
+          console.error(error);
+        }
       }
     };
     fetchStats();

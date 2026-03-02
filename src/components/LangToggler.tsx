@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Globe, Check } from "lucide-react";
-import { useTranslation } from "../context/LanguageContext";
 import type { LanguageCode } from "../constant/translations";
+import { useTranslation } from "../hooks/useTranslation";
 
 const LANGUAGES: { code: LanguageCode; label: string }[] = [
   { code: "ja", label: "日本語" },

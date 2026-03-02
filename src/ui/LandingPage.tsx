@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Copy,
-  Check,
-  ArrowRight,
-  Fingerprint,
-  ShieldCheck,
-} from "lucide-react";
+import { Copy, Check, ArrowRight, ShieldCheck } from "lucide-react";
 import { userApi } from "../api/userApi";
-import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "../context/LanguageContext";
+import { useTranslation } from "../hooks/useTranslation";
+import { useUser } from "../hooks/useUser";
 
 const LandingPage = () => {
   const { t } = useTranslation();

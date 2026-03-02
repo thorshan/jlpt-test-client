@@ -1,5 +1,4 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
 import { ProtectedRoutes } from "./ProtectedRoutes";
 
 // Admin Imports
@@ -15,6 +14,7 @@ import Home from "../ui/Home";
 import LandingPage from "../ui/LandingPage";
 import { LoadingScreen } from "../components/LoadingScreen";
 import UserManual from "../ui/UserManual";
+import { useUser } from "../hooks/useUser";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
