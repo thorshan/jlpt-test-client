@@ -5,6 +5,7 @@ export interface Section {
   title: string;
   desc: string;
   duration: number;
+  minPassedMark: number;
   questions: string[];
 }
 
@@ -14,7 +15,15 @@ export interface Exam {
   title: string;
   desc: string;
   passingScore: number;
-  sections: [Section];
+  sections: Section[];
+}
+
+export interface ExamForm {
+  level: string;
+  title: string;
+  desc: string;
+  passingScore: number;
+  sections: Section[];
 }
 
 interface ApiResponse<T> {

@@ -29,7 +29,7 @@ export interface Exam {
   title: string;
   desc: string;
   passingScore: number;
-  sections: [Section];
+  sections: string[];
 }
 
 const Home = () => {

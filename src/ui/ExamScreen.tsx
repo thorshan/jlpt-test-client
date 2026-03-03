@@ -32,6 +32,7 @@ export interface Question {
 export interface Section {
   _id: string;
   title: string;
+  desc: string;
   duration: number;
   questions: Question[];
 }
