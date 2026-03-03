@@ -15,7 +15,7 @@ import { useTranslation } from "../hooks/useTranslation";
 import { examApi } from "../api/examApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 
-export interface Section {
+interface Section {
   _id: string;
   title: string;
   desc: string;
@@ -23,13 +23,13 @@ export interface Section {
   questions: string[];
 }
 
-export interface Exam {
+interface Exam {
   _id: string;
   level: string;
   title: string;
   desc: string;
   passingScore: number;
-  sections: string[];
+  sections: Section[];
 }
 
 const Home = () => {
@@ -38,7 +38,6 @@ const Home = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Fixed typo: exsms -> exams
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,7 +47,9 @@ const Home = () => {
         setLoading(true);
         const res = await examApi.getExams();
         const resExam = res?.data?.data;
-        const filterExams = resExam.filter((ex) => ex.level === user?.level);
+        const filterExams = resExam.filter(
+          (ex: Exam) => ex.level === user?.level,
+        );
         setExams(filterExams);
       } catch (err) {
         console.error("Failed to fetch exams:", err);
