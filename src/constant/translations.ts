@@ -38,7 +38,6 @@ export const translations = {
     select_level: "Select Your Level",
     level_ask: "Which JLPT level are you aiming for?",
     proficiency: "Proficiency",
-    // Manual & Notice Keys
     manual: "User Manual",
     manual_title: "HOW TO USE JLPTX",
     manual_subtitle: "A minimalist guide to your proficiency preparation.",
@@ -61,6 +60,11 @@ export const translations = {
     notice_ttl_title: "7-Day Expiry",
     notice_ttl_warning:
       "If you do not visit for 7 days, our system automatically deletes your record for privacy.",
+    // 404 Keys as Strings
+    notFound_title: "Lost in the Universe",
+    notFound_desc: "The coordinates you requested do not exist in this sector.",
+    notFound_back: "Go Back",
+    notFound_home: "Home",
   },
   ja: {
     welcome: "お帰りなさい",
@@ -123,6 +127,79 @@ export const translations = {
     notice_ttl_title: "7日間の期限",
     notice_ttl_warning:
       "7日間アクセスがない場合、プライバシー保護のため記録が自動削除されます。",
+    notFound_title: "宇宙で迷子になりました",
+    notFound_desc:
+      "お探しのページは、ボイド（虚無）へと漂流してしまったようです。",
+    notFound_back: "戻る",
+    notFound_home: "ホーム",
+  },
+  vi: {
+    welcome: "Chào mừng quay trở lại",
+    start_test: "Bắt đầu luyện tập",
+    logout: "Đăng xuất phiên",
+    level: "Cấp độ mục tiêu",
+    past_exams: "Đề thi có sẵn",
+    select_language: "Chọn ngôn ngữ",
+    token: "Mã truy cập",
+    verify: "Xác minh danh tính",
+    generate: "Tạo mã Token",
+    copy: "Sao chép mã",
+    back: "Quay lại",
+    loading: "Đang tải nội dung...",
+    no_exams: "Không tìm thấy kỳ thi nào cho cấp độ này.",
+    hero_title: "SẴN SÀNG CHO",
+    hero_subtitle: "KỲ THI JLPT?",
+    hero_desc:
+      "Không thu thập dữ liệu. 100% giáo dục. Cách tối giản nhất để chuẩn bị cho kỳ thi năng lực tiếng Nhật của bạn.",
+    feat_1_title: "Chấm điểm thời gian thực",
+    feat_1_desc: "Phản hồi tức thì về kết quả làm bài của bạn ở mọi cấp độ.",
+    feat_2_title: "Quyền riêng tư là trên hết",
+    feat_2_desc:
+      "Không cần tài khoản, không theo dõi, không thu thập dữ liệu cá nhân.",
+    feat_3_title: "Nội dung chính thức",
+    feat_3_desc:
+      "Nguồn dữ liệu trực tiếp từ các tài liệu tham khảo JLPT chính thức.",
+    integrity_title: "Liêm chính học thuật",
+    integrity_desc:
+      "Xây dựng cho cộng đồng toàn cầu. Tất cả tài liệu dùng cho mục đích giáo dục. Truy cập",
+    official_link: "Trang chủ JLPT chính thức",
+    footer_tag: "Dành cho học tập • Không thu thập dữ liệu • 2026",
+    generate_token: "Tạo mã truy cập",
+    name_label: "Tên",
+    name_placeholder: "Nhập tên của bạn",
+    proceed: "Tiếp tục",
+    verify_token: "Xác minh mã",
+    verify_desc: "Dán mã bạn vừa sao chép để xác nhận danh tính.",
+    verify_btn: "Xác minh & Tiếp tục",
+    select_level: "Chọn cấp độ của bạn",
+    level_ask: "Cấp độ JLPT bạn đang hướng tới là gì?",
+    proficiency: "Năng lực",
+    manual: "Hướng dẫn sử dụng",
+    manual_title: "CÁCH SỬ DỤNG JLPTX",
+    manual_subtitle: "Hướng dẫn tối giản cho việc chuẩn bị năng lực của bạn.",
+    step_1_title: "Danh tính & Mã Token",
+    step_1_desc:
+      "Chúng tôi không dùng mật khẩu. Mã truy cập là chìa khóa duy nhất của bạn.",
+    step_2_title: "Phiên làm việc 1 tuần",
+    step_2_desc:
+      "Để bảo vệ quyền riêng tư, mọi dữ liệu người dùng sẽ tự động xóa sau 7 ngày không hoạt động.",
+    step_3_title: "Luyện tập mục tiêu",
+    step_3_desc:
+      "Chọn cấp độ (N1-N5). Chúng tôi cung cấp các câu hỏi mô phỏng môi trường thi thật.",
+    step_4_title: "Không theo dõi",
+    step_4_desc:
+      "Không email hay cookie. Tiến trình của bạn gắn chặt với mã truy cập tạm thời.",
+    ready_btn: "Sẵn sàng bắt đầu",
+    notice_title: "Thông báo quan trọng",
+    notice_logout_warning:
+      "Đăng xuất sẽ hủy phiên làm việc ngay lập tức và xóa mọi dữ liệu cục bộ. Bạn không thể khôi phục tiến trình sau khi đăng xuất.",
+    notice_ttl_title: "Hết hạn sau 7 ngày",
+    notice_ttl_warning:
+      "Nếu bạn không truy cập trong 7 ngày, hệ thống sẽ tự động xóa bản ghi của bạn để bảo mật.",
+    notFound_title: "Lạc giữa vũ trụ",
+    notFound_desc: "Tọa độ bạn yêu cầu không tồn tại trong khu vực này.",
+    notFound_back: "Quay lại",
+    notFound_home: "Trang chủ",
   },
   my: {
     welcome: "ပြန်လည်ကြိုဆိုပါတယ်",
@@ -183,6 +260,11 @@ export const translations = {
     notice_ttl_title: "၇ ရက် သက်တမ်း",
     notice_ttl_warning:
       "၇ ရက်ဆက်တိုက် အသုံးမပြုပါက မှတ်တမ်းများကို System မှ အလိုအလျောက်ဖျက်သိမ်းပါမည်။",
+    notFound_title: "စကြဝဠာထဲတွင် လမ်းပျောက်နေသည်",
+    notFound_desc:
+      "သင်ရှာဖွေနေသောစာမျက်နှာသည် ဟင်းလင်းပြင်ထဲတွင် ပျောက်ဆုံးနေပါသည်။",
+    notFound_back: "နောက်သို့",
+    notFound_home: "ပင်မစာမျက်နှာ",
   },
   ne: {
     welcome: "स्वागत छ",
@@ -246,6 +328,10 @@ export const translations = {
     notice_ttl_title: "७-दिन म्याद",
     notice_ttl_warning:
       "यदि तपाईं ७ दिनसम्म आउनुहुन्न भने, प्रणालीले तपाईंको रेकर्ड हटाउनेछ।",
+    notFound_title: "ब्रह्माण्डमा हरायो",
+    notFound_desc: "तपाईंले खोज्नुभएको पृष्ठ फेला परेन।",
+    notFound_back: "पछाडि जानुहोस्",
+    notFound_home: "गृहपृष्ठ",
   },
   ko: {
     welcome: "환영합니다",
@@ -308,6 +394,10 @@ export const translations = {
     notice_ttl_title: "7일 유효기간",
     notice_ttl_warning:
       "7일 동안 방문하지 않으면 개인정보 보호를 위해 기록이 자동 삭제됩니다.",
+    notFound_title: "우주에서 길을 잃다",
+    notFound_desc: "요청하신 페이지가 존재하지 않습니다.",
+    notFound_back: "뒤로 가기",
+    notFound_home: "홈으로",
   },
   zh: {
     welcome: "欢迎回来",
@@ -364,16 +454,18 @@ export const translations = {
     notice_ttl_title: "7天有效期",
     notice_ttl_warning:
       "如果您连续7天未访问，系统将自动删除您的记录以保护隐私。",
+    notFound_title: "在宇宙中迷失",
+    notFound_desc: "您要求的页面不存在于这个星区。",
+    notFound_back: "返回",
+    notFound_home: "首页",
   },
   ru: {
-    integrity_desc:
-      "Создано для мирового сообщества. Все материалы предназначены для образовательных целей. Посетите сайт.",
-    select_language: "Выберите язык",
     welcome: "С возвращением",
     start_test: "Начать практику",
     logout: "Выйти",
     level: "Целевой уровень",
     past_exams: "Экзамены",
+    select_language: "Выберите язык",
     token: "Токен",
     verify: "Проверить",
     generate: "Создать токен",
@@ -393,6 +485,8 @@ export const translations = {
     feat_3_title: "Официальный контент",
     feat_3_desc: "Получено напрямую из справочных материалов JLPT.",
     integrity_title: "Академическая этика",
+    integrity_desc:
+      "Создано для мирового сообщества. Все материалы предназначены для образовательных целей. Посетите сайт.",
     official_link: "Официальный сайт",
     footer_tag: "Для учебы • Без сбора данных • 2026",
     generate_token: "Создать токен доступа",
@@ -425,19 +519,25 @@ export const translations = {
     notice_ttl_title: "Срок 7 дней",
     notice_ttl_warning:
       "Если вы не заходите 7 дней, система удаляет запись для конфиденциальности.",
+    notFound_title: "Затерянный во вселенной",
+    notFound_desc: "Запрошенная вами страница не существует.",
+    notFound_back: "Назад",
+    notFound_home: "Главная",
   },
   id: {
-    integrity_desc:
-      "Ginawa para sa pandaigdigang komunidad. Ang lahat ng materyales ay para sa gamit pang-edukasyon. Bisitahin ang",
-    select_language: "Pilih Bahasa",
     welcome: "Selamat datang",
     start_test: "Mulai Latihan",
     logout: "Keluar",
     level: "Target Level",
     past_exams: "Soal Ujian",
+    select_language: "Pilih Bahasa",
     token: "Token",
     verify: "Verifikasi",
     generate: "Buat Token",
+    copy: "Salin Kode",
+    back: "Kembali",
+    loading: "Memuat...",
+    no_exams: "Tidak ada ujian untuk level ini.",
     hero_title: "SIAP UNTUK",
     hero_subtitle: "JLPT?",
     hero_desc:
@@ -447,14 +547,12 @@ export const translations = {
     feat_2_title: "Privasi Utama",
     feat_2_desc: "Tanpa akun, tanpa pelacakan, tanpa pengumpulan data pribadi.",
     feat_3_title: "Konten Resmi",
-    feat_3_desc: "Bersumber langsung dari materi referensi JLPT resmi.",
+    feat_3_desc: "Bersumber langsung từ materi referensi JLPT resmi.",
     integrity_title: "Integritas Akademik",
+    integrity_desc:
+      "Ginawa para sa pandaigdigang komunidad. Ang lahat ng materyales ay para sa gamit pang-edukasyon. Bisitahin ang",
     official_link: "Situs Resmi",
     footer_tag: "Untuk Belajar • 2026",
-    copy: "Salin Kode",
-    back: "Kembali",
-    loading: "Memuat...",
-    no_exams: "Tidak ada ujian untuk level ini.",
     generate_token: "Buat Token Akses",
     name_label: "Nama",
     name_placeholder: "Masukkan Nama Anda",
@@ -487,19 +585,25 @@ export const translations = {
     notice_ttl_title: "Kedaluwarsa 7 Hari",
     notice_ttl_warning:
       "Jika tidak berkunjung selama 7 hari, sistem akan menghapus data demi privasi.",
+    notFound_title: "Tersesat di Semesta",
+    notFound_desc: "Halaman yang Anda minta tidak ditemukan.",
+    notFound_back: "Kembali",
+    notFound_home: "Beranda",
   },
   ph: {
-    integrity_desc:
-      "Ginawa para sa pandaigdigang komunidad. Ang lahat ng materyales ay para sa gamit pang-edukasyon. Bisitahin ang",
-    select_language: "Pumili ng Wika",
     welcome: "Maligayang pagdating",
     start_test: "Simulan ang Practice",
     logout: "Mag-logout",
     level: "Target na Level",
     past_exams: "Mga Exam",
+    select_language: "Pumili ng Wika",
     token: "Token",
     verify: "I-verify",
     generate: "Gumawa ng Token",
+    copy: "Kopyahin ang Code",
+    back: "Bumalik",
+    loading: "Loading...",
+    no_exams: "Walang nahanap na exam sa level na ito.",
     hero_title: "HANDA NA BA SA",
     hero_subtitle: "JLPT?",
     hero_desc: "Walang kinokolektang data. 100% educational.",
@@ -510,12 +614,10 @@ export const translations = {
     feat_3_title: "Official na Nilalaman",
     feat_3_desc: "Direktang hango mula sa mga JLPT reference material.",
     integrity_title: "Academic Integrity",
+    integrity_desc:
+      "Ginawa para sa pandaigdigang komunidad. Ang lahat ng materyales ay para sa gamit pang-edukasyon. Bisitahin ang",
     official_link: "Official na Site",
     footer_tag: "Para sa Pag-aaral • 2026",
-    copy: "Kopyahin ang Code",
-    back: "Bumalik",
-    loading: "Loading...",
-    no_exams: "Walang nahanap na exam sa level na ito.",
     generate_token: "Gumawa ng Access Token",
     name_label: "Pangalan",
     name_placeholder: "Ilagay ang Iyong Pangalan",
@@ -545,7 +647,11 @@ export const translations = {
       "Ang pag-logout ay magbubura sa iyong session at data. Hindi na ito mababawi.",
     notice_ttl_title: "7-Araw na Expiry",
     notice_ttl_warning:
-      "Kung hindi bibisita sa loob ng 7 araw, awtomatikong buburahin ang iyong record.",
+      "Kung hindi bibisita sa loob của 7 araw, awtomatikong buburahin ang iyong record.",
+    notFound_title: "Nawala sa Kalawakan",
+    notFound_desc: "Ang hinahanap mong pahina ay hindi matagpuan.",
+    notFound_back: "Bumalik",
+    notFound_home: "Home",
   },
 };
 

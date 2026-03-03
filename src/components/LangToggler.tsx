@@ -11,6 +11,7 @@ const LANGUAGES: { code: LanguageCode; label: string }[] = [
   { code: "ko", label: "한국어" },
   { code: "zh", label: "中文" },
   { code: "ne", label: "नेपाली" },
+  { code: "vi", label: "Việt Nam" },
   { code: "ru", label: "Русский" },
   { code: "id", label: "Indonesia" },
   { code: "ph", label: "Tagalog" },

@@ -80,7 +80,7 @@ const Index = () => {
 
           <motion.h1
             variants={itemVariants}
-            className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter leading-[0.9] md:leading-none"
+            className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter leading-[1.5] md:leading-none"
           >
             {t("hero_title")} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-sky-600">
@@ -95,11 +95,26 @@ const Index = () => {
             {t("hero_desc")}
           </motion.p>
 
-          <motion.div variants={itemVariants} className="pt-4">
+          <motion.div
+            variants={itemVariants}
+            className="pt-4 flex justify-center w-full"
+          >
             <motion.button
-              whileHover={{ scale: 1.02 }}
+              whileHover={{
+                scale: 1.02,
+              }}
               whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto bg-white text-black px-12 py-4 md:py-5 rounded-2xl font-black text-lg shadow-[0_0_40px_rgba(255,255,255,0.1)] active:bg-neutral-200 transition-colors"
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              className="
+                sm:w-2/4 w-full
+                bg-white text-black
+                px-12 py-4 md:py-5
+                rounded-2xl font-black text-lg
+                shadow-[0_0_40px_rgba(255,255,255,0.1)]
+                active:bg-neutral-200
+                transition-colors
+                flex items-center justify-center
+              "
               onClick={() => navigate("/get-started")}
             >
               {t("start_test")}

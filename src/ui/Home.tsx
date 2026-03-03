@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,44 +6,31 @@ import {
   User as UserIcon,
   ChevronDown,
   BookOpen,
-  Calendar,
   ArrowRight,
+  Album,
 } from "lucide-react";
 import { LangToggler } from "../components/LangToggler";
 import { useUser } from "../hooks/useUser";
 import { useTranslation } from "../hooks/useTranslation";
+import { examApi } from "../api/examApi";
+import { LoadingScreen } from "../components/LoadingScreen";
 
-// Mock Data - In production, fetch this from your API
-const PAST_EXAMS = [
-  {
-    id: "1",
-    year: "2023",
-    period: "July",
-    title: "JLPT N1 Full Mock Exam",
-    questions: 120,
-  },
-  {
-    id: "2",
-    year: "2022",
-    period: "December",
-    title: "JLPT N1 Grammar Focus",
-    questions: 45,
-  },
-  {
-    id: "3",
-    year: "2022",
-    period: "July",
-    title: "JLPT N1 Reading Comprehension",
-    questions: 60,
-  },
-  {
-    id: "4",
-    year: "2021",
-    period: "December",
-    title: "JLPT N1 Vocabulary & Kanji",
-    questions: 80,
-  },
-];
+export interface Section {
+  _id: string;
+  title: string;
+  desc: string;
+  duration: number;
+  questions: string[];
+}
+
+export interface Exam {
+  _id: string;
+  level: string;
+  title: string;
+  desc: string;
+  passingScore: number;
+  sections: [Section];
+}
 
 const Home = () => {
   const { user, logout } = useUser();
@@ -51,21 +38,43 @@ const Home = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // Fixed typo: exsms -> exams
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchExams = async () => {
+      try {
+        setLoading(true);
+        const res = await examApi.getExams();
+        const resExam = res?.data?.data;
+        const filterExams = resExam.filter((ex) => ex.level === user?.level);
+        setExams(filterExams);
+      } catch (err) {
+        console.error("Failed to fetch exams:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchExams();
+  }, [user?.level]);
+
   const handleLogout = () => {
     logout();
     navigate("/");
   };
+
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-black text-white font-sans overflow-x-hidden selection:bg-sky-500/30">
       {/* NAVBAR */}
       <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/60 backdrop-blur-xl border-b border-neutral-800 h-16 md:h-20">
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-          {/* Logo Section */}
           <motion.div
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2 cursor-pointer shrink-0"
-            onClick={() => navigate("/home")}
+            onClick={() => navigate("/test")}
           >
             <img
               src="/JLPTX.png"
@@ -74,11 +83,9 @@ const Home = () => {
             />
           </motion.div>
 
-          {/* Right Side Actions */}
           <div className="flex gap-2 items-center">
             <LangToggler />
 
-            {/* User Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -131,7 +138,6 @@ const Home = () => {
 
       {/* MAIN CONTENT AREA */}
       <main className="relative pt-24 md:pt-32 pb-20 px-4 md:px-6 max-w-4xl mx-auto">
-        {/* Header Section */}
         <header className="mb-10 md:mb-14">
           <motion.h2
             initial={{ opacity: 0, x: -10 }}
@@ -158,55 +164,69 @@ const Home = () => {
               {t("past_exams")}
             </h3>
             <span className="text-[10px] text-neutral-600 font-bold">
-              {PAST_EXAMS.length} Papers
+              {exams.length} Papers
             </span>
           </div>
 
-          {/* Exam Cards Container */}
           <div className="grid gap-3 sm:gap-4">
-            {PAST_EXAMS.map((exam, index) => (
-              <motion.div
-                key={exam.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => navigate(`/exam/${exam.id}`)}
-                className="group w-full flex items-center justify-between bg-neutral-900/40 border border-neutral-800 p-4 rounded-2xl transition-all hover:border-sky-500/40 hover:bg-neutral-900/60 cursor-pointer overflow-hidden"
-              >
-                {/* Left: Info Block */}
-                <div className="flex items-center gap-4 min-w-0 flex-1">
-                  {/* Date Badge */}
-                  <div className="shrink-0 w-12 h-12 md:w-14 md:h-14 bg-sky-500/10 rounded-2xl flex flex-col items-center justify-center text-sky-500 border border-sky-500/20 group-hover:bg-sky-500 group-hover:text-black transition-colors duration-300">
-                    <Calendar size={14} className="md:size-4" />
-                    <span className="text-[10px] md:text-[11px] font-black mt-0.5">
-                      {exam.year}
-                    </span>
-                  </div>
+            {exams.length > 0 ? (
+              exams.map((exam, index) => (
+                <motion.div
+                  key={exam._id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate(`/test/${exam._id}`)}
+                  className="group w-full flex items-center justify-between bg-neutral-900/40 border border-neutral-800 p-4 rounded-2xl transition-all hover:border-sky-500/40 hover:bg-neutral-900/60 cursor-pointer overflow-hidden"
+                >
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className="shrink-0 w-12 h-12 md:w-14 md:h-14 bg-sky-500/10 rounded-2xl flex flex-col items-center justify-center text-sky-500 border border-sky-500/20 group-hover:bg-sky-500 group-hover:text-black transition-colors duration-300">
+                      <Album size={14} className="md:size-4" />
+                      {/*<span className="text-[10px] md:text-[11px] font-black mt-0.5">
+                        {exam.level}
+                      </span>*/}
+                    </div>
 
-                  {/* Text Details */}
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-sm md:text-lg font-bold text-neutral-100 truncate group-hover:text-sky-400 transition-colors">
-                      {exam.title}
-                    </h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] md:text-xs text-neutral-500 font-medium bg-neutral-800 px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <BookOpen size={10} /> {exam.questions} Qs
-                      </span>
-                      <span className="w-1 h-1 bg-neutral-700 rounded-full" />
-                      <span className="text-[10px] md:text-xs text-neutral-500 italic uppercase">
-                        {exam.period}
-                      </span>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-sm md:text-lg font-bold text-neutral-100 truncate group-hover:text-sky-400 transition-colors">
+                        {exam.title}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] md:text-xs text-neutral-500 font-medium bg-neutral-800 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <BookOpen size={10} className=" text-white" />{" "}
+                          {exam.sections?.reduce(
+                            (total, sec) => total + (sec.questions.length || 0),
+                            0,
+                          )}{" "}
+                          Questions
+                        </span>
+                        <span className="w-1 h-1 bg-white rounded-full" />
+                        {/*<span className="text-[10px] md:text-xs text-neutral-500 truncate">
+                          {exam.sections?.map((sec) => sec.title).join("・")}
+                        </span>
+                        <span className="w-1 h-1 bg-white rounded-full" />*/}
+                        <span className="text-[10px] md:text-xs text-sky-500 truncate">
+                          {exam.sections?.reduce(
+                            (total, sec) => total + (sec.duration || 0),
+                            0,
+                          )}{" "}
+                          Minutes
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right: Action Icon */}
-                <div className="ml-4 shrink-0 w-10 h-10 rounded-full bg-neutral-800/50 flex items-center justify-center text-neutral-500 group-hover:bg-sky-500 group-hover:text-black group-hover:translate-x-1 transition-all">
-                  <ArrowRight size={18} />
-                </div>
-              </motion.div>
-            ))}
+                  <div className="ml-4 shrink-0 w-10 h-10 rounded-full bg-neutral-800/50 flex items-center justify-center text-neutral-500 group-hover:bg-sky-500 group-hover:text-black group-hover:translate-x-1 transition-all">
+                    <ArrowRight size={18} />
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <p className="text-neutral-500 text-sm py-10 text-center italic">
+                No past exams available for your level yet.
+              </p>
+            )}
           </div>
         </section>
       </main>

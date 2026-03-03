@@ -32,6 +32,8 @@ export interface Question {
 
 export const questionApi = {
   getQuestions: () => apiClient.get<{ data: Question[] }>("/questions"),
+  getQuestionsBySection: (sectionId: string) =>
+    apiClient.get<{ data: Question[] }>(`/questions/section/${sectionId}`),
   createQuestion: (data: Omit<Question, "_id">) =>
     apiClient.post<{ data: Question }>("/questions", data),
   updateQuestion: (id: string, data: Partial<Question>) =>

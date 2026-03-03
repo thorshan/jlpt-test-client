@@ -5,6 +5,20 @@
     --color-primary: #3b82f6;
 }
 
+@layer utilities {
+    .scrollbar-hide {
+        /* IE and Edge */
+        -ms-overflow-style: none;
+        /* Firefox */
+        scrollbar-width: none;
+    }
+
+    /* Chrome, Safari and Opera */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
+
 /* Global Styles */
 body {
     @apply bg-neutral-800 text-slate-300 antialiased;

@@ -14,7 +14,7 @@ export interface Exam {
   title: string;
   desc: string;
   passingScore: number;
-  sections: string[];
+  sections: [Section];
 }
 
 interface ApiResponse<T> {
@@ -27,6 +27,8 @@ export type ExamFormData = Omit<Exam, "_id">;
 
 export const examApi = {
   getExams: () => apiClient.get<ApiResponse<Exam[]>>("/exams"),
+
+  getExam: (id: string) => apiClient.get<ApiResponse<Exam>>(`/exams/${id}`),
 
   createExam: (data: ExamFormData) =>
     apiClient.post<ApiResponse<Exam>>("/exams", data),

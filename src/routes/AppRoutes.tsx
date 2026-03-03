@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { ProtectedRoutes } from "./ProtectedRoutes";
 
 // Admin Imports
@@ -15,6 +15,9 @@ import LandingPage from "../ui/LandingPage";
 import { LoadingScreen } from "../components/LoadingScreen";
 import UserManual from "../ui/UserManual";
 import { useUser } from "../hooks/useUser";
+import NotFound from "../ui/404";
+import ExamScreen from "../ui/ExamScreen";
+import Results from "../ui/Results";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
@@ -32,16 +35,24 @@ const AppRoutes = () => {
       />
       <Route path="/get-started" element={<LandingPage />} />
       <Route path="/manual" element={<UserManual />} />
+      <Route path="/results" element={<Results />} />
 
       {/* PROTECTED STUDENT ROUTES */}
       <Route
         path="/test"
         element={
           <ProtectedRoutes>
-            <Home />
+            {/* This ensures all sub-routes (/test/exam, /test/:id) are protected */}
+            <Outlet />
           </ProtectedRoutes>
         }
-      />
+      >
+        {/* path: "/test" - Defaults to Home */}
+        <Route index element={<Home />} />
+
+        {/* path: "/test/:id" - Shows the actual Exam Screen */}
+        <Route path=":id" element={<ExamScreen />} />
+      </Route>
 
       {/* PROTECTED ADMIN ROUTES */}
       <Route path="/admin" element={<DashboardLayout />}>
@@ -52,7 +63,7 @@ const AppRoutes = () => {
       </Route>
 
       {/* 404 FALLBACK */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
