@@ -6,6 +6,7 @@ import {
   QuestionCategory,
 } from "../api/questionApi";
 import axios from "axios";
+import { LoadingScreen } from "../components/LoadingScreen";
 
 interface QuestionForm {
   refText: string;
@@ -136,6 +137,8 @@ const Questions = () => {
       }
     }
   };
+
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen p-8 bg-neutral-900 text-slate-100">
@@ -270,43 +273,39 @@ const Questions = () => {
           <h2 className="text-xl font-bold mb-2">
             Current Questions ({questions?.length || 0})
           </h2>
-          {loading ? (
-            <div className="animate-pulse text-amber-500">Loading...</div>
-          ) : (
-            questions.map((q) => (
-              <div
-                key={q._id}
-                className="bg-neutral-800 p-4 rounded border border-neutral-700 flex justify-between items-center group hover:border-amber-500/50 transition"
-              >
-                <div className="flex-1 min-w-0 pr-4">
-                  <div className="flex gap-2 items-center mb-1">
-                    <span className="text-[10px] bg-amber-900/40 text-amber-300 px-2 py-0.5 rounded uppercase">
-                      {q.category}
-                    </span>
-                    <span className="text-[10px] bg-neutral-700 text-neutral-300 px-2 py-0.5 rounded">
-                      {q.module}
-                    </span>
-                  </div>
-                  <p className="font-semibold truncate">{q.text}</p>
-                  <p className="text-xs text-neutral-500">{q.point} Points</p>
+          {questions.map((q) => (
+            <div
+              key={q._id}
+              className="bg-neutral-800 p-4 rounded border border-neutral-700 flex justify-between items-center group hover:border-amber-500/50 transition"
+            >
+              <div className="flex-1 min-w-0 pr-4">
+                <div className="flex gap-2 items-center mb-1">
+                  <span className="text-[10px] bg-amber-900/40 text-amber-300 px-2 py-0.5 rounded uppercase">
+                    {q.category}
+                  </span>
+                  <span className="text-[10px] bg-neutral-700 text-neutral-300 px-2 py-0.5 rounded">
+                    {q.module}
+                  </span>
                 </div>
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => handleEdit(q)}
-                    className="text-sky-400 text-xs font-bold hover:underline"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(q._id)}
-                    className="text-red-500 text-xs font-bold hover:underline"
-                  >
-                    Delete
-                  </button>
-                </div>
+                <p className="font-semibold truncate">{q.text}</p>
+                <p className="text-xs text-neutral-500">{q.point} Points</p>
               </div>
-            ))
-          )}
+              <div className="flex gap-4">
+                <button
+                  onClick={() => handleEdit(q)}
+                  className="text-sky-400 text-xs font-bold hover:underline"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(q._id)}
+                  className="text-red-500 text-xs font-bold hover:underline"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
         </section>
       </div>
     </div>

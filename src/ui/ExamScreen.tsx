@@ -9,9 +9,10 @@ import {
   Coffee,
   CheckCircle2,
   Volume2,
+  Loader2,
 } from "lucide-react";
 import { examApi } from "../api/examApi";
-import { resultApi } from "../api/resultApi";
+import { resultApi, type ResultFormData } from "../api/resultApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import { useUser } from "../hooks/useUser";
 
@@ -29,11 +30,20 @@ export interface Question {
   point: number;
 }
 
+export interface SectionDetail {
+  sectionTitle: string;
+  earnedPoints: number;
+  totalPoints: number;
+  gradeJLPT: "A" | "B" | "C";
+  passed: boolean;
+}
+
 export interface Section {
   _id: string;
   title: string;
   desc: string;
   duration: number;
+  minPassedMark: number;
   questions: Question[];
 }
 
@@ -41,13 +51,10 @@ export interface Exam {
   _id: string;
   title: string;
   level: "N1" | "N2" | "N3" | "N4" | "N5";
+  passingScore: number;
   sections: Section[];
 }
 
-// Fixed CEFR Union to match your API requirements
-type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1";
-
-// Title Reference Helper
 const title = {
   vocab: {
     m1: "もんだい　１・＿＿＿＿＿　の　ことばは　ひらがなで　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
@@ -62,7 +69,7 @@ const title = {
     m2: "もんだい　２・＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   reading: {
-    m3: "もんだい　３・（　　）から（　　）に　なにを　いれますか。ぶんしょうの　いみを　かんがえて\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m3: "もんだい　３・（　　）に　なにを　いれますか。ぶんしょうの　いみを　かんがえて\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
     m4: "もんだい　４・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
     m5: "もんだい　５・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
     m6: "もんだい　６・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
@@ -85,6 +92,7 @@ const ExamScreen = () => {
   // --- STATE ---
   const [exam, setExam] = useState<Exam | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentSectionIdx, setCurrentSectionIdx] = useState(0);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [status, setStatus] = useState<"exam" | "rest">("exam");
@@ -123,16 +131,18 @@ const ExamScreen = () => {
 
   // --- 2. TIMER LOGIC ---
   useEffect(() => {
-    if (loading || !exam) return;
+    if (loading || !exam || isSubmitting) return;
     const timer = setInterval(() => {
       if (status === "exam") {
-        setSectionTimeLeft((p) => (p <= 1 ? (handleSectionEnd(), 0) : p - 1));
+        setSectionTimeLeft((p) =>
+          p <= 1 ? (handleSectionEnd(userAnswers), 0) : p - 1,
+        );
       } else {
         setRestTimeLeft((p) => (p <= 1 ? (startNextSection(), 0) : p - 1));
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [status, loading, exam]);
+  }, [status, loading, exam, userAnswers, isSubmitting]);
 
   useEffect(() => {
     if (status === "exam" && questionRefs.current[currentQuestionIdx]) {
@@ -146,106 +156,152 @@ const ExamScreen = () => {
 
   // --- 3. AUTO-PLAY AUDIO LOGIC ---
   useEffect(() => {
-    // Fixed: Use 'number' for browser setTimeout return type
     let playTimeout: number;
-
     if (status === "exam" && currentQuestion?.refAudio) {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
       }
-
       playTimeout = window.setTimeout(() => {
-        const audioPath = `/audio/${currentQuestion.refAudio}`;
-        const audio = new Audio(audioPath);
+        const audio = new Audio(currentQuestion.refAudio);
+        audio.crossOrigin = "anonymous";
+        audio.preload = "auto";
         audioRef.current = audio;
         audio
           .play()
           .catch((err) => console.error("Audio playback failed:", err));
       }, 3000);
     }
-
     return () => {
       window.clearTimeout(playTimeout);
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+      if (audioRef.current) audioRef.current.pause();
     };
   }, [currentQuestionIdx, currentSectionIdx, status]);
 
   // --- 4. CALCULATION & SUBMISSION ---
-  const submitExam = async () => {
-    if (!exam || !user?._id) return;
-
-    let totalPoints = 0;
-    let earnedPoints = 0;
-
-    exam.sections.forEach((sec) => {
-      sec.questions.forEach((q) => {
-        totalPoints += q.point;
-        if (userAnswers[q._id] === q.correctOptionIndex) {
-          earnedPoints += q.point;
-        }
-      });
-    });
-
-    const scorePercentage = (earnedPoints / totalPoints) * 100;
-    const gradeJLPT: "A" | "B" | "C" =
-      scorePercentage >= 67 ? "A" : scorePercentage >= 34 ? "B" : "C";
-
-    // Fixed Logic: Cappings at C1 to satisfy API types
-    let gradeCEFR: CEFRLevel = "A1";
-    const lvl = exam.level;
-
-    if (lvl === "N3")
-      gradeCEFR = earnedPoints >= 104 ? "B1" : earnedPoints >= 95 ? "A2" : "A1";
-    else if (lvl === "N2")
-      gradeCEFR = earnedPoints >= 112 ? "B2" : earnedPoints >= 90 ? "B1" : "A2";
-    else if (lvl === "N1")
-      gradeCEFR =
-        earnedPoints >= 142 ? "C1" : earnedPoints >= 100 ? "B2" : "B1";
-    else if (lvl === "N4") gradeCEFR = "A2";
+  const submitExam = async (finalAnswers: Record<string, number>) => {
+    if (!exam || !user?._id || isSubmitting) return;
 
     try {
-      await resultApi.createResult({
-        user: user._id,
-        level: exam.level,
-        sectionTotalScore: totalPoints,
-        overAllScore: earnedPoints,
-        sectionScore: earnedPoints,
-        status: earnedPoints >= totalPoints * 0.38,
-        gradeJLPT,
-        grade: gradeCEFR,
+      setIsSubmitting(true);
+      let totalEarnedPoints = 0;
+      let totalPossiblePoints = 0;
+      const sectionResults: SectionDetail[] = [];
+
+      exam.sections.forEach((sec) => {
+        let sectionTotalPoints = 0;
+        let sectionEarnedPoints = 0;
+
+        sec.questions.forEach((q) => {
+          const pointValue = Number(q.point) || 0;
+          sectionTotalPoints += pointValue;
+
+          const userAnswer = finalAnswers[q._id];
+          if (
+            userAnswer !== undefined &&
+            String(userAnswer) === String(q.correctOptionIndex)
+          ) {
+            sectionEarnedPoints += pointValue;
+          }
+        });
+
+        const sectionPercentage =
+          sectionTotalPoints > 0
+            ? (sectionEarnedPoints / sectionTotalPoints) * 100
+            : 0;
+        totalPossiblePoints += sectionTotalPoints;
+        totalEarnedPoints += sectionEarnedPoints;
+
+        sectionResults.push({
+          sectionTitle: sec.title,
+          earnedPoints: sectionEarnedPoints,
+          totalPoints: sectionTotalPoints,
+          gradeJLPT:
+            sectionPercentage >= 67 ? "A" : sectionPercentage >= 34 ? "B" : "C",
+          passed: sectionEarnedPoints >= sec.minPassedMark,
+        });
       });
+
+      const totalPercentage =
+        totalPossiblePoints > 0
+          ? (totalEarnedPoints / totalPossiblePoints) * 100
+          : 0;
+      const gradeJLPT =
+        totalPercentage >= 67 ? "A" : totalPercentage >= 34 ? "B" : "C";
+      const allSectionsPassed = sectionResults.every((sec) => sec.passed);
+      const resultStatus =
+        totalEarnedPoints >= exam.passingScore && allSectionsPassed;
+
+      // CEFR Grading Logic
+      let gradeCEFR: "A1" | "A2" | "B1" | "B2" | "C1" = "A1";
+      const lvl = exam.level;
+      if (lvl === "N3")
+        gradeCEFR =
+          totalEarnedPoints >= 104
+            ? "B1"
+            : totalEarnedPoints >= 95
+              ? "A2"
+              : "A1";
+      else if (lvl === "N2")
+        gradeCEFR =
+          totalEarnedPoints >= 112
+            ? "B2"
+            : totalEarnedPoints >= 90
+              ? "B1"
+              : "A2";
+      else if (lvl === "N1")
+        gradeCEFR =
+          totalEarnedPoints >= 142
+            ? "C1"
+            : totalEarnedPoints >= 100
+              ? "B2"
+              : "B1";
+      else if (lvl === "N4") gradeCEFR = "A2";
+
+      const payload: ResultFormData = {
+        user: user._id,
+        exam: exam._id,
+        level: exam.level,
+        sectionDetails: sectionResults,
+        totalEarnedPoints: totalEarnedPoints,
+        totalPossiblePoints: totalPossiblePoints,
+        status: resultStatus,
+        gradeJLPT: gradeJLPT,
+        grade: gradeCEFR,
+      };
+      await resultApi.createResult(payload);
       navigate("/results");
     } catch (err) {
       console.error("Submission failed", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // --- HANDLERS ---
   const handleNextQuestion = () => {
     if (currentQuestion && selectedOption !== null) {
-      setUserAnswers((prev) => ({
-        ...prev,
+      const updatedAnswers = {
+        ...userAnswers,
         [currentQuestion._id]: selectedOption,
-      }));
-    }
+      };
+      setUserAnswers(updatedAnswers);
 
-    if (currentQuestionIdx < questions.length - 1) {
-      const nextIdx = currentQuestionIdx + 1;
-      setCurrentQuestionIdx(nextIdx);
-      setSelectedOption(userAnswers[questions[nextIdx]._id] ?? null);
-    } else {
-      handleSectionEnd();
+      if (currentQuestionIdx < questions.length - 1) {
+        const nextIdx = currentQuestionIdx + 1;
+        setCurrentQuestionIdx(nextIdx);
+        setSelectedOption(updatedAnswers[questions[nextIdx]._id] ?? null);
+      } else {
+        handleSectionEnd(updatedAnswers);
+      }
     }
   };
 
-  const handleSectionEnd = () => {
+  const handleSectionEnd = (updatedAnswers: Record<string, number>) => {
     if (exam && currentSectionIdx < exam.sections.length - 1) {
       setStatus("rest");
     } else {
-      submitExam();
+      submitExam(updatedAnswers);
     }
   };
 
@@ -257,6 +313,7 @@ const ExamScreen = () => {
     setSectionTimeLeft(exam.sections[nextIdx].duration * 60);
     setStatus("exam");
     setSelectedOption(null);
+    setRestTimeLeft(10 * 60);
   };
 
   const formatTime = (s: number) =>
@@ -268,7 +325,6 @@ const ExamScreen = () => {
         ? "vocab"
         : category.toLowerCase();
     const modKey = module.toLowerCase().replace("module ", "m");
-
     // @ts-expect-error - dynamic access
     return title[catKey]?.[modKey] || "";
   };
@@ -295,7 +351,6 @@ const ExamScreen = () => {
 
       {status === "exam" && (
         <div className="w-full bg-neutral-900/40 border-b border-neutral-800 py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-          {/* Notice the large horizontal padding and min-w-max */}
           <div className="flex gap-2 min-w-max px-[calc(50vw-20px)]">
             {questions.map((q, idx) => (
               <button
@@ -303,10 +358,10 @@ const ExamScreen = () => {
                 ref={(el) => {
                   questionRefs.current[idx] = el;
                 }}
-                // onClick={() => {
-                //   setCurrentQuestionIdx(idx);
-                //   setSelectedOption(userAnswers[q._id] ?? null);
-                // }}
+                onClick={() => {
+                  setCurrentQuestionIdx(idx);
+                  setSelectedOption(userAnswers[q._id] ?? null);
+                }}
                 className={`min-w-[40px] h-[40px] rounded-md text-[10px] font-black transition-all border snap-center shrink-0 ${
                   currentQuestionIdx === idx
                     ? "bg-sky-500 border-sky-400 text-black scale-110 shadow-[0_0_15px_rgba(14,165,233,0.5)]"
@@ -337,8 +392,8 @@ const ExamScreen = () => {
                   <header>
                     <div className="flex justify-between items-center mb-6">
                       <p className="text-sky-500 text-[13px] font-black">
-                        Section {currentSectionIdx + 1} {"・"}{" "}
-                        {currentQuestionIdx + 1} / {questions.length}
+                        {currentSection?.title} {"・"} {currentQuestionIdx + 1}{" "}
+                        / {questions.length} Qs
                       </p>
                       {currentQuestion.refAudio && (
                         <div className="flex items-center gap-2 px-3 py-1 bg-sky-500/10 border border-sky-500/20 rounded-full">
@@ -353,17 +408,14 @@ const ExamScreen = () => {
                       )}
                     </div>
 
-                    {/* Title Section */}
-                    {status === "exam" && currentQuestion && (
-                      <div className="mb-6">
-                        <h2 className="text-neutral-300 text-sm md:text-base font-medium leading-relaxed whitespace-pre-line bg-neutral-900/30 p-4 rounded-xl border border-neutral-800/50">
-                          {getQuestionTitle(
-                            currentQuestion.category,
-                            currentQuestion.module,
-                          )}
-                        </h2>
-                      </div>
-                    )}
+                    <div className="mb-6">
+                      <h2 className="text-neutral-300 text-md md:text-2xl font-medium leading-relaxed whitespace-pre-line bg-neutral-900/30 p-4 rounded-xl border border-neutral-800/50">
+                        {getQuestionTitle(
+                          currentQuestion.category,
+                          currentQuestion.module,
+                        )}
+                      </h2>
+                    </div>
 
                     {currentQuestion.refImage && (
                       <div className="mb-6 rounded-2xl border border-neutral-800 overflow-hidden bg-white/5">
@@ -424,11 +476,11 @@ const ExamScreen = () => {
               animate={{ opacity: 1 }}
               className="text-center py-32 space-y-8"
             >
-              <div className="w-24 h-24 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
+              <div className="w-24 h-24 bg-sky-500/10 text-sky-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
                 <Coffee size={48} />
               </div>
               <h2 className="text-4xl font-black">Take a Breath</h2>
-              <div className="text-7xl font-mono font-black text-amber-500 tracking-tighter">
+              <div className="text-7xl font-mono font-black text-sky-500 tracking-tighter">
                 {formatTime(restTimeLeft)}
               </div>
               <button
@@ -445,7 +497,6 @@ const ExamScreen = () => {
       <AnimatePresence>
         {showExitModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -453,8 +504,6 @@ const ExamScreen = () => {
               onClick={() => setShowExitModal(false)}
               className="absolute inset-0 bg-black/80 backdrop-blur-md"
             />
-
-            {/* Dialog Card */}
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -464,24 +513,21 @@ const ExamScreen = () => {
               <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <LogOut size={32} />
               </div>
-
               <h3 className="text-2xl font-black mb-2">Leave Exam?</h3>
               <p className="text-neutral-400 text-sm mb-8">
                 Your progress will not be saved. Are you sure you want to exit
                 now?
               </p>
-
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setShowExitModal(false)}
-                  className="py-4 bg-neutral-800 text-white font-bold rounded-2xl hover:bg-neutral-700 transition-all"
+                  className="py-4 bg-neutral-800 text-white font-bold rounded-2xl hover:bg-neutral-700"
                 >
                   Cancel
                 </button>
-
                 <button
                   onClick={() => navigate("/test")}
-                  className="py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-all shadow-[0_0_20px_rgba(239,68,68,0.2)]"
+                  className="py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600"
                 >
                   Exit
                 </button>
@@ -498,18 +544,26 @@ const ExamScreen = () => {
               <Info size={14} className="text-sky-500" /> Session active
             </div>
             <button
-              disabled={selectedOption === null}
+              disabled={selectedOption === null || isSubmitting}
               onClick={handleNextQuestion}
               className={`px-10 py-4 rounded-2xl font-black uppercase transition-all flex items-center gap-3 ${
-                selectedOption !== null
+                selectedOption !== null && !isSubmitting
                   ? "bg-sky-500 text-black shadow-lg"
                   : "bg-neutral-800 text-neutral-600 opacity-50 cursor-not-allowed"
               }`}
             >
-              {currentQuestionIdx === questions.length - 1
-                ? "Complete Section"
-                : "Next Question"}
-              <ChevronRight size={20} />
+              {isSubmitting ? (
+                <>
+                  Saving... <Loader2 size={20} className="animate-spin" />
+                </>
+              ) : (
+                <>
+                  {currentQuestionIdx === questions.length - 1
+                    ? "Complete Section"
+                    : "Next Question"}
+                  <ChevronRight size={20} />
+                </>
+              )}
             </button>
           </div>
         </footer>

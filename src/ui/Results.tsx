@@ -3,11 +3,12 @@ import { useReactToPrint } from "react-to-print";
 import {
   Printer,
   XCircle,
-  Hash,
   Loader2,
   ShieldCheck,
   ArrowLeft,
   Trophy,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { resultApi, type Result } from "../api/resultApi";
@@ -28,10 +29,17 @@ const Results: React.FC = () => {
       try {
         setLoading(true);
         const res = await resultApi.getResultsByUser(user._id);
-        const resultsArray = res?.data?.data;
+        const resultsArray: Result[] = res?.data?.data;
 
         if (resultsArray && resultsArray.length > 0) {
-          setData(resultsArray[resultsArray.length - 1]);
+          // Fixed 'any' by using the 'Result' type and safe date parsing
+          const latest = resultsArray.sort((a: Result, b: Result) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateB - dateA;
+          })[0];
+
+          setData(latest);
         }
       } catch (err) {
         console.error("Error fetching results:", err);
@@ -52,8 +60,8 @@ const Results: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
         <Loader2 className="w-10 h-10 text-sky-500 animate-spin mb-4" />
-        <p className="text-neutral-500 font-medium animate-pulse">
-          Calculating Proficiency...
+        <p className="text-neutral-500 font-medium animate-pulse text-sm tracking-widest uppercase">
+          Generating Official Report...
         </p>
       </div>
     );
@@ -79,192 +87,245 @@ const Results: React.FC = () => {
   return (
     <div className="min-h-screen bg-black p-4 md:p-8 font-sans text-neutral-200">
       <div className="max-w-4xl mx-auto space-y-10">
-        {/* --- UI HEADER --- */}
-        <div className="flex justify-between items-center">
+        {/* --- RESPONSIVE UI HEADER --- */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+          {/* Exit Link - Centered on mobile, Left on desktop */}
           <Link
             to="/test"
-            className="flex items-center gap-2 text-neutral-500 hover:text-white transition-colors font-bold uppercase text-xs tracking-widest"
+            className="flex items-center gap-2 text-neutral-500 hover:text-white transition-all font-bold uppercase text-[10px] md:text-xs tracking-[0.2em] group"
           >
-            <ArrowLeft size={16} /> Exit to Dashboard
+            <ArrowLeft
+              size={16}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
+            Exit to Dashboard
           </Link>
-          <button
-            onClick={() => {
-              if (certificateRef.current) {
-                handlePrint(() => certificateRef.current);
-              }
-            }}
-            className="flex items-center gap-3 bg-sky-500 hover:bg-sky-600 text-black px-8 py-4 rounded-2xl font-black transition-all shadow-[0_0_30px_rgba(14,165,233,0.3)] active:scale-95"
-          >
-            <Printer size={20} /> PRINT CERTIFICATE
-          </button>
+
+          {/* Actions Wrapper - Stacks on small mobile (xs), Rows on tablet+ */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+            {/* Status Badge */}
+            <div
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full border w-full sm:w-auto ${
+                isPassed
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                  : "border-red-500/30 bg-red-500/10 text-red-500"
+              }`}
+            >
+              {isPassed ? (
+                <CheckCircle2 size={16} />
+              ) : (
+                <AlertCircle size={16} />
+              )}
+              <span className="text-[10px] md:text-xs font-black tracking-widest uppercase">
+                {isPassed ? "Exam Passed" : "Did Not Pass"}
+              </span>
+            </div>
+
+            {/* Print Button - Full width on mobile, Auto on desktop */}
+            <button
+              onClick={() => {
+                if (certificateRef.current) {
+                  handlePrint(() => certificateRef.current);
+                }
+              }}
+              className="flex items-center justify-center gap-3 bg-sky-500 hover:bg-sky-400 text-black px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl w-full sm:w-auto font-black transition-all shadow-[0_0_20px_rgba(14,165,233,0.2)] active:scale-95"
+            >
+              <Printer size={18} />
+              <span className="text-sm md:text-base">PRINT CERTIFICATE</span>
+            </button>
+          </div>
         </div>
 
         {/* --- PRINTABLE CERTIFICATE --- */}
         <div className="overflow-x-auto pb-20">
           <div
             ref={certificateRef}
-            className="w-[850px] mx-auto bg-black p-14 relative shadow-2xl border border-neutral-800 flex flex-col justify-between overflow-hidden"
+            className="w-[850px] mx-auto bg-black p-10 relative shadow-2xl border border-neutral-800 flex flex-col justify-between"
             style={{
-              aspectRatio: "1.414/1",
+              // Removed fixed aspect-ratio to prevent content clipping
+              minHeight: "600px",
               boxSizing: "border-box",
               WebkitPrintColorAdjust: "exact",
               printColorAdjust: "exact",
+              // Ensure the background color and borders are forced in PDF
             }}
           >
-            {/* ABSTRACT BACKGROUND PATTERN */}
+            {/* BACKGROUND PATTERN - Lowered opacity slightly for better legibility */}
             <div
-              className="absolute inset-0 pointer-events-none opacity-20"
+              className="absolute inset-0 pointer-events-none opacity-[0.02] grayscale"
               style={{
-                backgroundImage: `
-                  radial-gradient(circle at 2px 2px, #0ea5e9 1px, transparent 0),
-                  linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111),
-                  linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111)
-                `,
-                backgroundSize: "40px 40px, 80px 80px, 80px 80px",
-                backgroundPosition: "0 0, 0 0, 40px 40px",
+                backgroundImage: `url('/JLPTX.png')`,
+                backgroundSize: "120px",
+                backgroundRepeat: "repeat",
               }}
             />
 
             {/* CORNER ACCENTS */}
-            <div className="absolute top-0 left-0 w-24 h-24 border-t-2 border-l-2 border-sky-500/20 m-6" />
-            <div className="absolute bottom-0 right-0 w-24 h-24 border-b-2 border-r-2 border-sky-500/20 m-6" />
+            <div className="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-sky-500 m-4" />
+            <div className="absolute bottom-0 right-0 w-20 h-20 border-b-4 border-r-4 border-sky-500 m-4" />
 
-            {/* Row 1: Header */}
-            <div className="relative z-10 flex justify-between items-center border-b border-neutral-800/50 pb-3">
-              <div className="flex items-center gap-4">
-                <div className="p-2 rounded-lg">
-                  <img src="/JLPTX.png" alt="Logo" className="h-15 w-auto" />
+            {/* --- Content Sections --- */}
+            <div className="relative z-10">
+              {/* Header */}
+              <div className="flex justify-between items-start border-b border-neutral-800 pb-6 mb-6">
+                <div className="flex items-center gap-4">
+                  <img src="/JLPTX.png" alt="Logo" className="h-12 w-auto" />
+                  <div>
+                    <h4 className="text-white font-black text-2xl tracking-tighter leading-none">
+                      JLPTX
+                    </h4>
+                    <p className="text-sky-500/80 text-[10px] font-black">
+                      Japanese Language Proficiency Test
+                    </p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <h4 className="text-white font-black text-lg leading-none">
-                    JLPTX
-                  </h4>
-                  <p className="text-sky-500 text-[8px] font-black uppercase tracking-[0.3em]">
-                    Official Certification
+                <div className="text-right">
+                  <p className="text-neutral-500 text-[9px] font-black uppercase tracking-widest">
+                    Certificate Number
+                  </p>
+                  <p className="text-xs font-mono text-white mb-2 uppercase">
+                    #JLPT-{data.level}-{data._id.toUpperCase()}
+                  </p>
+                  <p className="text-neutral-500 text-[9px] font-black uppercase tracking-widest">
+                    Date of Issue
+                  </p>
+                  <p className="text-sm font-bold text-white">
+                    {new Date(data.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-neutral-500 text-[9px] font-black uppercase tracking-widest">
-                  Date of Issue
-                </p>
-                <p className="text-sm font-bold text-white">
-                  {new Date(data.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              </div>
-            </div>
 
-            {/* Row 2: User Identity */}
-            <div className="relative z-10 text-center py-4">
-              <p className="text-sky-500 uppercase text-[10px] font-black tracking-[0.5em] mb-4">
-                Statement of Proficiency
-              </p>
-              <h2 className="text-6xl font-serif italic text-white mb-2">
-                {user?.name || "Examinee"}
-              </h2>
-              <div className="flex items-center justify-center gap-4 mt-6">
-                <div className="h-[1px] w-16 bg-gradient-to-r from-transparent to-sky-500" />
-                <div className="px-8 py-2 bg-sky-500 text-black font-black text-xl rounded-sm">
-                  JLPT {data.level}
+              {/* Examinee Identity */}
+              <div className="text-center py-4">
+                <p className="text-sky-500 uppercase text-[10px] font-black tracking-[0.5em] mb-2">
+                  Result of Japanese Language Proficiency
+                </p>
+                <h2 className="text-5xl font-serif italic text-white mb-4 underline decoration-sky-500/30 underline-offset-8">
+                  {user?.name || "Examinee"}
+                </h2>
+                <p className="text-neutral-400 text-xs max-w-md mx-auto">
+                  Has successfully completed the competency assessment for the
+                  Japanese Language Proficiency Test at the following level:
+                </p>
+                <div className="flex items-center justify-center gap-6 mt-4">
+                  <div className="h-[1px] w-16 bg-neutral-800" />
+                  <div className="px-8 py-2 bg-white text-black font-black text-xl rounded-sm skew-x-[-10deg]">
+                    LEVEL {data.level}
+                  </div>
+                  <div className="h-[1px] w-16 bg-neutral-800" />
                 </div>
-                <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-sky-500" />
               </div>
-            </div>
 
-            {/* Row 3: Grades Matrix */}
-            <div className="relative z-10 grid grid-cols-2 gap-10 my-4">
-              {/* Left Side: Summary */}
-              <div className="space-y-4">
-                <div className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl">
-                  <p className="text-neutral-500 text-[9px] font-black uppercase tracking-widest mb-3">
-                    Overall Performance
-                  </p>
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-3xl font-black text-white">
-                        {data.overAllScore}
-                        <span className="text-sm text-neutral-600 ml-1">
-                          /{data.sectionTotalScore}
+              {/* Score Breakdown Matrix */}
+              <div className="grid grid-cols-5 gap-4 my-6">
+                <div className="col-span-2 space-y-4">
+                  <div className="bg-neutral-900/40 border border-neutral-800 p-4 rounded-sm">
+                    <p className="text-[9px] text-neutral-500 font-black uppercase mb-3 tracking-widest">
+                      Score Summary
+                    </p>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-end">
+                        <span className="text-[9px] text-neutral-400 font-bold uppercase">
+                          Total Points
                         </span>
-                      </p>
-                      <p className="text-[10px] text-sky-500 font-bold uppercase">
-                        Total Point Score
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-3xl font-black text-sky-500">
-                        {data.grade}
-                      </p>
-                      <p className="text-[10px] text-neutral-500 font-bold uppercase">
-                        CEFR Level
-                      </p>
+                        <span className="text-xl font-black text-white">
+                          {data.totalEarnedPoints}
+                          <span className="text-xs text-neutral-600 font-normal">
+                            {" "}
+                            / {data.totalPossiblePoints}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <span className="text-[9px] text-neutral-400 font-bold">
+                          JLPT Grade (Overall)
+                        </span>
+                        <span className="text-xl font-black text-sky-500">
+                          {data.gradeJLPT}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <span className="text-[9px] text-neutral-400 font-bold">
+                          CEFR Grade
+                        </span>
+                        <span className="text-xl font-black text-white">
+                          {data.grade}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Right Side: Section Breakdown */}
-              <div className="space-y-4">
-                <div className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl">
-                  <p className="text-neutral-500 text-[9px] font-black uppercase tracking-widest mb-3">
-                    JLPT Grades
+                <div className="col-span-3 bg-neutral-900/40 border border-neutral-800 p-4 rounded-sm">
+                  <p className="text-[9px] text-neutral-500 font-black uppercase mb-3 tracking-widest">
+                    Sectional Breakdown
                   </p>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center border-b border-neutral-800 pb-2">
-                      <span className="text-[11px] font-bold text-neutral-300 italic">
-                        Overall
-                      </span>
-                      <span className="text-lg font-black text-white">
-                        {data.gradeJLPT}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[11px] font-bold text-sky-500/80 uppercase tracking-tighter">
-                        Result Status
-                      </span>
-                      <span
-                        className={`text-sm font-black ${isPassed ? "text-green-500" : "text-red-500"}`}
-                      >
-                        {isPassed ? "SUCCESS" : "FAILED"}
-                      </span>
-                    </div>
-                  </div>
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="text-[8px] text-neutral-500 uppercase border-b border-neutral-800">
+                        <th className="pb-1 font-black">Section</th>
+                        <th className="pb-1 font-black text-center">Score</th>
+                        <th className="pb-1 font-black text-right">Grade</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-[10px]">
+                      {data.sectionDetails?.map((sec, idx) => (
+                        <tr
+                          key={idx}
+                          className="border-b border-neutral-800/50"
+                        >
+                          <td className="py-1.5 text-neutral-300 font-bold uppercase">
+                            {sec.sectionTitle}
+                          </td>
+                          <td className="py-1.5 text-center text-white font-mono">
+                            {sec.earnedPoints} / {sec.totalPoints}
+                          </td>
+                          <td className="py-1.5 text-right font-black text-sky-500">
+                            {sec.gradeJLPT}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
 
-            {/* Row 4: Footer */}
-            <div className="relative z-10 flex justify-between items-end border-t border-neutral-800/50 pt-2 ">
-              <div className="flex flex-col gap-1">
+            {/* Footer / Security - This will now be pushed correctly to the bottom */}
+            <div className="relative z-10 flex justify-between items-end border-t border-neutral-800 pt-6 mt-auto">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2 text-neutral-600">
-                  <Hash size={12} />
-                  <span className="text-[9px] font-mono tracking-widest uppercase">
-                    Cert: {data._id.slice(-14).toUpperCase()}
+                  <ShieldCheck size={12} className="text-emerald-500" />
+                  <span className="text-[8px] font-bold uppercase">
+                    Digital Signature Verified
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-neutral-600">
-                  <Trophy size={12} className="text-sky-500/50" />
-                  <span className="text-[9px] font-bold uppercase tracking-tighter">
-                    Verified by JLPT-X Assessment Engine
+                  <Trophy size={12} className="text-sky-500" />
+                  <span className="text-[8px] font-bold uppercase tracking-widest">
+                    Validated via JLPTX
                   </span>
                 </div>
               </div>
+
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <p className="text-white text-[10px] font-black uppercase tracking-widest">
-                    Authority Signature
-                  </p>
-                  <p className="text-neutral-600 text-[8px] font-serif italic">
-                    Digital Audit Trail Secured
+                  <div className="h-8 w-32 border-b border-neutral-700 mb-1 flex items-end justify-end">
+                    <span
+                      className={`text-lg font-black ${data.status === true ? "text-emerald-500" : "text-red-500"}`}
+                    >
+                      {data.status === true ? "PASSED" : "FAILED"}
+                    </span>
+                  </div>
+                  <p className="text-[8px] text-neutral-500 font-black uppercase tracking-widest">
+                    Status
                   </p>
                 </div>
-                <div className="bg-sky-500/10 p-2 rounded-full border border-sky-500/20">
-                  <ShieldCheck size={32} className="text-sky-500" />
-                </div>
+                <img src="/JLPTX.png" alt="Logo" className="h-12 w-auto" />
               </div>
             </div>
           </div>
