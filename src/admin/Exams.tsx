@@ -19,6 +19,7 @@ interface Exam {
   level: string;
   title: string;
   desc: string;
+  category: string;
   passingScore: number;
   sections: Section[];
 }
@@ -27,6 +28,7 @@ interface ExamForm {
   level: string;
   title: string;
   desc: string;
+  category: string;
   passingScore: number;
   sections: Section[];
 }
@@ -46,6 +48,7 @@ const Exams = () => {
     level: "",
     title: "",
     desc: "",
+    category: "",
     passingScore: 80,
     sections: [],
   });
@@ -104,11 +107,8 @@ const Exams = () => {
   const handleEdit = (exam: Exam) => {
     setEditingId(exam._id);
 
-    // Use a type assertion (s: any) or (s: string) to tell TS
-    // that these are IDs from the database
     const fullSectionObjects = (exam.sections || [])
       .map((sectionData: Section) => {
-        // If the database gave us a string ID, find the object
         const id =
           typeof sectionData === "string" ? sectionData : sectionData._id;
         return availableSections.find((s) => s._id === id);
@@ -119,6 +119,7 @@ const Exams = () => {
       level: exam.level,
       title: exam.title,
       desc: exam.desc,
+      category: exam.category,
       passingScore: exam.passingScore,
       sections: fullSectionObjects,
     });
@@ -137,7 +138,14 @@ const Exams = () => {
   };
 
   const resetForm = () => {
-    setForm({ level: "", title: "", desc: "", passingScore: 80, sections: [] });
+    setForm({
+      level: "",
+      title: "",
+      desc: "",
+      category: "",
+      passingScore: 80,
+      sections: [],
+    });
     setEditingId(null);
   };
 
@@ -206,6 +214,32 @@ const Exams = () => {
                 className="bg-neutral-900 p-3 rounded border border-neutral-600 focus:border-sky-500 outline-none"
                 placeholder="Describe this exam..."
               />
+            </div>
+
+            <div className="flex flex-col gap-3 mt-4">
+              <label className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                Exam Category
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {["JLPT Old Questions", "Level Test", "Custom Test"].map(
+                  (cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() =>
+                        setForm((prev) => ({ ...prev, category: cat }))
+                      }
+                      className={`px-5 py-2 rounded-xl text-sm font-bold border transition-all duration-200 ${
+                        form.category === cat
+                          ? "bg-sky-600 border-sky-400 text-white shadow-lg"
+                          : "bg-neutral-800 border-neutral-700 text-neutral-500 hover:border-neutral-500"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ),
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col gap-1">

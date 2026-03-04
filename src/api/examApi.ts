@@ -14,6 +14,7 @@ export interface Exam {
   level: string;
   title: string;
   desc: string;
+  category: string;
   passingScore: number;
   sections: Section[];
 }
@@ -22,6 +23,7 @@ export interface ExamForm {
   level: string;
   title: string;
   desc: string;
+  category: string;
   passingScore: number;
   sections: Section[];
 }

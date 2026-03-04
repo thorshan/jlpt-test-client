@@ -34,13 +34,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [isVerifying, setIsVerifying] = useState(true);
 
-  // 2. Definitive Logout function (defined before useEffect)
   const logout = async () => {
-    // 1. Capture the ID first so we don't lose it
     const userId = user?._id;
 
-    // 2. Immediate UI response (Optimistic UI)
-    // This makes the app feel "snappy" on mobile
     setUser(null);
     localStorage.removeItem("jlpt_user");
 
@@ -56,14 +52,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const verifyUserWithServer = async () => {
-      // Get the most current data from localStorage for verification
       const saved = localStorage.getItem("jlpt_user");
       const localUser = saved ? JSON.parse(saved) : null;
 
       if (localUser?._id) {
         try {
           await userApi.getUser(localUser._id);
-          // Sync state just in case localStorage was changed in another tab
           setUser(localUser);
         } catch (error) {
           if (
@@ -87,7 +81,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     verifyUserWithServer();
-    // Empty dependency is fine here because we want this only on "App Mount/Refresh"
   }, []);
 
   const login = (data: UserData) => {
