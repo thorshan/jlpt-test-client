@@ -9,18 +9,43 @@ import {
   Trophy,
   CheckCircle2,
   AlertCircle,
+  Award,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { resultApi, type Result } from "../api/resultApi";
 import { useUser } from "../hooks/useUser";
+import { useTranslation } from "../hooks/useTranslation";
+
+// --- ANIMATED COUNTER COMPONENT ---
+const CountUp: React.FC<{ end: number; duration?: number }> = ({
+  end,
+  duration = 2000,
+}) => {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      setCount(Math.floor(progress * end));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [end, duration]);
+  return <>{count}</>;
+};
 
 const Results: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useUser();
   const certificateRef = useRef<HTMLDivElement>(null);
 
   // --- STATE ---
   const [data, setData] = useState<Result | null>(null);
   const [loading, setLoading] = useState(true);
+  const [step, setStep] = useState(0); // 0: Animation, 1: Certificate Page
 
   // --- FETCH DATA ---
   useEffect(() => {
@@ -32,7 +57,6 @@ const Results: React.FC = () => {
         const resultsArray: Result[] = res?.data?.data;
 
         if (resultsArray && resultsArray.length > 0) {
-          // Fixed 'any' by using the 'Result' type and safe date parsing
           const latest = resultsArray.sort((a: Result, b: Result) => {
             const dateA = new Date(a.createdAt).getTime();
             const dateB = new Date(b.createdAt).getTime();
@@ -60,8 +84,8 @@ const Results: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
         <Loader2 className="w-10 h-10 text-sky-500 animate-spin mb-4" />
-        <p className="text-neutral-500 font-medium animate-pulse text-sm tracking-widest uppercase">
-          Generating Official Report...
+        <p className="text-neutral-500 font-medium animate-pulse text-sm">
+          {t("generating_report")}...
         </p>
       </div>
     );
@@ -71,12 +95,12 @@ const Results: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-black p-6 text-center">
         <XCircle className="w-16 h-16 text-neutral-800 mb-4" />
-        <h2 className="text-2xl font-bold text-white">No Record Found</h2>
+        <h2 className="text-2xl font-bold text-white">{t("no_record")}</h2>
         <Link
           to="/test"
           className="mt-4 text-sky-500 flex items-center gap-2 hover:underline"
         >
-          <ArrowLeft size={18} /> Return to Tests
+          <ArrowLeft size={18} /> {t("return_tests")}
         </Link>
       </div>
     );
@@ -84,12 +108,81 @@ const Results: React.FC = () => {
 
   const isPassed = data.status;
 
+  // --- STEP 1: RESULT ANIMATION PAGE ---
+  if (step === 0) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-6">
+        <div className="max-w-2xl w-full text-center space-y-8 animate-in fade-in zoom-in duration-700">
+          <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase italic">
+            {t("results")}
+          </h1>
+
+          <div className="py-4">
+            <div
+              className={`inline-flex items-center gap-3 px-8 py-3 rounded-full border-2 text-2xl font-black tracking-widest uppercase transition-colors duration-1000 ${
+                isPassed
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
+                  : "border-red-500 bg-red-500/10 text-red-500"
+              }`}
+            >
+              {isPassed ? (
+                <CheckCircle2 size={28} />
+              ) : (
+                <AlertCircle size={28} />
+              )}
+              {isPassed ? t("passed") : t("failed")}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6">
+            {/* Total Score Section */}
+            <div className="bg-neutral-900/50 border border-neutral-800 p-8 rounded-3xl">
+              <div className="text-6xl font-black text-shadow-sky-500">
+                <CountUp end={data.totalEarnedPoints} />
+                <span className="text-2xl text-neutral-600 ml-2">
+                  / {data.totalPossiblePoints}
+                </span>
+              </div>
+            </div>
+
+            {/* Sectional Score Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {data.sectionDetails?.map((sec, idx) => (
+                <div
+                  key={idx}
+                  className="bg-neutral-900/30 border border-neutral-800/50 p-4 rounded-2xl"
+                >
+                  <p className="text-[10px] text-neutral-500 font-bold uppercase truncate mb-1">
+                    {sec.sectionTitle}
+                  </p>
+                  <div className="text-2xl font-black text-sky-500">
+                    <CountUp end={sec.earnedPoints} />
+                    <span className="text-sm text-neutral-600 font-normal ml-1">
+                      / {sec.totalPoints}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setStep(1)}
+            className="group relative inline-flex items-center gap-3 bg-white text-black px-10 py-4 rounded-2xl font-black text-lg hover:bg-sky-400 transition-all active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+          >
+            <Award size={20} />
+            {t("print_cert")}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- STEP 2: CERTIFICATE PAGE ---
   return (
-    <div className="min-h-screen bg-black p-4 md:p-8 font-sans text-neutral-200">
+    <div className="min-h-screen bg-black p-4 md:p-8 font-sans text-neutral-200 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="max-w-4xl mx-auto space-y-10">
-        {/* --- RESPONSIVE UI HEADER --- */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-          {/* Exit Link - Centered on mobile, Left on desktop */}
           <Link
             to="/test"
             className="flex items-center gap-2 text-neutral-500 hover:text-white transition-all font-bold uppercase text-[10px] md:text-xs tracking-[0.2em] group"
@@ -98,12 +191,10 @@ const Results: React.FC = () => {
               size={16}
               className="group-hover:-translate-x-1 transition-transform"
             />
-            Exit to Dashboard
+            {t("exit_home")}
           </Link>
 
-          {/* Actions Wrapper - Stacks on small mobile (xs), Rows on tablet+ */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-            {/* Status Badge */}
             <div
               className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full border w-full sm:w-auto ${
                 isPassed
@@ -117,11 +208,10 @@ const Results: React.FC = () => {
                 <AlertCircle size={16} />
               )}
               <span className="text-[10px] md:text-xs font-black tracking-widest uppercase">
-                {isPassed ? "Exam Passed" : "Did Not Pass"}
+                {isPassed ? t("passed") : t("failed")}
               </span>
             </div>
 
-            {/* Print Button - Full width on mobile, Auto on desktop */}
             <button
               onClick={() => {
                 if (certificateRef.current) {
@@ -131,26 +221,22 @@ const Results: React.FC = () => {
               className="flex items-center justify-center gap-3 bg-sky-500 hover:bg-sky-400 text-black px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl w-full sm:w-auto font-black transition-all shadow-[0_0_20px_rgba(14,165,233,0.2)] active:scale-95"
             >
               <Printer size={18} />
-              <span className="text-sm md:text-base">PRINT CERTIFICATE</span>
+              <span className="text-sm md:text-base">{t("print_cert")}</span>
             </button>
           </div>
         </div>
 
-        {/* --- PRINTABLE CERTIFICATE --- */}
         <div className="overflow-x-auto pb-20">
           <div
             ref={certificateRef}
             className="w-[850px] mx-auto bg-black p-10 relative shadow-2xl border border-neutral-800 flex flex-col justify-between"
             style={{
-              // Removed fixed aspect-ratio to prevent content clipping
               minHeight: "600px",
               boxSizing: "border-box",
               WebkitPrintColorAdjust: "exact",
               printColorAdjust: "exact",
-              // Ensure the background color and borders are forced in PDF
             }}
           >
-            {/* BACKGROUND PATTERN - Lowered opacity slightly for better legibility */}
             <div
               className="absolute inset-0 pointer-events-none opacity-[0.02] grayscale"
               style={{
@@ -160,13 +246,10 @@ const Results: React.FC = () => {
               }}
             />
 
-            {/* CORNER ACCENTS */}
             <div className="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-sky-500 m-4" />
             <div className="absolute bottom-0 right-0 w-20 h-20 border-b-4 border-r-4 border-sky-500 m-4" />
 
-            {/* --- Content Sections --- */}
             <div className="relative z-10">
-              {/* Header */}
               <div className="flex justify-between items-start border-b border-neutral-800 pb-6 mb-6">
                 <div className="flex items-center gap-4">
                   <img src="/JLPTX.png" alt="Logo" className="h-12 w-auto" />
@@ -199,7 +282,6 @@ const Results: React.FC = () => {
                 </div>
               </div>
 
-              {/* Examinee Identity */}
               <div className="text-center py-4">
                 <p className="text-sky-500 uppercase text-[10px] font-black tracking-[0.5em] mb-2">
                   Result of Japanese Language Proficiency
@@ -220,7 +302,6 @@ const Results: React.FC = () => {
                 </div>
               </div>
 
-              {/* Score Breakdown Matrix */}
               <div className="grid grid-cols-5 gap-4 my-6">
                 <div className="col-span-2 space-y-4">
                   <div className="bg-neutral-900/40 border border-neutral-800 p-4 rounded-sm">
@@ -234,8 +315,7 @@ const Results: React.FC = () => {
                         </span>
                         <span className="text-xl font-black text-white">
                           {data.totalEarnedPoints}
-                          <span className="text-xs text-neutral-600 font-normal">
-                            {" "}
+                          <span className="text-xs text-neutral-600 font-normal ml-1">
                             / {data.totalPossiblePoints}
                           </span>
                         </span>
@@ -295,7 +375,6 @@ const Results: React.FC = () => {
               </div>
             </div>
 
-            {/* Footer / Security - This will now be pushed correctly to the bottom */}
             <div className="relative z-10 flex justify-between items-end border-t border-neutral-800 pt-6 mt-auto">
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 text-neutral-600">

@@ -19,7 +19,7 @@ import { useTranslation } from "../hooks/useTranslation";
 import { examApi } from "../api/examApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 
-// --- INTERFACES (Synced with your Mongoose Schema) ---
+// --- INTERFACES ---
 interface Section {
   _id: string;
   title: string;
@@ -49,7 +49,7 @@ const Home = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // --- CATEGORY LIST (Synced with Mongoose Enum) ---
+  // --- CATEGORY LIST ---
   const categoryList = [
     "All",
     "JLPT Old Questions",
@@ -150,7 +150,7 @@ const Home = () => {
                         {user?.name}
                       </p>
                       <p className="text-[10px] text-neutral-500 font-mono mt-0.5 opacity-70">
-                        Lv: {user?.level || "N/A"}
+                        {t("level")} : {user?.level || "N/A"}
                       </p>
                     </div>
                     <button
@@ -186,7 +186,7 @@ const Home = () => {
             </div>
             <input
               type="text"
-              placeholder="Search papers by title..."
+              placeholder={t("search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-neutral-900/40 border border-neutral-800 rounded-2xl py-4 pl-12 pr-12 text-sm md:text-base focus:outline-none focus:border-sky-500/50 focus:bg-neutral-900 transition-all placeholder:text-neutral-600"
@@ -207,7 +207,7 @@ const Home = () => {
           <div className="flex items-center gap-2 mb-4 text-neutral-500">
             <LayoutGrid size={14} />
             <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-              Select Category
+              {t("select_category")}
             </span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar scroll-smooth">
@@ -233,11 +233,11 @@ const Home = () => {
             <div className="flex items-center gap-2">
               <Filter size={12} className="text-sky-500" />
               <h3 className="text-[10px] md:text-xs font-black text-neutral-500 uppercase tracking-[0.2em]">
-                {activeCategory} Results
+                {activeCategory} {t("results")}
               </h3>
             </div>
             <span className="text-[10px] text-neutral-600 font-bold">
-              {filteredExams.length} Available
+              {filteredExams.length} {t("available")}
             </span>
           </div>
 
@@ -308,7 +308,7 @@ const Home = () => {
                   <Search size={28} />
                 </div>
                 <p className="text-neutral-500 text-sm italic">
-                  No papers match your search or category.
+                  {t("no_record")}
                 </p>
                 <button
                   onClick={() => {
@@ -317,7 +317,7 @@ const Home = () => {
                   }}
                   className="mt-4 text-sky-500 text-xs font-black uppercase tracking-widest hover:text-sky-400 transition-colors underline underline-offset-8 decoration-sky-500/30"
                 >
-                  Reset Filters
+                  {t("reset_filters")}
                 </button>
               </motion.div>
             )}

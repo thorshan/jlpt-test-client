@@ -15,6 +15,7 @@ import { examApi } from "../api/examApi";
 import { resultApi, type ResultFormData } from "../api/resultApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import { useUser } from "../hooks/useUser";
+import { useTranslation } from "../hooks/useTranslation";
 
 // --- INTERFACES ---
 export interface Question {
@@ -83,6 +84,7 @@ const title = {
 };
 
 const ExamScreen = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useUser();
@@ -345,7 +347,7 @@ const ExamScreen = () => {
           onClick={() => setShowExitModal(true)}
           className="text-neutral-500 hover:text-red-400 text-xs font-bold uppercase flex items-center gap-2"
         >
-          Exit <LogOut size={16} />
+          {t("exit")} <LogOut size={16} />
         </button>
       </nav>
 
@@ -402,7 +404,7 @@ const ExamScreen = () => {
                             className="text-sky-500 animate-pulse"
                           />
                           <span className="text-sky-500 text-[9px] font-black uppercase italic">
-                            Listening Track Active
+                            {t("listening_active")}
                           </span>
                         </div>
                       )}
@@ -479,7 +481,7 @@ const ExamScreen = () => {
               <div className="w-24 h-24 bg-sky-500/10 text-sky-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
                 <Coffee size={48} />
               </div>
-              <h2 className="text-4xl font-black">Take a Breath</h2>
+              <h2 className="text-4xl font-black">{t("take_breath")}</h2>
               <div className="text-7xl font-mono font-black text-sky-500 tracking-tighter">
                 {formatTime(restTimeLeft)}
               </div>
@@ -487,7 +489,7 @@ const ExamScreen = () => {
                 onClick={startNextSection}
                 className="px-12 py-4 bg-white text-black rounded-2xl font-black"
               >
-                Skip Break
+                {t("skip_break")}
               </button>
             </motion.div>
           )}
@@ -513,7 +515,7 @@ const ExamScreen = () => {
               <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <LogOut size={32} />
               </div>
-              <h3 className="text-2xl font-black mb-2">Leave Exam?</h3>
+              <h3 className="text-2xl font-black mb-2">{t("leave_exam")}?</h3>
               <p className="text-neutral-400 text-sm mb-8">
                 Your progress will not be saved. Are you sure you want to exit
                 now?
