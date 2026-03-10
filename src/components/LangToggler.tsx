@@ -41,7 +41,7 @@ export const LangToggler = () => {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="absolute right-0 mt-2 w-48 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl py-2 z-20 overflow-hidden"
+              className="absolute right-0 mt-2 w-48 bg-sky-900/20 border border-sky-800 rounded-2xl shadow-2xl py-2 z-20 overflow-hidden"
             >
               {LANGUAGES.map((l) => (
                 <button

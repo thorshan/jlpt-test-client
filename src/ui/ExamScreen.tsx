@@ -334,25 +334,51 @@ const ExamScreen = () => {
   if (loading || !exam) return <LoadingScreen />;
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col font-sans overflow-hidden">
-      <nav className="h-16 border-b border-neutral-800 bg-black/60 backdrop-blur-xl flex items-center justify-between px-4 sticky top-0 z-[60]">
-        <div className="flex items-center gap-3">
-          <img src="/JLPTX.png" alt="Logo" className="w-8 h-8 object-contain" />
-          <div className="text-sky-500 font-mono text-sm font-bold bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20 flex items-center gap-2">
-            <Clock size={14} />
+    <div className="min-h-screen bg-[#020617] text-white flex flex-col font-sans overflow-hidden relative">
+      {/* --- BACKGROUND LAYER --- */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <motion.div
+          initial={{ backgroundPosition: "0px 0px" }}
+          animate={{ backgroundPosition: ["0px 0px", "40px 40px"] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-0 opacity-[0.12]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, #1e293b 1px, transparent 1px),
+              linear-gradient(to bottom, #1e293b 1px, transparent 1px)
+            `,
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#020617]/0 via-[#020617]/50 to-[#020617]" />
+        <div className="absolute top-[-15%] right-[-10%] w-[50%] h-[50%] bg-sky-500/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-15%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[120px] rounded-full" />
+      </div>
+
+      {/* --- NAVBAR --- */}
+      <nav className="h-16 md:h-20 border-b border-white/5 bg-[#020617]/60 backdrop-blur-2xl flex items-center justify-between px-4 md:px-8 sticky top-0 z-[60]">
+        <div className="flex items-center gap-4">
+          <img
+            src="/JLPTX.png"
+            alt="Logo"
+            className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(14,165,233,0.3)]"
+          />
+          <div className="text-sky-400 font-mono text-sm font-black bg-sky-500/10 px-4 py-1.5 rounded-full border border-sky-500/20 flex items-center gap-2 shadow-inner">
+            <Clock size={16} className="text-sky-500" />
             {status === "exam" ? formatTime(sectionTimeLeft) : "REST"}
           </div>
         </div>
         <button
           onClick={() => setShowExitModal(true)}
-          className="text-neutral-500 hover:text-red-400 text-xs font-bold uppercase flex items-center gap-2"
+          className="text-neutral-500 hover:text-red-400 text-xs font-black uppercase flex items-center gap-2 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/5"
         >
           {t("exit")} <LogOut size={16} />
         </button>
       </nav>
 
+      {/* --- PROGRESS BAR --- */}
       {status === "exam" && (
-        <div className="w-full bg-neutral-900/40 border-b border-neutral-800 py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+        <div className="w-full bg-[#020617]/40 border-b border-white/5 py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory relative z-10">
           <div className="flex gap-2 min-w-max px-[calc(50vw-20px)]">
             {questions.map((q, idx) => (
               <button
@@ -364,12 +390,12 @@ const ExamScreen = () => {
                   setCurrentQuestionIdx(idx);
                   setSelectedOption(userAnswers[q._id] ?? null);
                 }}
-                className={`min-w-[40px] h-[40px] rounded-md text-[10px] font-black transition-all border snap-center shrink-0 ${
+                className={`min-w-[42px] h-[42px] rounded-xl text-[10px] font-black transition-all border snap-center shrink-0 ${
                   currentQuestionIdx === idx
-                    ? "bg-sky-500 border-sky-400 text-black scale-110 shadow-[0_0_15px_rgba(14,165,233,0.5)]"
+                    ? "bg-sky-500 border-sky-400 text-slate-950 scale-110 shadow-[0_0_20px_rgba(14,165,233,0.4)]"
                     : userAnswers[q._id] !== undefined
                       ? "bg-sky-500/20 border-sky-500/40 text-sky-400"
-                      : "bg-neutral-800 border-neutral-700 text-neutral-500"
+                      : "bg-white/5 border-white/10 text-slate-500"
                 }`}
               >
                 {idx + 1}
@@ -379,21 +405,23 @@ const ExamScreen = () => {
         </div>
       )}
 
-      <main className="flex-1 flex flex-col items-center p-4 md:p-8 overflow-y-auto">
+      {/* --- MAIN CONTENT --- */}
+      <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-10 overflow-y-auto">
         <AnimatePresence mode="wait">
           {status === "exam" ? (
             <motion.div
               key={`q-${currentSectionIdx}-${currentQuestionIdx}`}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="w-full max-w-3xl pb-24"
+              exit={{ opacity: 0, y: -15 }}
+              className="w-full max-w-4xl pb-32"
             >
               {currentQuestion && (
                 <div className="space-y-8">
                   <header>
                     <div className="flex justify-between items-center mb-6">
-                      <p className="text-sky-500 text-[13px] font-black">
+                      <p className="text-sky-500 text-[11px] font-black uppercase tracking-widest flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
                         {currentSection?.title} {"・"} {currentQuestionIdx + 1}{" "}
                         / {questions.length} Qs
                       </p>
@@ -410,8 +438,8 @@ const ExamScreen = () => {
                       )}
                     </div>
 
-                    <div className="mb-6">
-                      <h2 className="text-neutral-300 text-md md:text-2xl font-medium leading-relaxed whitespace-pre-line bg-neutral-900/30 p-4 rounded-xl border border-neutral-800/50">
+                    <div className="mb-8">
+                      <h2 className="text-slate-300 text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line bg-white/5 p-6 rounded-3xl border border-white/5 shadow-xl backdrop-blur-sm">
                         {getQuestionTitle(
                           currentQuestion.category,
                           currentQuestion.module,
@@ -420,49 +448,61 @@ const ExamScreen = () => {
                     </div>
 
                     {currentQuestion.refImage && (
-                      <div className="mb-6 rounded-2xl border border-neutral-800 overflow-hidden bg-white/5">
+                      <div className="mb-8 rounded-3xl border border-white/10 overflow-hidden bg-white/5 p-4 backdrop-blur-sm shadow-2xl">
                         <img
                           src={`/refImages/${currentQuestion.refImage}`}
                           alt="Ref"
-                          className="max-h-80 w-full object-contain p-4"
+                          className="max-h-80 w-full object-contain rounded-xl"
                           onError={(e) => (e.currentTarget.src = "/JLPTX.png")}
                         />
                       </div>
                     )}
 
                     {currentQuestion.refText && (
-                      <div className="mb-8 p-6 bg-neutral-900/50 rounded-2xl border border-neutral-800 shadow-inner text-neutral-200">
+                      <div className="mb-8 p-8 bg-[#0f172a]/60 rounded-3xl border border-white/5 shadow-inner text-slate-200 text-xl leading-relaxed">
                         {currentQuestion.refText}
                       </div>
                     )}
 
-                    <h2 className="text-xl md:text-3xl font-bold text-white leading-tight">
+                    <h2 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
                       {currentQuestion.text}
                     </h2>
                   </header>
 
-                  <div className="grid gap-3">
+                  {/* OPTIONS */}
+                  <div className="grid gap-4">
                     {currentQuestion.options?.map((opt, i) => (
                       <button
                         key={i}
                         onClick={() => setSelectedOption(i)}
-                        className={`w-full text-left p-5 rounded-2xl border-2 transition-all flex items-center justify-between ${
+                        className={`w-full text-left p-6 rounded-3xl border-2 transition-all flex items-center justify-between backdrop-blur-md ${
                           selectedOption === i
-                            ? "bg-sky-500/10 border-sky-500 text-sky-400"
-                            : "bg-neutral-900/50 border-neutral-700 text-neutral-400 hover:border-neutral-500"
+                            ? "bg-sky-500/10 border-sky-500 text-sky-400 shadow-lg"
+                            : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
                         }`}
                       >
-                        <div className="flex gap-3 items-center">
-                          <span className="flex justify-center items-center w-[35px] h-[35px] border-[2px] border-sky-500/30 rounded-full font-semibold text-lg">
+                        <div className="flex gap-4 items-center">
+                          <span
+                            className={`flex justify-center items-center w-9 h-9 border-2 rounded-2xl font-black text-sm transition-colors ${
+                              selectedOption === i
+                                ? "bg-sky-500 border-sky-500 text-slate-950"
+                                : "border-white/10 text-slate-500"
+                            }`}
+                          >
                             {i + 1}
                           </span>
-                          <span className="font-semibold text-lg">{opt}</span>
+                          <span className="font-bold text-lg md:text-xl">
+                            {opt}
+                          </span>
                         </div>
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedOption === i ? "bg-sky-500 border-sky-500" : "border-neutral-700"}`}
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedOption === i ? "bg-sky-500 border-sky-500" : "border-white/10"}`}
                         >
                           {selectedOption === i && (
-                            <CheckCircle2 size={14} className="text-black" />
+                            <CheckCircle2
+                              size={14}
+                              className="text-slate-950"
+                            />
                           )}
                         </div>
                       </button>
@@ -474,20 +514,22 @@ const ExamScreen = () => {
           ) : (
             <motion.div
               key="rest"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
               className="text-center py-32 space-y-8"
             >
-              <div className="w-24 h-24 bg-sky-500/10 text-sky-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
-                <Coffee size={48} />
+              <div className="w-24 h-24 bg-sky-500/10 text-sky-500 rounded-full flex items-center justify-center mx-auto border border-sky-500/20 shadow-[0_0_30px_rgba(14,165,233,0.2)]">
+                <Coffee size={48} className="animate-bounce" />
               </div>
-              <h2 className="text-4xl font-black">{t("take_breath")}</h2>
-              <div className="text-7xl font-mono font-black text-sky-500 tracking-tighter">
+              <h2 className="text-5xl font-black tracking-tighter italic">
+                {t("take_breath")}
+              </h2>
+              <div className="text-8xl md:text-9xl font-black text-white tracking-tighter drop-shadow-2xl">
                 {formatTime(restTimeLeft)}
               </div>
               <button
                 onClick={startNextSection}
-                className="px-12 py-4 bg-white text-black rounded-2xl font-black"
+                className="px-12 py-5 bg-white text-slate-950 rounded-[2rem] font-black uppercase tracking-widest hover:bg-sky-500 transition-all active:scale-95 shadow-xl"
               >
                 {t("skip_break")}
               </button>
@@ -496,6 +538,7 @@ const ExamScreen = () => {
         </AnimatePresence>
       </main>
 
+      {/* --- EXIT MODAL --- */}
       <AnimatePresence>
         {showExitModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -504,32 +547,34 @@ const ExamScreen = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowExitModal(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+              className="absolute inset-0 bg-[#020617]/90 backdrop-blur-xl"
             />
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-sm bg-neutral-900 border border-neutral-800 p-8 rounded-[2rem] shadow-2xl text-center"
+              className="relative w-full max-w-sm bg-[#0f172a] border border-white/10 p-10 rounded-[2.5rem] shadow-2xl text-center"
             >
-              <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
                 <LogOut size={32} />
               </div>
-              <h3 className="text-2xl font-black mb-2">{t("leave_exam")}?</h3>
-              <p className="text-neutral-400 text-sm mb-8">
+              <h3 className="text-2xl font-black mb-2 tracking-tight">
+                {t("leave_exam")}?
+              </h3>
+              <p className="text-slate-400 text-sm mb-8 leading-relaxed">
                 Your progress will not be saved. Are you sure you want to exit
                 now?
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setShowExitModal(false)}
-                  className="py-4 bg-neutral-800 text-white font-bold rounded-2xl hover:bg-neutral-700"
+                  className="py-4 bg-white/5 text-white font-bold rounded-2xl hover:bg-white/10 transition-colors border border-white/5"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => navigate("/test")}
-                  className="py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600"
+                  className="py-4 bg-red-500 text-slate-950 font-black rounded-2xl hover:bg-red-600 transition-all"
                 >
                   Exit
                 </button>
@@ -539,19 +584,20 @@ const ExamScreen = () => {
         )}
       </AnimatePresence>
 
+      {/* --- FOOTER --- */}
       {status === "exam" && (
-        <footer className="h-24 border-t border-neutral-800 bg-black/90 backdrop-blur-xl px-4 flex items-center justify-center fixed bottom-0 left-0 right-0 z-50">
-          <div className="max-w-3xl w-full flex items-center justify-between">
-            <div className="hidden sm:flex items-center gap-2 text-neutral-500 text-xs font-bold uppercase">
+        <footer className="h-24 border-t border-white/5 bg-[#020617]/80 backdrop-blur-2xl px-4 md:px-10 flex items-center justify-center fixed bottom-0 left-0 right-0 z-50">
+          <div className="max-w-4xl w-full flex items-center justify-between">
+            <div className="hidden sm:flex items-center gap-2 text-slate-500 text-[10px] font-black uppercase tracking-widest">
               <Info size={14} className="text-sky-500" /> Session active
             </div>
             <button
               disabled={selectedOption === null || isSubmitting}
               onClick={handleNextQuestion}
-              className={`px-10 py-4 rounded-2xl font-black uppercase transition-all flex items-center gap-3 ${
+              className={`px-10 py-4 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center gap-3 ${
                 selectedOption !== null && !isSubmitting
-                  ? "bg-sky-500 text-black shadow-lg"
-                  : "bg-neutral-800 text-neutral-600 opacity-50 cursor-not-allowed"
+                  ? "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95"
+                  : "bg-white/5 text-slate-600 opacity-50 cursor-not-allowed border border-white/5"
               }`}
             >
               {isSubmitting ? (

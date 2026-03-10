@@ -55,13 +55,44 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 md:p-6 overflow-x-hidden">
-      {/* BACKGROUND ORBS */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] bg-sky-500/10 blur-[100px] rounded-full" />
+    <div className="min-h-screen bg-[#020617] text-white flex items-center justify-center p-4 md:p-6 overflow-hidden relative">
+      {/* 1. ANIMATED GRID (Matches Home Page) */}
+      <motion.div
+        className="fixed inset-0 pointer-events-none z-0"
+        initial={{ backgroundPosition: "0px 0px" }}
+        animate={{ backgroundPosition: ["0px 0px", "48px 48px"] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 1px 1px, rgb(14 165 233 / 0.15) 1px, transparent 0),
+            linear-gradient(rgb(30 41 59 / 0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgb(30 41 59 / 0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: "48px 48px",
+        }}
+      />
+
+      {/* 2. BACKGROUND ORBS */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-[10%] -left-[10%] w-[60%] h-[50%] bg-sky-600/20 blur-[120px] rounded-full"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.2, 0.1] }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
+          className="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-blue-900/30 blur-[150px] rounded-full"
+        />
       </div>
 
-      <div className="w-full max-w-md bg-neutral-900/80 backdrop-blur-xl border border-neutral-800 p-6 md:p-10 rounded-[32px] shadow-2xl relative z-10">
+      {/* CARD CONTENT */}
+      <div className="w-full max-w-md bg-sky-950/20 backdrop-blur-2xl border border-sky-500/10 p-6 md:p-10 rounded-[40px] shadow-2xl relative z-10">
         <AnimatePresence mode="wait">
           {/* STEP 1: REGISTRATION */}
           {step === 1 && (
@@ -73,24 +104,26 @@ const LandingPage = () => {
               className="flex flex-col"
             >
               <div className="flex flex-col items-center mb-8">
-                <img
-                  src="/JLPTX.png"
-                  alt="Logo"
-                  className="w-16 h-16 object-contain drop-shadow-[0_0_15px_rgba(14,165,233,0.3)] mb-6"
-                />
-                <h2 className="text-2xl md:text-3xl font-black text-white">
+                <div className="w-20 h-20 bg-sky-500/10 rounded-3xl flex items-center justify-center border border-sky-500/20 mb-6 shadow-2xl shadow-sky-500/10">
+                  <img
+                    src="/JLPTX.png"
+                    alt="Logo"
+                    className="w-12 h-12 object-contain brightness-110"
+                  />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-white text-center leading-[1.6]">
                   {t("welcome")}
                 </h2>
               </div>
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 ml-1">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500/60 ml-1">
                     {t("name_label")}
                   </label>
                   <input
                     placeholder={t("name_placeholder")}
-                    className="w-full bg-black border border-neutral-800 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base"
+                    className="w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -100,7 +133,7 @@ const LandingPage = () => {
                   <button
                     disabled={!name}
                     onClick={generateToken}
-                    className="w-full py-5 bg-white text-black font-black rounded-2xl hover:bg-neutral-200 transition-transform active:scale-[0.98] disabled:opacity-50"
+                    className="w-full py-5 bg-white text-black font-black rounded-2xl hover:bg-sky-50 transition-all active:scale-[0.98] disabled:opacity-50"
                   >
                     {t("generate_token")}
                   </button>
@@ -110,7 +143,7 @@ const LandingPage = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     className="space-y-4"
                   >
-                    <div className="w-full flex items-center justify-between bg-black p-5 rounded-2xl border-2 border-dashed border-sky-500/30">
+                    <div className="w-full flex items-center justify-between bg-black/60 p-5 rounded-2xl border border-sky-500/30">
                       <span className="text-2xl font-mono font-black tracking-[0.3em] text-sky-400">
                         {generatedToken}
                       </span>
@@ -120,7 +153,7 @@ const LandingPage = () => {
                           setCopied(true);
                           setTimeout(() => setCopied(false), 2000);
                         }}
-                        className="p-2 bg-neutral-800 rounded-lg text-neutral-400 active:bg-neutral-700"
+                        className="p-2 bg-sky-500/10 rounded-lg text-sky-400 active:bg-sky-500/30"
                       >
                         {copied ? (
                           <Check className="text-green-500" size={20} />
@@ -131,7 +164,7 @@ const LandingPage = () => {
                     </div>
                     <button
                       onClick={handleCreateUser}
-                      className="w-full py-5 bg-sky-600 font-black rounded-2xl flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(14,165,233,0.2)] active:scale-[0.98] transition-transform"
+                      className="w-full py-5 bg-sky-600 font-black rounded-2xl flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(14,165,233,0.3)] active:scale-[0.98] transition-transform"
                     >
                       {t("proceed")} <ArrowRight size={20} />
                     </button>
@@ -150,11 +183,13 @@ const LandingPage = () => {
               exit={{ opacity: 0, x: -20 }}
               className="flex flex-col items-center text-center"
             >
-              <div className="w-16 h-16 bg-sky-500/10 rounded-full flex items-center justify-center mb-6 text-sky-500">
+              <div className="w-16 h-16 bg-sky-500/10 rounded-full flex items-center justify-center mb-6 text-sky-500 border border-sky-500/20">
                 <ShieldCheck size={32} />
               </div>
-              <h2 className="text-2xl font-black mb-2">{t("verify_token")}</h2>
-              <p className="text-neutral-500 text-sm mb-8 px-4 leading-relaxed">
+              <h2 className="text-2xl font-black mb-2 leading-[1.6]">
+                {t("verify_token")}
+              </h2>
+              <p className="text-sky-500/60 text-sm mb-8 px-4 leading-[1.6]">
                 {t("verify_desc")}
               </p>
 
@@ -162,7 +197,7 @@ const LandingPage = () => {
                 autoFocus
                 autoComplete="off"
                 placeholder="--- ---"
-                className="w-full bg-black border border-neutral-800 p-5 rounded-2xl mb-6 text-center font-mono text-3xl font-black tracking-[0.4em] uppercase text-sky-400 outline-none focus:border-sky-500"
+                className="w-full bg-black/60 border border-sky-900/50 p-5 rounded-2xl mb-6 text-center font-mono text-3xl font-black tracking-[0.4em] uppercase text-sky-400 outline-none focus:border-sky-500"
                 value={inputToken}
                 onChange={(e) => setInputToken(e.target.value)}
               />
@@ -170,7 +205,7 @@ const LandingPage = () => {
               <button
                 disabled={inputToken.length < 6}
                 onClick={verifyToken}
-                className="w-full py-5 bg-sky-600 font-black rounded-2xl shadow-[0_10px_30px_rgba(14,165,233,0.2)] active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full py-5 bg-sky-600 font-black rounded-2xl shadow-[0_10px_30px_rgba(14,165,233,0.3)] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {t("verify_btn")}
               </button>
@@ -186,26 +221,27 @@ const LandingPage = () => {
               className="flex flex-col"
             >
               <div className="text-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-black mb-2">
+                <h2 className="text-2xl md:text-3xl font-black mb-2 leading-[1.6]">
                   {t("select_level")}
                 </h2>
-                <p className="text-neutral-500 text-sm">{t("level_ask")}</p>
+                <p className="text-sky-500/60 text-sm leading-[1.6]">
+                  {t("level_ask")}
+                </p>
               </div>
 
-              {/* Mobile Friendly Grid: 2 columns on mobile, 1 on larger */}
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-1">
                 {["N1", "N2", "N3", "N4", "N5"].map((lvl, index) => (
                   <button
                     key={lvl}
                     onClick={() => selectLevel(lvl)}
-                    className={`group w-full p-4 md:p-5 bg-neutral-800/50 border border-neutral-800 rounded-2xl font-black text-lg transition-all active:scale-[0.96] hover:bg-sky-600 hover:border-sky-400 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 ${
+                    className={`group w-full p-4 md:p-5 bg-sky-950/40 border border-sky-900/40 rounded-2xl font-black text-lg transition-all active:scale-[0.96] hover:bg-sky-600 hover:border-sky-400 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 ${
                       index === 4 ? "col-span-2 sm:col-span-1" : ""
                     }`}
                   >
                     <span className="text-sky-500 group-hover:text-white transition-colors">
                       {lvl}
                     </span>
-                    <span className="text-[10px] md:text-xs uppercase tracking-widest text-neutral-500 group-hover:text-sky-100 opacity-60">
+                    <span className="text-[10px] md:text-xs uppercase tracking-widest text-sky-900 group-hover:text-sky-100 opacity-60">
                       {t("proficiency")}
                     </span>
                   </button>
