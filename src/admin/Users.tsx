@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -51,7 +51,7 @@ const Users = () => {
     setLoading(true);
     try {
       const res = await userApi.getAllUsers();
-      setUsers(res.data?.data || []);
+      setUsers(res.data?.data);
     } catch (err) {
       handleApiError(err);
       showToast("Failed to fetch database records", "error");
