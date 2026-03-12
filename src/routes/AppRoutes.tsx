@@ -18,6 +18,8 @@ import { useUser } from "../hooks/useUser";
 import NotFound from "../ui/404";
 import ExamScreen from "../ui/ExamScreen";
 import Results from "../ui/Results";
+import Users from "../admin/Users";
+import Login from "../ui/Login";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
@@ -36,30 +38,36 @@ const AppRoutes = () => {
       <Route path="/get-started" element={<LandingPage />} />
       <Route path="/manual" element={<UserManual />} />
       <Route path="/results" element={<Results />} />
+      <Route path="/auth" element={<Login />} />
 
       {/* PROTECTED STUDENT ROUTES */}
       <Route
         path="/test"
         element={
           <ProtectedRoutes>
-            {/* This ensures all sub-routes (/test/exam, /test/:id) are protected */}
             <Outlet />
           </ProtectedRoutes>
         }
       >
-        {/* path: "/test" - Defaults to Home */}
         <Route index element={<Home />} />
 
-        {/* path: "/test/:id" - Shows the actual Exam Screen */}
         <Route path=":id" element={<ExamScreen />} />
       </Route>
 
       {/* PROTECTED ADMIN ROUTES */}
-      <Route path="/admin" element={<DashboardLayout />}>
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoutes allowedRoles={["admin"]}>
+            <DashboardLayout />
+          </ProtectedRoutes>
+        }
+      >
         <Route index element={<Dashboard />} />
         <Route path="exams" element={<Exams />} />
         <Route path="sections" element={<Sections />} />
         <Route path="questions" element={<Questions />} />
+        <Route path="users" element={<Users />} />
       </Route>
 
       {/* 404 FALLBACK */}

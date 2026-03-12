@@ -1,15 +1,45 @@
 import { apiClient } from "./apiClient";
 
+export interface User {
+  _id: string;
+  name: string;
+  level?: string;
+  role: string;
+  token: string;
+}
+
+export interface UserForm {
+  name?: string;
+  level?: string;
+  role?: string;
+  token: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  token: string;
+  data: T;
+}
+
+export type UserFormData = Omit<User, "_id">;
+
 export const userApi = {
   createUser: (name: string, token: string) =>
-    apiClient.post("/users", { name, token }),
+    apiClient.post<ApiResponse<User>>("/users", { name, token }),
 
   updateUser: (id: string, level: string) =>
-    apiClient.put(`/users/${id}`, { level }),
+    apiClient.put<ApiResponse<User>>(`/users/${id}`, { level }),
 
-  getUser: (id: string) => apiClient.get(`/users/${id}`),
+  updateRole: (id: string) =>
+    apiClient.put<ApiResponse<User>>(`/users/${id}/role`),
 
-  getAllUsers: () => apiClient.get("/users"),
+  getUser: (id: string) => apiClient.get<ApiResponse<User>>(`/users/${id}`),
 
-  clearUser: (id: string) => apiClient.delete(`/users/${id}`),
+  getAllUsers: () => apiClient.get<ApiResponse<User[]>>("/users"),
+
+  clearUser: (id: string) =>
+    apiClient.delete<ApiResponse<null>>(`/users/${id}`),
+
+  login: (data: UserForm) =>
+    apiClient.post<ApiResponse<User>>("/users/auth", data),
 };

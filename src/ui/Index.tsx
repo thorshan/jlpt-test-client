@@ -5,7 +5,14 @@ import {
   useSpring,
 } from "framer-motion";
 import { useEffect } from "react";
-import { ExternalLink, Zap, Globe, Lock, BookOpen } from "lucide-react";
+import {
+  ExternalLink,
+  Zap,
+  Globe,
+  Lock,
+  BookOpen,
+  UserStar,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LangToggler } from "../components/LangToggler";
 import { useTranslation } from "../hooks/useTranslation";
@@ -89,30 +96,42 @@ const Index = () => {
         {/* Buttons Section */}
         <div className="flex items-center gap-3 pointer-events-auto">
           <motion.div variants={itemVariants}>
+            <div className="bg-white/5 backdrop-blur-xl border border-sky-500/10 p-1 rounded-2xl shadow-2xl">
+              <LangToggler />
+            </div>
+          </motion.div>
+          <motion.div variants={itemVariants}>
             <motion.button
               whileHover={{
                 scale: 1.02,
                 backgroundColor: "rgba(255,255,255,0.08)",
               }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-sky-500/10 text-white px-4 py-2.5 md:px-6 md:py-4 rounded-2xl font-bold text-sm md:text-base shadow-2xl hover:border-sky-400/40 transition-all"
+              className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-sky-500/10 text-white px-4 py-2.5 md:px-6 md:py-2 rounded-2xl font-bold text-sm md:text-base shadow-2xl hover:border-sky-400/40 transition-all"
               onClick={() => navigate("/manual")}
             >
               <span className="bg-sky-500/20 text-sky-400 p-1 rounded-lg">
                 <BookOpen size={18} />
               </span>
-              {/* If Burmese is cutting here, add 'leading-relaxed' */}
               <span className={isBurmese ? "leading-relaxed" : ""}>
                 {t("manual")}
               </span>
             </motion.button>
           </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <div className="bg-white/5 backdrop-blur-xl border border-sky-500/10 p-1 rounded-2xl shadow-2xl">
-              <LangToggler />
-            </div>
-          </motion.div>
+          <motion.button
+            whileHover={{
+              scale: 1.02,
+              backgroundColor: "rgba(255,255,255,0.08)",
+            }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-sky-500/10 text-white px-4 py-2.5 md:px-6 md:py-2 rounded-2xl font-bold text-sm md:text-base shadow-2xl hover:border-sky-400/40 transition-all"
+            onClick={() => navigate("/auth")}
+          >
+            <span className="bg-sky-500/20 text-sky-400 p-1 rounded-lg">
+              <UserStar size={18} />
+            </span>
+          </motion.button>
         </div>
       </div>
 

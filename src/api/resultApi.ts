@@ -12,22 +12,21 @@ export interface SectionDetail {
 export interface Result {
   _id: string;
   user: string | { _id: string; name: string };
-  exam: string; // Reference to the Exam ID
+  exam: string;
   level: "N1" | "N2" | "N3" | "N4" | "N5";
 
   // Detailed Sectional Performance
   sectionDetails: SectionDetail[];
 
   // Overall Performance
-  totalEarnedPoints: number; // Previously overAllScore
-  totalPossiblePoints: number; // The 170 or 180 total
+  totalEarnedPoints: number;
+  totalPossiblePoints: number;
 
-  // Final Pass/Fail Status
   status: boolean;
 
   // Overall Grades
   gradeJLPT: "A" | "B" | "C";
-  grade: "A1" | "A2" | "B1" | "B2" | "C1"; // CEFR Grade
+  grade: "A1" | "A2" | "B1" | "B2" | "C1";
 
   createdAt: string;
   updatedAt: string;

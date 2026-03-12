@@ -118,7 +118,7 @@ const LandingPage = () => {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500/60 ml-1">
+                  <label className="text-[14px] font-black uppercase tracking-[0.2em] text-sky-500/60 ml-5">
                     {t("name_label")}
                   </label>
                   <input

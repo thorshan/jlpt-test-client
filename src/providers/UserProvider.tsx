@@ -1,94 +1,83 @@
-import { useEffect, useState } from "react";
-import { userApi } from "../api/userApi";
+import { useCallback, useEffect, useState } from "react";
+import { userApi, type User, type UserForm } from "../api/userApi";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
 
-interface UserData {
-  _id?: string;
-  name: string;
-  token: string;
-  level?: string;
-}
-
-interface ValidationError {
-  message: string;
-  errors: Record<string, string[]>;
-}
-
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  // 1. Instant Synchronous Hydration
-  const [user, setUser] = useState<UserData | null>(() => {
+  const [user, setUser] = useState<User | null>(() => {
     try {
       const saved = localStorage.getItem("jlpt_user");
       return saved ? JSON.parse(saved) : null;
-    } catch (error) {
-      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
-        console.log(error.status);
-        console.error(error.response);
-      } else {
-        console.error(error);
-      }
+    } catch {
       return null;
     }
   });
 
   const [isVerifying, setIsVerifying] = useState(true);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     const userId = user?._id;
+    const userRole = user?.role;
 
-    setUser(null);
-    localStorage.removeItem("jlpt_user");
-
-    // 3. Backend cleanup
-    if (userId) {
-      try {
+    try {
+      if (userId && userRole !== "admin") {
         await userApi.clearUser(userId);
-      } catch (error) {
-        console.error("Failed to clear session on server:", error);
       }
+    } catch (error) {
+      console.error("Session cleanup failed:", error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem("jlpt_user");
+      localStorage.removeItem("token");
     }
-  };
+  }, [user?._id, user?.role]);
 
   useEffect(() => {
-    const verifyUserWithServer = async () => {
-      const saved = localStorage.getItem("jlpt_user");
-      const localUser = saved ? JSON.parse(saved) : null;
+    const verifyUser = async () => {
+      const sessionJwt = localStorage.getItem("token");
 
-      if (localUser?._id) {
+      if (user?._id && sessionJwt) {
         try {
-          await userApi.getUser(localUser._id);
-          setUser(localUser);
+          const res = await userApi.getUser(user._id);
+          const freshUser = res.data.data;
+
+          setUser(freshUser);
+          localStorage.setItem("jlpt_user", JSON.stringify(freshUser));
         } catch (error) {
           if (
-            axios.isAxiosError<ValidationError, Record<string, unknown>>(error)
+            axios.isAxiosError(error) &&
+            (error.response?.status === 401 || error.response?.status === 404)
           ) {
-            console.log(error.status);
-            console.error(error.response);
-            if (error.response?.status === 404) {
-              logout();
-            }
-          } else {
-            console.error(error);
+            logout();
           }
         }
-      } else {
-        // No user found in storage at all
+      } else if (!sessionJwt) {
         setUser(null);
       }
-
       setIsVerifying(false);
     };
 
-    verifyUserWithServer();
-  }, []);
+    verifyUser();
+  }, [logout]);
 
-  const login = (data: UserData) => {
-    setUser(data);
-    localStorage.setItem("jlpt_user", JSON.stringify(data));
+  const login = async (formData: UserForm) => {
+    try {
+      const res = await userApi.login(formData);
+      const userData = res.data.data;
+      const sessionJwt = res.data.token;
+
+      setUser(userData);
+      localStorage.setItem("jlpt_user", JSON.stringify(userData));
+      localStorage.setItem("token", sessionJwt);
+
+      return res.data;
+    } catch (err) {
+      console.error("Login failed:", err);
+      throw err;
+    }
   };
 
-  const updateUser = (updates: Partial<UserData>) => {
+  const updateUser = (updates: Partial<User>) => {
     setUser((prev) => {
       if (!prev) return null;
       const newData = { ...prev, ...updates };

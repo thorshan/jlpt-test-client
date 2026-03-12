@@ -103,6 +103,7 @@ const ExamScreen = () => {
   const [restTimeLeft, setRestTimeLeft] = useState(10 * 60);
   const [userAnswers, setUserAnswers] = useState<Record<string, number>>({});
   const [showExitModal, setShowExitModal] = useState(false);
+  const [exmaTimeLeft, setExamTimeLeft] = useState(0);
 
   // --- DERIVED DATA ---
   const currentSection = exam?.sections?.[currentSectionIdx];
@@ -144,7 +145,7 @@ const ExamScreen = () => {
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [status, loading, exam, userAnswers, isSubmitting]);
+  }, [status, loading, exam, userAnswers, isSubmitting, sectionTimeLeft]);
 
   useEffect(() => {
     if (status === "exam" && questionRefs.current[currentQuestionIdx]) {
@@ -301,6 +302,7 @@ const ExamScreen = () => {
 
   const handleSectionEnd = (updatedAnswers: Record<string, number>) => {
     if (exam && currentSectionIdx < exam.sections.length - 1) {
+      setExamTimeLeft(sectionTimeLeft);
       setStatus("rest");
     } else {
       submitExam(updatedAnswers);
@@ -312,7 +314,12 @@ const ExamScreen = () => {
     const nextIdx = currentSectionIdx + 1;
     setCurrentSectionIdx(nextIdx);
     setCurrentQuestionIdx(0);
-    setSectionTimeLeft(exam.sections[nextIdx].duration * 60);
+
+    const nextSectionDuration = exam.sections[nextIdx].duration * 60;
+    setSectionTimeLeft(nextSectionDuration + exmaTimeLeft);
+
+    setExamTimeLeft(0);
+
     setStatus("exam");
     setSelectedOption(null);
     setRestTimeLeft(10 * 60);

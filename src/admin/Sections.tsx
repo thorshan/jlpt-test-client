@@ -1,4 +1,19 @@
 import { useEffect, useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  PlusCircle,
+  Edit3,
+  Save,
+  XCircle,
+  Trash2,
+  Clock,
+  Target,
+  CheckCircle2,
+  Layers,
+  Database,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
 import { sectionApi, type Section } from "../api/sectionApi";
 import { questionApi, type Question } from "../api/questionApi";
 import { LoadingScreen } from "../components/LoadingScreen";
@@ -14,6 +29,10 @@ const Sections = () => {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // --- DELETE MODAL STATE ---
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   // --- FILTER STATE ---
   const [filterCategory, setFilterCategory] = useState<string>("All");
@@ -58,11 +77,11 @@ const Sections = () => {
         sectionApi.getSections(),
         questionApi.getQuestions(),
       ]);
-      setSections(secRes.data.data);
-      setAllQuestions(qRes.data.data);
+      setSections(secRes.data.data || []);
+      setAllQuestions(qRes.data.data || []);
     } catch (error) {
       if (axios.isAxiosError<ValidationError>(error)) {
-        console.error(error.response);
+        console.error("API Error:", error.response);
       }
     } finally {
       setLoading(false);
@@ -88,7 +107,7 @@ const Sections = () => {
       resetForm();
     } catch (error) {
       if (axios.isAxiosError<ValidationError>(error)) {
-        console.error(error.response);
+        console.error("Submission Error:", error.response);
       }
     }
   };
@@ -115,229 +134,409 @@ const Sections = () => {
 
   const handleEdit = (section: Section) => {
     setEditingId(section._id);
+    const questionIds = section.questions.map((q: string | Question) => {
+      if (typeof q === "string") return q;
+      return q._id;
+    });
     setForm({
       title: section.title,
-      desc: section.desc,
+      desc: section.desc || "",
       duration: section.duration,
       minPassedMark: section.minPassedMark,
-      questions: section.questions,
+      questions: questionIds,
     });
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Delete section?")) return;
-    await sectionApi.deleteSection(id);
-    setSections((prev) => prev.filter((s) => s._id !== id));
+  const openDeleteModal = (id: string) => {
+    setItemToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (itemToDelete) {
+      try {
+        await sectionApi.deleteSection(itemToDelete);
+        setSections((prev) => prev.filter((s) => s._id !== itemToDelete));
+      } catch (error) {
+        console.error("Delete Error:", error);
+      } finally {
+        setIsDeleteModalOpen(false);
+        setItemToDelete(null);
+      }
+    }
   };
 
   if (loading) return <LoadingScreen />;
 
   return (
-    <div className="min-h-screen p-8 bg-neutral-900 text-slate-100 flex flex-col gap-8">
-      <h1 className="text-3xl font-bold text-emerald-500">
-        Section Management
-      </h1>
+    <div className="h-screen bg-[#020617] text-white flex flex-col font-sans overflow-hidden">
+      {/* Background Orbs */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-sky-500/5 blur-[120px] rounded-full" />
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: `radial-gradient(#334155 1px, transparent 1px)`,
+            backgroundSize: "30px 30px",
+          }}
+        />
+      </div>
 
-      <div className="grid lg:grid-cols-2 gap-10 items-start">
-        {/* FORM */}
-        <section className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700 shadow-xl sticky top-8">
-          <h2 className="text-xl font-bold mb-6 text-emerald-400">
-            {editingId ? "Edit Section" : "Create New Section"}
-          </h2>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs text-neutral-500 uppercase font-bold">
-                  Title
-                </label>
-                <input
-                  className="bg-neutral-900 p-3 rounded border border-neutral-600 focus:border-emerald-500 outline-none"
-                  placeholder="N1 Listening"
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs text-neutral-500 uppercase font-bold">
-                  Duration (Mins)
-                </label>
-                <input
-                  className="bg-neutral-900 p-3 rounded border border-neutral-600 focus:border-emerald-500 outline-none"
-                  type="number"
-                  value={form.duration}
-                  onChange={(e) =>
-                    setForm({ ...form, duration: Number(e.target.value) })
-                  }
-                />
-              </div>
-            </div>
+      <main className="relative z-10 p-6 md:p-12 max-w-7xl mx-auto w-full h-full flex flex-col overflow-hidden">
+        {/* HEADER */}
+        <header className="mb-8 shrink-0">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-4xl font-black tracking-tighter italic flex items-center gap-4 text-white">
+              <Layers className="text-sky-500" size={32} />
+              SECTIONS
+            </h1>
+            <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em] mt-2">
+              Section Management
+            </p>
+          </motion.div>
+        </header>
 
-            <input
-              className="bg-neutral-900 p-3 rounded border border-neutral-600 focus:border-emerald-500 outline-none"
-              placeholder="Description"
-              value={form.desc}
-              onChange={(e) => setForm({ ...form, desc: e.target.value })}
-            />
+        {/* MAIN GRID */}
+        <div className="grid lg:grid-cols-2 gap-12 items-start flex-1 overflow-hidden">
+          {/* --- LEFT: FORM SECTION (PINNED/FIXED) --- */}
+          <section className="h-full flex flex-col overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white/5 border border-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] shadow-2xl flex flex-col max-h-full"
+            >
+              <h2 className="text-sm font-black uppercase tracking-widest text-sky-500 mb-6 flex items-center gap-2 shrink-0">
+                {editingId ? <Edit3 size={16} /> : <PlusCircle size={16} />}
+                {editingId ? "Update Section" : "Create Section"}
+              </h2>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-neutral-500 uppercase font-bold">
-                Minimum Passing Mark
-              </label>
-              <input
-                className="bg-neutral-900 p-3 rounded border border-neutral-600 focus:border-emerald-500 outline-none"
-                type="number"
-                value={form.minPassedMark}
-                onChange={(e) =>
-                  setForm({ ...form, minPassedMark: Number(e.target.value) })
-                }
-              />
-            </div>
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col gap-5 overflow-y-auto pr-2 scrollbar-hide"
+              >
+                <div className="space-y-2 shrink-0">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                    Section Title
+                  </label>
+                  <input
+                    className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-bold text-white"
+                    placeholder="e.g., N5 Grammar Assessment"
+                    value={form.title}
+                    onChange={(e) =>
+                      setForm({ ...form, title: e.target.value })
+                    }
+                    required
+                  />
+                </div>
 
-            {/* --- QUESTION SELECTOR WITH FILTERS --- */}
-            <div className="flex flex-col gap-3">
-              <div className="flex justify-between items-end">
-                <label className="text-sm font-bold text-neutral-400">
-                  Select Questions ({form.questions.length} selected)
-                </label>
-                {(filterCategory !== "All" || filterModule !== "All") && (
+                <div className="space-y-2 shrink-0">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-2 flex items-center gap-2">
+                    <Info size={12} className="text-sky-500" /> Description
+                  </label>
+                  <textarea
+                    className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-slate-300 min-h-[80px]"
+                    placeholder="Provide details about this section..."
+                    value={form.desc}
+                    onChange={(e) => setForm({ ...form, desc: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 shrink-0">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-2 text-sky-500/80 flex items-center gap-1">
+                      <Clock size={10} /> Duration (M)
+                    </label>
+                    <input
+                      className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-bold text-sky-400"
+                      type="number"
+                      value={form.duration}
+                      onChange={(e) =>
+                        setForm({ ...form, duration: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-2 text-sky-500/80 flex items-center gap-1">
+                      <Target size={10} /> Min Pass Mark
+                    </label>
+                    <input
+                      className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-bold text-sky-400"
+                      type="number"
+                      value={form.minPassedMark}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          minPassedMark: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* --- QUESTION SELECTOR --- */}
+                <div className="flex flex-col gap-3 min-h-[600px] custom-scrollbar">
+                  <div className="flex justify-between items-end shrink-0">
+                    <label className="text-[10px] font-black uppercase text-slate-400">
+                      Add Questions ({form.questions.length} Selected)
+                    </label>
+                    {(filterCategory !== "All" || filterModule !== "All") && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFilterCategory("All");
+                          setFilterModule("All");
+                        }}
+                        className="text-[10px] text-sky-500 font-black uppercase tracking-tighter hover:underline"
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-2 p-3 bg-slate-950/50 rounded-2xl border border-white/5 shrink-0">
+                    <div className="flex flex-wrap gap-1 items-center">
+                      <span className="text-[9px] text-slate-600 font-black w-8">
+                        CAT
+                      </span>
+                      {categories.map((cat) => (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => setFilterCategory(cat)}
+                          className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase border transition ${filterCategory === cat ? "bg-sky-500 border-sky-400 text-slate-950 shadow-sm" : "bg-white/5 border-white/5 text-slate-400"}`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-1 items-center">
+                      <span className="text-[9px] text-slate-600 font-black w-8">
+                        MOD
+                      </span>
+                      {modules.map((mod) => (
+                        <button
+                          key={mod}
+                          type="button"
+                          onClick={() => setFilterModule(mod)}
+                          className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase border transition ${filterModule === mod ? "bg-white border-white text-slate-950 shadow-sm" : "bg-white/5 border-white/5 text-slate-400"}`}
+                        >
+                          {mod}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto border border-white/5 rounded-2xl bg-slate-950/30 p-2 flex flex-col gap-2 custom-scrollbar">
+                    {filteredQuestions.length > 0 ? (
+                      filteredQuestions.map((q) => (
+                        <div
+                          key={q._id}
+                          onClick={() => toggleQuestionSelection(q._id)}
+                          className={`p-3 rounded-xl cursor-pointer text-xs flex justify-between items-start transition-all ${
+                            form.questions.includes(q._id)
+                              ? "bg-sky-500/10 border border-sky-500/50"
+                              : "bg-white/5 border border-transparent hover:bg-white/10"
+                          }`}
+                        >
+                          <div className="flex flex-col gap-1 truncate pr-4">
+                            <span
+                              className={`truncate font-bold ${form.questions.includes(q._id) ? "text-sky-400" : "text-slate-300"}`}
+                            >
+                              {q.text}
+                            </span>
+                            <div className="flex gap-2 text-[8px] font-black">
+                              <span className="text-slate-500 uppercase">
+                                {q.category}
+                              </span>
+                              <span className="text-sky-500/50">/</span>
+                              <span className="text-slate-500 uppercase">
+                                {q.module}
+                              </span>
+                            </div>
+                          </div>
+                          {form.questions.includes(q._id) && (
+                            <CheckCircle2
+                              size={14}
+                              className="text-sky-400 shrink-0 mt-0.5"
+                            />
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-10 text-center text-slate-600 text-[10px] font-black uppercase tracking-widest italic">
+                        No questions available
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3 shrink-0 pt-4">
                   <button
-                    type="button"
-                    onClick={() => {
-                      setFilterCategory("All");
-                      setFilterModule("All");
-                    }}
-                    className="text-[10px] text-emerald-500 hover:underline"
+                    type="submit"
+                    className={`py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 ${
+                      editingId
+                        ? "bg-white text-slate-950"
+                        : "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20"
+                    }`}
                   >
-                    Clear Filters
+                    <Save size={18} />
+                    {editingId ? "Update Section" : "Save Section"}
                   </button>
-                )}
-              </div>
-
-              {/* Filter Bar */}
-              <div className="flex flex-col gap-2 p-3 bg-neutral-900/50 rounded-lg border border-neutral-700">
-                <div className="flex flex-wrap gap-2 items-center">
-                  <span className="text-[10px] text-neutral-500 font-bold w-12">
-                    CAT:
-                  </span>
-                  {categories.map((cat) => (
+                  {editingId && (
                     <button
-                      key={cat}
                       type="button"
-                      onClick={() => setFilterCategory(cat)}
-                      className={`px-2 py-0.5 rounded text-[10px] border transition ${filterCategory === cat ? "bg-emerald-600 border-emerald-400" : "bg-neutral-800 border-neutral-700 text-neutral-400"}`}
+                      onClick={resetForm}
+                      className="text-[10px] font-black uppercase text-red-500 flex items-center justify-center gap-2 hover:text-white"
                     >
-                      {cat}
+                      <XCircle size={14} /> Abort Edit
                     </button>
-                  ))}
+                  )}
                 </div>
-                <div className="flex flex-wrap gap-2 items-center">
-                  <span className="text-[10px] text-neutral-500 font-bold w-12">
-                    MOD:
-                  </span>
-                  {modules.map((mod) => (
-                    <button
-                      key={mod}
-                      type="button"
-                      onClick={() => setFilterModule(mod)}
-                      className={`px-2 py-0.5 rounded text-[10px] border transition ${filterModule === mod ? "bg-sky-600 border-sky-400" : "bg-neutral-800 border-neutral-700 text-neutral-400"}`}
-                    >
-                      {mod}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              </form>
+            </motion.div>
+          </section>
 
-              {/* List */}
-              <div className="max-h-60 overflow-y-auto border border-neutral-700 rounded bg-neutral-900 p-2 flex flex-col gap-2">
-                {filteredQuestions.length > 0 ? (
-                  filteredQuestions.map((q) => (
-                    <div
-                      key={q._id}
-                      onClick={() => toggleQuestionSelection(q._id)}
-                      className={`p-2 rounded cursor-pointer text-xs flex justify-between items-start transition ${
-                        form.questions.includes(q._id)
-                          ? "bg-emerald-900/40 border border-emerald-500"
-                          : "bg-neutral-800 border border-transparent hover:bg-neutral-700"
-                      }`}
-                    >
-                      <div className="flex flex-col gap-1 truncate pr-4">
-                        <span className="truncate">{q.text}</span>
-                        <div className="flex gap-2 text-[9px] font-mono text-neutral-500">
-                          <span className="bg-neutral-950 px-1 rounded">
-                            CAT: {q.category}
+          {/* --- RIGHT: LIST SECTION (SCROLLABLE) --- */}
+          <section className="h-full flex flex-col overflow-hidden">
+            <div className="shrink-0 mb-8 flex justify-between items-end px-2">
+              <div>
+                <h2 className="text-xl font-black italic uppercase">
+                  Sections Entries
+                </h2>
+                <p className="text-[10px] font-black text-sky-500 uppercase tracking-widest">
+                  Active Sections: {sections.length}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide space-y-4 pb-12">
+              <AnimatePresence mode="popLayout">
+                {sections.map((s) => (
+                  <motion.div
+                    layout
+                    key={s._id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="bg-white/5 border border-white/5 backdrop-blur-md p-6 rounded-[2rem] flex justify-between items-center group hover:bg-sky-500/[0.03] hover:border-sky-500/20 transition-all"
+                  >
+                    <div className="flex-1 min-w-0 pr-6">
+                      <h3 className="font-black text-lg tracking-tight truncate group-hover:text-sky-400 transition-colors uppercase italic">
+                        {s.title}
+                      </h3>
+                      {s.desc && (
+                        <p className="text-[10px] text-slate-500 mt-1 line-clamp-1 italic">
+                          {s.desc}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap gap-3 mt-3">
+                        <div className="flex items-center gap-1.5 text-slate-500">
+                          <Database size={12} className="text-sky-500/50" />
+                          <span className="text-[10px] font-black uppercase">
+                            {s.questions.length} Q's
                           </span>
-                          <span className="bg-neutral-950 px-1 rounded">
-                            MOD: {q.module}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-500">
+                          <Clock size={12} className="text-sky-500/50" />
+                          <span className="text-[10px] font-black uppercase">
+                            {s.duration} Mins
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-500">
+                          <Target size={12} className="text-sky-500/50" />
+                          <span className="text-[10px] font-black uppercase">
+                            {s.minPassedMark} Min Mark
                           </span>
                         </div>
                       </div>
-                      {form.questions.includes(q._id) && (
-                        <span className="text-emerald-400 font-bold">✓</span>
-                      )}
                     </div>
-                  ))
-                ) : (
-                  <div className="py-10 text-center text-neutral-600 text-xs italic">
-                    No questions match these filters.
-                  </div>
-                )}
-              </div>
+
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      <button
+                        onClick={() => handleEdit(s)}
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sky-400 transition-all active:scale-90"
+                      >
+                        <Edit3 size={18} />
+                      </button>
+                      <button
+                        onClick={() => openDeleteModal(s._id)}
+                        className="p-3 bg-white/5 hover:bg-red-500/10 rounded-2xl text-red-500 transition-all active:scale-90"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {sections.length === 0 && (
+                <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-[2.5rem]">
+                  <p className="text-slate-600 text-xs font-black uppercase tracking-widest">
+                    Database Clean
+                  </p>
+                </div>
+              )}
             </div>
+          </section>
+        </div>
+      </main>
 
-            <button
-              className={`py-3 rounded-lg font-bold transition active:scale-95 ${editingId ? "bg-orange-600" : "bg-emerald-600"}`}
+      {/* --- DELETE CONFIRM MODAL --- */}
+      <AnimatePresence>
+        {isDeleteModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-[#0f172a] border border-white/10 p-8 rounded-[2.5rem] max-w-sm w-full shadow-2xl overflow-hidden"
             >
-              {editingId ? "Update Section" : "Save Section"}
-            </button>
-            {editingId && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="text-sm text-neutral-500 underline"
-              >
-                Cancel Edit
-              </button>
-            )}
-          </form>
-        </section>
-
-        {/* LIST */}
-        <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-bold">
-            Existing Sections ({sections.length})
-          </h2>
-          {sections.map((s) => (
-            <div
-              key={s._id}
-              className="bg-neutral-800 p-5 rounded-xl border border-neutral-700 flex justify-between items-center hover:border-emerald-500/50 transition"
-            >
-              <div>
-                <h3 className="font-bold text-lg">{s.title}</h3>
-                <p className="text-sm text-neutral-400">
-                  {s?.questions.length} Questions • {s.duration} Mins •{" "}
-                  {s.minPassedMark} Min Mark
+              <div className="relative z-10 text-center">
+                <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                  <AlertTriangle size={32} />
+                </div>
+                <h3 className="text-xl font-black italic uppercase mb-2">
+                  Confirm Purge
+                </h3>
+                <p className="text-slate-400 text-xs font-medium leading-relaxed mb-8 px-4">
+                  Are you sure you want to delete this section? This action will
+                  remove the module from the exam bank.
                 </p>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={confirmDelete}
+                    className="w-full py-4 bg-red-500 hover:bg-red-600 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all shadow-lg shadow-red-500/20"
+                  >
+                    Confirm Deletion
+                  </button>
+                  <button
+                    onClick={() => setIsDeleteModalOpen(false)}
+                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                  >
+                    Cancel Action
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-4">
-                <button
-                  onClick={() => handleEdit(s)}
-                  className="text-sky-400 text-sm font-semibold hover:underline"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(s._id)}
-                  className="text-red-500 text-sm font-semibold hover:underline"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </section>
-      </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      <style>{`
+              .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+              .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+              .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.2); border-radius: 10px; }
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(14, 165, 233, 0.4); }
+            `}</style>
     </div>
   );
 };

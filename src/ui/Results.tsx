@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useReactToPrint } from "react-to-print";
-import { motion, AnimatePresence } from "framer-motion"; // Added for background animation
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Printer,
   XCircle,

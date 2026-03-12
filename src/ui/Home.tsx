@@ -233,14 +233,14 @@ const Home = () => {
               {t("select_category")}
             </span>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar scroll-smooth">
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
             {categoryList.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`whitespace-nowrap px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
                   activeCategory === cat
-                    ? "bg-sky-500 border-sky-400 text-slate-950 shadow-[0_10px_25px_rgba(14,165,233,0.4)]"
+                    ? "bg-sky-500 border-sky-400 text-slate-950"
                     : "bg-sky-950/30 border-sky-500/10 text-slate-500 hover:border-sky-500/30 hover:text-sky-400"
                 }`}
               >

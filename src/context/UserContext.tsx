@@ -1,18 +1,12 @@
 import { createContext } from "react";
-
-interface UserData {
-  _id?: string;
-  name: string;
-  token: string;
-  level?: string;
-}
+import type { ApiResponse, User, UserForm } from "../api/userApi";
 
 interface UserContextType {
-  user: UserData | null;
+  user: User | null;
   isVerifying: boolean;
-  login: (data: UserData) => void;
+  login: (data: UserForm) => Promise<ApiResponse<User>>;
   logout: () => void;
-  updateUser: (updates: Partial<UserData>) => void;
+  updateUser: (updates: Partial<User>) => void;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(
