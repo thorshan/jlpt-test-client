@@ -150,7 +150,7 @@ const Home = () => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center gap-2 bg-sky-950/40 border border-sky-500/20 p-1 md:pl-4 md:pr-2 md:py-1.5 rounded-full hover:border-sky-500/50 transition-all active:scale-95 shadow-xl"
               >
-                <span className="hidden sm:inline text-xs font-black text-slate-300 max-w-[100px] truncate uppercase tracking-wider">
+                <span className="hidden sm:inline text-xs font-black text-slate-300 max-w-[100px] truncate">
                   {user?.name || "Student"}
                 </span>
                 <div className="w-8 h-8 bg-sky-500 text-slate-950 rounded-full flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(14,165,233,0.3)]">
@@ -171,7 +171,7 @@ const Home = () => {
                     className="absolute right-0 mt-4 w-60 bg-[#0f172a] border border-sky-500/20 rounded-[2rem] shadow-2xl p-3 z-[110] backdrop-blur-xl"
                   >
                     <div className="px-4 py-4 border-b border-sky-500/10 mb-2 bg-sky-500/5 rounded-t-[1.5rem]">
-                      <p className="text-[9px] text-sky-500 font-black uppercase tracking-[0.3em] mb-1">
+                      <p className="text-[9px] text-sky-500 font-black mb-2">
                         {t("name_label")}
                       </p>
                       <p className="text-sm font-black text-white truncate leading-none mb-2">
@@ -229,7 +229,7 @@ const Home = () => {
         <div className="mb-14">
           <div className="flex items-center gap-2 mb-5 text-slate-500">
             <LayoutGrid size={14} />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em]">
+            <span className="text-[12px] font-black">
               {t("select_category")}
             </span>
           </div>
@@ -238,7 +238,7 @@ const Home = () => {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`whitespace-nowrap px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                className={`whitespace-nowrap px-8 py-3.5 rounded-2xl text-[10px] font-black transition-all border ${
                   activeCategory === cat
                     ? "bg-sky-500 border-sky-400 text-slate-950"
                     : "bg-sky-950/30 border-sky-500/10 text-slate-500 hover:border-sky-500/30 hover:text-sky-400"
@@ -255,11 +255,11 @@ const Home = () => {
           <div className="flex items-center justify-between border-b border-sky-500/10 pb-6">
             <div className="flex items-center gap-2">
               <Filter size={14} className="text-sky-500" />
-              <h3 className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-[0.3em]">
+              <h3 className="text-[10px] md:text-xs font-black text-slate-400">
                 {activeCategory} {t("results")}
               </h3>
             </div>
-            <span className="text-[10px] text-sky-500/60 font-black uppercase tracking-widest bg-sky-500/5 px-3 py-1 rounded-full border border-sky-500/10">
+            <span className="text-[10px] text-sky-500/60 font-black bg-sky-500/5 px-3 py-1 rounded-full border border-sky-500/10">
               {filteredExams.length} {t("available")}
             </span>
           </div>
@@ -297,7 +297,7 @@ const Home = () => {
                       <div className="flex items-center gap-4 mt-4">
                         <div className="flex items-center gap-2 text-slate-500 font-bold">
                           <BookOpen size={14} className="text-sky-500/50" />
-                          <span className="text-xs uppercase tracking-tighter">
+                          <span className="text-xs tracking-tighter">
                             {exam.sections?.reduce(
                               (acc, s) => acc + (s.questions?.length || 0),
                               0,
@@ -306,7 +306,7 @@ const Home = () => {
                           </span>
                         </div>
                         <div className="w-1.5 h-1.5 bg-sky-500/20 rounded-full" />
-                        <span className="text-xs font-black text-sky-500 uppercase tracking-widest">
+                        <span className="text-xs font-black text-sky-500 tracking-widest">
                           {exam.sections?.reduce(
                             (acc, s) => acc + (s.duration || 0),
                             0,
@@ -331,7 +331,7 @@ const Home = () => {
                 <div className="w-20 h-20 bg-sky-950/40 rounded-full flex items-center justify-center mb-6 border border-sky-500/10 text-sky-900 shadow-inner">
                   <Search size={32} strokeWidth={3} />
                 </div>
-                <p className="text-slate-500 text-sm font-black uppercase tracking-[0.2em]">
+                <p className="text-slate-500 text-sm font-black">
                   {t("no_record")}
                 </p>
                 <button
@@ -339,7 +339,7 @@ const Home = () => {
                     setActiveCategory("All");
                     setSearchQuery("");
                   }}
-                  className="mt-6 text-sky-500 text-[10px] font-black uppercase tracking-[0.3em] hover:text-white transition-colors bg-sky-500/5 px-6 py-3 rounded-xl border border-sky-500/20"
+                  className="mt-6 text-sky-500 text-[10px] font-black hover:text-white transition-colors bg-sky-500/5 px-6 py-3 rounded-xl border border-sky-500/20"
                 >
                   {t("reset_filters")}
                 </button>
