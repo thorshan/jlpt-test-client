@@ -78,7 +78,7 @@ const Dashboard = () => {
       icon: <UsersIcon size={20} />,
       color: "text-emerald-400",
       border: "border-emerald-500/20",
-      desc: "Registered Nodes",
+      desc: "Registered Users",
     },
     {
       label: "Total Exams",
@@ -86,7 +86,7 @@ const Dashboard = () => {
       icon: <FileText size={20} />,
       color: "text-sky-400",
       border: "border-sky-500/20",
-      desc: "Deployed Protocols",
+      desc: "Exams",
     },
     {
       label: "Total Sections",
@@ -94,7 +94,7 @@ const Dashboard = () => {
       icon: <Layers size={20} />,
       color: "text-purple-400",
       border: "border-purple-500/20",
-      desc: "Logical Segments",
+      desc: "Sections",
     },
     {
       label: "Total Questions",
@@ -102,7 +102,7 @@ const Dashboard = () => {
       icon: <HelpCircle size={20} />,
       color: "text-amber-400",
       border: "border-amber-500/20",
-      desc: "Raw Data Items",
+      desc: "Questions",
     },
   ];
 
@@ -126,7 +126,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-2 text-sky-500 mb-2">
               <ShieldCheck size={14} />
               <span className="text-[9px] font-black uppercase tracking-[0.4em]">
-                Secure Admin Terminal
+                Admin Terminal
               </span>
             </div>
             <h1 className="text-5xl font-black tracking-tighter italic uppercase text-white">
@@ -245,6 +245,9 @@ const Dashboard = () => {
                 <div className="flex items-center gap-2 text-slate-600 font-mono text-[10px] font-bold">
                   <Clock size={12} />
                   {new Date(log.createdAt).toLocaleTimeString([], {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "2-digit",
                     hour: "2-digit",
                     minute: "2-digit",
                   })}

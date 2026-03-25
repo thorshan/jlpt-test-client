@@ -20,6 +20,8 @@ import ExamScreen from "../ui/ExamScreen";
 import Results from "../ui/Results";
 import Users from "../admin/Users";
 import Login from "../ui/Login";
+import AdminResults from "../admin/Results";
+import ResultDetail from "../admin/ResultDetail";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
@@ -68,6 +70,10 @@ const AppRoutes = () => {
         <Route path="sections" element={<Sections />} />
         <Route path="questions" element={<Questions />} />
         <Route path="users" element={<Users />} />
+        <Route path="results">
+          <Route index element={<AdminResults />} />
+          <Route path=":id" element={<ResultDetail />} />
+        </Route>
       </Route>
 
       {/* 404 FALLBACK */}

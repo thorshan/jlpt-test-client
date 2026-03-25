@@ -118,12 +118,9 @@ const LandingPage = () => {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[14px] font-black uppercase tracking-[0.2em] text-sky-500/60 ml-5">
-                    {t("name_label")}
-                  </label>
                   <input
                     placeholder={t("name_placeholder")}
-                    className="w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
+                    className="mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />

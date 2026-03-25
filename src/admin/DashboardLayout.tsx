@@ -1,5 +1,6 @@
+import { useState } from "react"; // Added useState
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // Added AnimatePresence
 import {
   LayoutDashboard,
   BookOpen,
@@ -7,6 +8,8 @@ import {
   HelpCircle,
   User as UserIcon,
   LogOut,
+  Award,
+  AlertTriangle, // Added for the icon
 } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 
@@ -14,6 +17,7 @@ const DashboardLayout = () => {
   const location = useLocation();
   const { user, logout } = useUser();
   const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); // State for dialog
 
   const handleLogout = () => {
     logout();
@@ -23,6 +27,7 @@ const DashboardLayout = () => {
   const navItems = [
     { name: "Overview", path: "/admin", icon: <LayoutDashboard size={18} /> },
     { name: "Users", path: "/admin/users", icon: <UserIcon size={18} /> },
+    { name: "Results", path: "/admin/results", icon: <Award size={18} /> },
     { name: "Exams", path: "/admin/exams", icon: <BookOpen size={18} /> },
     { name: "Sections", path: "/admin/sections", icon: <Layers size={18} /> },
     {
@@ -34,6 +39,48 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-[#020617] text-slate-200 font-sans overflow-hidden">
+      {/* --- LOGOUT CONFIRMATION DIALOG --- */}
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-sm bg-slate-900 border border-white/10 p-6 rounded-3xl shadow-2xl"
+            >
+              <div className="flex flex-col items-center text-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-red-500/10 flex items-center justify-center text-red-500">
+                  <AlertTriangle size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black uppercase tracking-tight text-white italic">
+                    Terminate Session?
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1 font-medium">
+                    Are you sure you want to log out of the admin dashboard?
+                  </p>
+                </div>
+                <div className="flex w-full gap-3 mt-2">
+                  <button
+                    onClick={() => setShowLogoutConfirm(false)}
+                    className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-black uppercase tracking-widest transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* --- SIDEBAR --- */}
       <aside className="w-72 border-r border-white/5 bg-slate-950/50 backdrop-blur-3xl hidden md:flex flex-col relative z-20">
         {/* LOGO SECTION */}
@@ -101,11 +148,12 @@ const DashboardLayout = () => {
                 </p>
               </div>
 
-              {/* Logout Button integrated into card */}
+              {/* Logout Button triggers the dialog instead of direct logout */}
               <button
+                type="button"
                 title="Terminate Session"
                 className="p-2 bg-white/5 hover:bg-red-500/20 rounded-lg transition-all text-slate-500 hover:text-red-400"
-                onClick={handleLogout}
+                onClick={() => setShowLogoutConfirm(true)}
               >
                 <LogOut size={14} />
               </button>
@@ -116,10 +164,7 @@ const DashboardLayout = () => {
 
       {/* --- MAIN CONTENT AREA --- */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        {/* Subtle Background Glow for Main Area */}
         <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-sky-500/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
-
-        {/* Content Section */}
         <section className="flex-1 overflow-y-auto custom-scrollbar">
           <Outlet />
         </section>

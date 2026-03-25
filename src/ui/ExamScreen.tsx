@@ -338,6 +338,25 @@ const ExamScreen = () => {
     return title[catKey]?.[modKey] || "";
   };
 
+  const renderHighlightedText = (text: string) => {
+    const parts = text.split(/(（.*?）)/g);
+
+    return parts.map((part, index) => {
+      if (part.startsWith("（") && part.endsWith("）")) {
+        const content = part.slice(1, -1);
+        return (
+          <span
+            key={index}
+            className="inline-block mx-1.5 text-sky-500 underline underline-offset-8"
+          >
+            {content}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
   if (loading || !exam) return <LoadingScreen />;
 
   return (
@@ -470,10 +489,11 @@ const ExamScreen = () => {
                         {currentQuestion.refText}
                       </div>
                     )}
-
-                    <h2 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
-                      {currentQuestion.text}
-                    </h2>
+                    {currentQuestion.category !== "Listening" && (
+                      <h2 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
+                        {renderHighlightedText(currentQuestion.text)}
+                      </h2>
+                    )}
                   </header>
 
                   {/* OPTIONS */}
