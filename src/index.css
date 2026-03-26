@@ -19,18 +19,16 @@
     }
 }
 
-html {
-    background-color: #262626;
-}
+@layer base {
+    body {
+        background-color: #020617;
+        @apply text-slate-300 antialiased;
+    }
 
-.bg-clip-text {
-    -webkit-background-clip: text;
-    background-clip: text;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
-}
-
-/* Global Styles */
-body {
-    @apply bg-neutral-800 text-slate-300 antialiased;
+    .bg-clip-text {
+        -webkit-background-clip: text;
+        background-clip: text;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+    }
 }
