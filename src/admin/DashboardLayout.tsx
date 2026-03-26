@@ -9,7 +9,9 @@ import {
   User as UserIcon,
   LogOut,
   Award,
-  AlertTriangle, // Added for the icon
+  AlertTriangle,
+  MessageSquare,
+  Activity,
 } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 
@@ -35,6 +37,8 @@ const DashboardLayout = () => {
       path: "/admin/questions",
       icon: <HelpCircle size={18} />,
     },
+    { name: "Requests", path: "/admin/requests", icon: <MessageSquare size={18} /> },
+    { name: "Activity Logs", path: "/admin/logs", icon: <Activity size={18} /> },
   ];
 
   return (

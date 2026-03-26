@@ -48,7 +48,7 @@ const Dashboard = () => {
           sectionApi.getSections(),
           questionApi.getQuestions(),
           userApi.getAllUsers(),
-          activityApi.getRecent(),
+          activityApi.getLogs(),
         ]);
 
         setStats({

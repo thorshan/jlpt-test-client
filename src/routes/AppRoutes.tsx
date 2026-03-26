@@ -7,6 +7,8 @@ import Questions from "../admin/Questions";
 import Sections from "../admin/Sections";
 import Dashboard from "../admin/Dashboard";
 import DashboardLayout from "../admin/DashboardLayout";
+import Requests from "../admin/Requests";
+import Logs from "../admin/Logs";
 
 // UI Imports
 import Index from "../ui/Index";
@@ -70,6 +72,8 @@ const AppRoutes = () => {
         <Route path="sections" element={<Sections />} />
         <Route path="questions" element={<Questions />} />
         <Route path="users" element={<Users />} />
+        <Route path="requests" element={<Requests />} />
+        <Route path="logs" element={<Logs />} />
         <Route path="results">
           <Route index element={<AdminResults />} />
           <Route path=":id" element={<ResultDetail />} />

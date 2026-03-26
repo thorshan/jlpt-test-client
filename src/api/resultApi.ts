@@ -47,6 +47,9 @@ export const resultApi = {
   getResultsByUser: (userId: string) =>
     apiClient.get<ApiResponse<Result[]>>(`/results/${userId}`),
 
+  getResultsById: (id: string) =>
+    apiClient.get<ApiResponse<Result>>(`/results/result/${id}`),
+
   createResult: (data: ResultFormData) =>
     apiClient.post<ApiResponse<Result>>("/results", data),
 };

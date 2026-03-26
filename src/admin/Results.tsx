@@ -208,9 +208,7 @@ const Results = () => {
                             title="Full Analytics"
                             className="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-sky-400 hover:bg-sky-500/10 border border-transparent hover:border-sky-500/20 transition-all"
                             onClick={() =>
-                              navigate(
-                                `/admin/results/${typeof result?.user === "object" && result.user._id}`,
-                              )
+                              navigate(`/admin/results/${result._id}`)
                             }
                           >
                             <FileText size={18} />

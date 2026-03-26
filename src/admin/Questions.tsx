@@ -261,6 +261,22 @@ const Questions = () => {
                   ))}
                 </div>
 
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                    Point
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-white"
+                    placeholder="Enter point..."
+                    value={form.point}
+                    onChange={(e) =>
+                      setForm({ ...form, point: Number(e.target.value) })
+                    }
+                    required
+                  />
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <select
                     className="w-full bg-slate-950/50 p-3 rounded-xl border border-white/5 outline-none text-xs font-bold text-sky-400 appearance-none"

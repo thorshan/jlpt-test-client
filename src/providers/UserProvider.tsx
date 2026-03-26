@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { userApi, type User, type UserForm } from "../api/userApi";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
@@ -15,22 +15,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [isVerifying, setIsVerifying] = useState(true);
 
-  const logout = useCallback(async () => {
-    const userId = user?._id;
-    const userRole = user?.role;
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem("jlpt_user");
+    localStorage.removeItem("token");
+  }, []);
 
-    try {
-      if (userId && userRole !== "admin") {
-        await userApi.clearUser(userId);
-      }
-    } catch (error) {
-      console.error("Session cleanup failed:", error);
-    } finally {
-      setUser(null);
-      localStorage.removeItem("jlpt_user");
-      localStorage.removeItem("token");
-    }
-  }, [user?._id, user?.role]);
+  useEffect(() => {
+    const handleAuthError = () => logout();
+    window.addEventListener("auth_error", handleAuthError);
+    return () => window.removeEventListener("auth_error", handleAuthError);
+  }, [logout]);
 
   useEffect(() => {
     const verifyUser = async () => {

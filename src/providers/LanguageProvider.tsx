@@ -30,7 +30,7 @@ export const LanguageProvider = ({
   };
 
   const t = (key: keyof (typeof translations)["en"]) => {
-    return translations[lang][key] || translations["en"][key];
+    return (translations[lang] as any)[key] || (translations["en"] as any)[key];
   };
 
   return (

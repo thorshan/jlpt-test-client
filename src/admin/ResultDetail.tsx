@@ -9,15 +9,14 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { resultApi, type Result } from "../api/resultApi";
-import { useUser } from "../hooks/useUser";
 import { useTranslation } from "../hooks/useTranslation";
 import { LoadingScreen } from "../components/LoadingScreen";
 
 const ResultDetail: React.FC = () => {
   const { t } = useTranslation();
-  const { user } = useUser();
+  const { id } = useParams();
   const certificateRef = useRef<HTMLDivElement>(null);
 
   const [data, setData] = useState<Result | null>(null);
@@ -25,20 +24,11 @@ const ResultDetail: React.FC = () => {
 
   useEffect(() => {
     const fetchLatestResult = async () => {
-      if (!user?._id) return;
+      if (!id) return;
       try {
         setLoading(true);
-        const res = await resultApi.getResultsByUser(user._id);
-        const resultsArray: Result[] = res?.data?.data;
-
-        if (resultsArray && resultsArray.length > 0) {
-          const latest = resultsArray.sort((a: Result, b: Result) => {
-            const dateA = new Date(a.createdAt).getTime();
-            const dateB = new Date(b.createdAt).getTime();
-            return dateB - dateA;
-          })[0];
-          setData(latest);
-        }
+        const res = await resultApi.getResultsById(id);
+        setData(res.data.data);
       } catch (err) {
         console.error("Error fetching results:", err);
       } finally {
@@ -46,10 +36,10 @@ const ResultDetail: React.FC = () => {
       }
     };
     fetchLatestResult();
-  }, [user?._id]);
+  }, [id]);
 
   const handlePrint = useReactToPrint({
-    documentTitle: `JLPT_Certificate_${user?.name || "Student"}`,
+    documentTitle: `${typeof data?.exam === "object" && data.exam?.title}_Certificate_${(typeof data?.user === "object" && data?.user?.name) || "Student"}`,
   });
 
   if (loading) return <LoadingScreen />;
@@ -174,7 +164,8 @@ const ResultDetail: React.FC = () => {
                         Certificate No.
                       </p>
                       <p className="text-xs font-mono text-white mb-4">
-                        #JLPT-{data?.level}-{data?._id.slice(-8).toUpperCase()}
+                        #{typeof data?.exam === "object" && data?.exam.title}-
+                        {data?.level}-{data?._id.slice(-8).toUpperCase()}
                       </p>
                       <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">
                         Issued Date
@@ -186,11 +177,12 @@ const ResultDetail: React.FC = () => {
                   </div>
 
                   <div className="text-center py-6">
-                    <p className="text-sky-500 uppercase text-[11px] font-black tracking-[0.5em] mb-4">
-                      Official Result
+                    <p className="text-sky-500 uppercase text-[18px] font-black mb-4">
+                      Certificate
                     </p>
                     <h2 className="text-6xl font-black text-white mb-6 underline decoration-sky-500/20 underline-offset-[12px]">
-                      {user?.name || "Examinee"}
+                      {(typeof data?.user === "object" && data?.user?.name) ||
+                        "Examinee"}
                     </h2>
                     <p className="text-slate-400 text-sm max-w-lg mx-auto leading-relaxed">
                       Has successfully demonstrated proficiency in the Japanese

@@ -16,6 +16,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { LangToggler } from "../components/LangToggler";
 import { useTranslation } from "../hooks/useTranslation";
+import { requestApi } from "../api/requestApi";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -275,6 +276,54 @@ const Index = () => {
               {t("official_link")} <ExternalLink size={14} />
             </a>
           </p>
+        </div>
+      </section>
+
+      {/* CERTIFICATE REQUEST SECTION */}
+      <section className="py-20 px-4 md:px-6 relative z-40 bg-gradient-to-t from-sky-950/20 to-transparent">
+        <div className="max-w-2xl mx-auto text-center space-y-6">
+          <h2 className="text-2xl font-black uppercase tracking-widest text-white">
+            {t("cert_request_title")}
+          </h2>
+          <p className="text-slate-400 text-sm">{t("cert_request_desc")}</p>
+          <form 
+            className="flex flex-col sm:flex-row gap-3 pt-4"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const resultId = formData.get("resultId") as string;
+              const email = formData.get("email") as string;
+              if(!resultId || !email) return;
+              try {
+                await requestApi.createRequest({ resultId, email });
+                alert(t("cert_request_success"));
+                (e.target as HTMLFormElement).reset();
+              } catch(err) {
+                alert("Error sending request.");
+              }
+            }}
+          >
+            <input 
+              name="resultId"
+              type="text" 
+              required
+              placeholder={t("result_id_placeholder")}
+              className="flex-1 min-w-[140px] bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 focus:outline-none focus:border-sky-500 text-white font-mono placeholder:font-sans text-sm sm:text-base backdrop-blur-md"
+            />
+            <input 
+              name="email"
+              type="email" 
+              required
+              placeholder="Email Address"
+              className="flex-1 min-w-[140px] bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 focus:outline-none focus:border-sky-500 text-white font-sans text-sm sm:text-base backdrop-blur-md"
+            />
+            <button 
+              type="submit"
+              className="bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-3 sm:px-8 sm:py-4 text-sm sm:text-base rounded-xl sm:rounded-2xl transition-all shadow-lg active:scale-95 whitespace-nowrap"
+            >
+              {t("cert_request_btn")}
+            </button>
+          </form>
         </div>
       </section>
 
