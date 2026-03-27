@@ -3,16 +3,10 @@ import {
   type Variants,
   useMotionValue,
   useSpring,
+  AnimatePresence,
 } from "framer-motion";
-import { useEffect } from "react";
-import {
-  ExternalLink,
-  Zap,
-  Globe,
-  Lock,
-  BookOpen,
-  UserStar,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Zap, Globe, Lock, UserStar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LangToggler } from "../components/LangToggler";
 import { useTranslation } from "../hooks/useTranslation";
@@ -29,6 +23,16 @@ const containerVariants: Variants = {
 const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
+const modalVariants: Variants = {
+  hidden: { y: "-100vh", opacity: 0 },
+  visible: {
+    y: "0",
+    opacity: 1,
+    transition: { delay: 0.1, type: "spring", stiffness: 120 },
+  },
+  exit: { y: "100vh", opacity: 0 },
 };
 
 const Index = () => {
@@ -53,6 +57,8 @@ const Index = () => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
+
+  const [showModal, setOpenModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#020617] text-white selection:bg-sky-500/30 overflow-x-hidden relative font-sans">
@@ -101,24 +107,6 @@ const Index = () => {
               <LangToggler />
             </div>
           </motion.div>
-          <motion.div variants={itemVariants}>
-            <motion.button
-              whileHover={{
-                scale: 1.02,
-                backgroundColor: "rgba(255,255,255,0.08)",
-              }}
-              whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-sky-500/10 text-white px-4 py-2.5 md:px-6 md:py-2 rounded-2xl font-bold text-sm md:text-base shadow-2xl hover:border-sky-400/40 transition-all"
-              onClick={() => navigate("/manual")}
-            >
-              <span className="bg-sky-500/20 text-sky-400 p-1 rounded-lg">
-                <BookOpen size={18} />
-              </span>
-              <span className={isBurmese ? "leading-relaxed" : ""}>
-                {t("manual")}
-              </span>
-            </motion.button>
-          </motion.div>
 
           <motion.button
             whileHover={{
@@ -162,14 +150,6 @@ const Index = () => {
           animate="visible"
           className="relative z-10 text-center space-y-6 md:space-y-8"
         >
-          {/* VERSION TAG */}
-          <motion.div
-            variants={itemVariants}
-            className="inline-block px-4 py-1.5 rounded-full border border-sky-500/20 bg-sky-500/10 text-sky-400 text-[10px] md:text-xs font-black tracking-[0.25em] uppercase"
-          >
-            v1.0
-          </motion.div>
-
           <motion.h3
             variants={itemVariants}
             className={`
@@ -266,15 +246,15 @@ const Index = () => {
             {t("integrity_title")}
           </h2>
           <p className="text-slate-400 text-sm md:text-base leading-relaxed max-w-xl mx-auto">
-            {t("integrity_desc")}{" "}
-            <a
+            {t("hero_desc")}{" "}
+            {/*<a
               href="https://jlpt.jp"
               target="_blank"
               rel="noreferrer"
               className="text-sky-400 font-bold hover:text-sky-300 transition-colors inline-flex items-center gap-1 border-b border-sky-500/30 pb-0.5"
             >
               {t("official_link")} <ExternalLink size={14} />
-            </a>
+            </a>*/}
           </p>
         </div>
       </section>
@@ -282,44 +262,45 @@ const Index = () => {
       {/* CERTIFICATE REQUEST SECTION */}
       <section className="py-20 px-4 md:px-6 relative z-40 bg-gradient-to-t from-sky-950/20 to-transparent">
         <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h2 className="text-2xl font-black uppercase tracking-widest text-white">
+          <h2 className="text-2xl font-black text-white">
             {t("cert_request_title")}
           </h2>
           <p className="text-slate-400 text-sm">{t("cert_request_desc")}</p>
-          <form 
+          <form
             className="flex flex-col sm:flex-row gap-3 pt-4"
             onSubmit={async (e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
               const resultId = formData.get("resultId") as string;
               const email = formData.get("email") as string;
-              if(!resultId || !email) return;
+              if (!resultId || !email) return;
               try {
                 await requestApi.createRequest({ resultId, email });
-                alert(t("cert_request_success"));
+                setOpenModal(true);
                 (e.target as HTMLFormElement).reset();
-              } catch(err) {
+              } catch (err) {
+                console.error(err);
                 alert("Error sending request.");
               }
             }}
           >
-            <input 
+            <input
               name="resultId"
-              type="text" 
+              type="text"
               required
               placeholder={t("result_id_placeholder")}
               className="flex-1 min-w-[140px] bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 focus:outline-none focus:border-sky-500 text-white font-mono placeholder:font-sans text-sm sm:text-base backdrop-blur-md"
             />
-            <input 
+            <input
               name="email"
-              type="email" 
+              type="email"
               required
-              placeholder="Email Address"
+              placeholder={t("email")}
               className="flex-1 min-w-[140px] bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 focus:outline-none focus:border-sky-500 text-white font-sans text-sm sm:text-base backdrop-blur-md"
             />
-            <button 
+            <button
               type="submit"
-              className="bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-5 py-3 sm:px-8 sm:py-4 text-sm sm:text-base rounded-xl sm:rounded-2xl transition-all shadow-lg active:scale-95 whitespace-nowrap"
+              className="bg-sky-500 hover:bg-sky-400 text-slate-300 font-black px-5 py-3 sm:px-8 sm:py-4 text-sm sm:text-base rounded-xl sm:rounded-2xl transition-all shadow-lg active:scale-95 whitespace-nowrap"
             >
               {t("cert_request_btn")}
             </button>
@@ -332,6 +313,48 @@ const Index = () => {
           &copy; {new Date().getFullYear()} JLPTX
         </span>
       </footer>
+
+      {/* --- PROTOCOL NOTIFICATION MODAL --- */}
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpenModal(false)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="relative bg-[#0f172a] border border-white/10 p-10 rounded-[3rem] max-w-sm w-full shadow-3xl text-center overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Decorative Background Glow */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent" />
+
+              <p className="text-slate-400 text-[18px] font-bold uppercase tracking-[0.15em] mb-10 leading-relaxed px-4">
+                {t("cert_request_success")}
+              </p>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => setOpenModal(false)}
+                  className="w-full py-5 bg-sky-500 text-slate-300 rounded-2xl font-black transition-all active:scale-95 shadow-lg shadow-sky-500/20"
+                >
+                  {t("close")}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

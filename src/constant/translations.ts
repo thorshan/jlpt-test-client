@@ -1,10 +1,15 @@
 export const translations = {
   en: {
+    email: "Email",
+    close: "Close",
+    processing: "Processing",
     copy_result_id: "Copy Result ID",
     result_id_copied: "Copied!",
-    save_code_warning: "Save this code! You will need it later to request your official certificate.",
+    save_code_warning:
+      "Save this code! You will need it later to request your official certificate.",
     cert_request_title: "Certificate Request",
-    cert_request_desc: "Enter your Result ID to request a formal certificate from the administrator.",
+    cert_request_desc:
+      "Enter your Result ID to request a formal certificate from the administrator.",
     cert_request_btn: "Send Request",
     cert_request_success: "Request sent successfully!",
     result_id_placeholder: "Enter Result ID...",
@@ -104,9 +109,13 @@ export const translations = {
     section: "Section",
   },
   ja: {
+    close: "閉じる",
+    processing: "処理中",
+    email: "メール",
     copy_result_id: "結果IDをコピー",
     result_id_copied: "コピーしました！",
-    save_code_warning: "このコードを保存してください！後で公式証明書を申請する際に必要になります。",
+    save_code_warning:
+      "このコードを保存してください！後で公式証明書を申請する際に必要になります。",
     cert_request_title: "証明書の発行申請",
     cert_request_desc: "公式証明書を申請するには、結果IDを入力してください。",
     cert_request_btn: "申請を送信",
@@ -208,11 +217,16 @@ export const translations = {
     section: "セクション",
   },
   vi: {
+    close: "Đóng",
+    processing: "Đang xử lý",
+    email: "Email",
     copy_result_id: "Sao chép ID Kết quả",
     result_id_copied: "Đã sao chép!",
-    save_code_warning: "Lưu mã này lại! Bạn sẽ cần nó sau này để yêu cầu cấp chứng chỉ chính thức.",
+    save_code_warning:
+      "Lưu mã này lại! Bạn sẽ cần nó sau này để yêu cầu cấp chứng chỉ chính thức.",
     cert_request_title: "Yêu cầu Chứng chỉ",
-    cert_request_desc: "Nhập ID Kết quả của bạn để yêu cầu chứng chỉ chính thức từ quản trị viên.",
+    cert_request_desc:
+      "Nhập ID Kết quả của bạn để yêu cầu chứng chỉ chính thức từ quản trị viên.",
     cert_request_btn: "Gửi Yêu cầu",
     cert_request_success: "Yêu cầu đã được gửi thành công!",
     result_id_placeholder: "Nhập ID Kết quả...",
@@ -313,11 +327,16 @@ export const translations = {
     section: "Phần",
   },
   my: {
+    close: "ပိတ်ရန်",
+    processing: "လုပ်ဆောင်နေသည်",
+    email: "အီးမေးလ်",
     copy_result_id: "ရလဒ် ID ကို ကူးယူပါ",
     result_id_copied: "ကူးယူပြီးပါပြီ!",
-    save_code_warning: "ဤကုဒ်ကို သိမ်းဆည်းပါ! တရားဝင်လက်မှတ်တောင်းခံရန် နောင်တွင် လိုအပ်မည်ဖြစ်သည်။",
+    save_code_warning:
+      "ဤကုဒ်ကို သိမ်းဆည်းပါ! တရားဝင်လက်မှတ်တောင်းခံရန် နောင်တွင် လိုအပ်မည်ဖြစ်သည်။",
     cert_request_title: "လက်မှတ် တောင်းခံရန်",
-    cert_request_desc: "တရားဝင်လက်မှတ်တောင်းခံရန် သင်၏ ရလဒ် ID ကို ရိုက်ထည့်ပါ။",
+    cert_request_desc:
+      "တရားဝင်လက်မှတ်တောင်းခံရန် သင်၏ ရလဒ် ID ကို ရိုက်ထည့်ပါ။",
     cert_request_btn: "တောင်းဆိုမှုကို ပေးပို့ပါ",
     cert_request_success: "တောင်းဆိုမှုကို အောင်မြင်စွာ ပေးပို့ပြီးပါပြီ!",
     result_id_placeholder: "ရလဒ် ID ကို ရိုက်ထည့်ပါ...",
@@ -416,11 +435,16 @@ export const translations = {
     section: "အပိုင်း",
   },
   ne: {
+    close: "बन्द गर्नुहोस्",
+    processing: "प्रक्रिया गर्दै",
+    email: "इमेल",
     copy_result_id: "नतिजा ID प्रतिलिपि गर्नुहोस्",
     result_id_copied: "प्रतिलिपि गरियो!",
-    save_code_warning: "यो कोड सुरक्षित राख्नुहोस्! भविष्यमा आधिकारिक प्रमाणपत्र अनुरोध गर्न यसको आवश्यकता पर्नेछ।",
+    save_code_warning:
+      "यो कोड सुरक्षित राख्नुहोस्! भविष्यमा आधिकारिक प्रमाणपत्र अनुरोध गर्न यसको आवश्यकता पर्नेछ।",
     cert_request_title: "प्रमाणपत्र अनुरोध",
-    cert_request_desc: "आधिकारिक प्रमाणपत्र अनुरोध गर्न आफ्नो नतिजा ID प्रविष्ट गर्नुहोस्।",
+    cert_request_desc:
+      "आधिकारिक प्रमाणपत्र अनुरोध गर्न आफ्नो नतिजा ID प्रविष्ट गर्नुहोस्।",
     cert_request_btn: "अनुरोध पठाउनुहोस्",
     cert_request_success: "अनुरोध सफलतापूर्वक पठाइयो!",
     result_id_placeholder: "नतिजा ID प्रविष्ट गर्नुहोस्...",
@@ -521,9 +545,13 @@ export const translations = {
     section: "खण्ड",
   },
   ko: {
+    close: "닫기",
+    processing: "처리 중",
+    email: "이메일",
     copy_result_id: "결과 ID 복사",
     result_id_copied: "복사되었습니다!",
-    save_code_warning: "이 코드를 저장하세요! 나중에 공식 인증서를 요청할 때 필요합니다.",
+    save_code_warning:
+      "이 코드를 저장하세요! 나중에 공식 인증서를 요청할 때 필요합니다.",
     cert_request_title: "인증서 요청",
     cert_request_desc: "공식 인증서를 요청하려면 결과 ID를 입력하세요.",
     cert_request_btn: "요청 보내기",
@@ -624,6 +652,9 @@ export const translations = {
     section: "섹션",
   },
   zh: {
+    close: "关闭",
+    processing: "处理中",
+    email: "电子邮件",
     copy_result_id: "复制结果 ID",
     result_id_copied: "已复制！",
     save_code_warning: "请保存此代码！您稍后申请官方证书时将需要用到它。",
@@ -721,11 +752,16 @@ export const translations = {
     section: "部分",
   },
   ru: {
+    close: "Закрыть",
+    processing: "Обработка",
+    email: "Эл. почта",
     copy_result_id: "Копировать ID результата",
     result_id_copied: "Скопировано!",
-    save_code_warning: "Сохраните этот код! Он понадобится вам позже для запроса официального сертификата.",
+    save_code_warning:
+      "Сохраните этот код! Он понадобится вам позже для запроса официального сертификата.",
     cert_request_title: "Запрос сертификата",
-    cert_request_desc: "Введите ваш ID результата для запроса официального сертификата у администратора.",
+    cert_request_desc:
+      "Введите ваш ID результата для запроса официального сертификата у администратора.",
     cert_request_btn: "Отправить запрос",
     cert_request_success: "Запрос успешно отправлен!",
     result_id_placeholder: "Введите ID результата...",
@@ -824,11 +860,16 @@ export const translations = {
     section: "Раздел",
   },
   id: {
+    close: "Tutup",
+    processing: "Memproses",
+    email: "Email",
     copy_result_id: "Salin ID Hasil",
     result_id_copied: "Tersalin!",
-    save_code_warning: "Simpan kode ini! Anda akan membutuhkannya nanti untuk meminta sertifikat resmi Anda.",
+    save_code_warning:
+      "Simpan kode ini! Anda akan membutuhkannya nanti untuk meminta sertifikat resmi Anda.",
     cert_request_title: "Permintaan Sertifikat",
-    cert_request_desc: "Masukkan ID Hasil Anda untuk meminta sertifikat resmi dari administrator.",
+    cert_request_desc:
+      "Masukkan ID Hasil Anda untuk meminta sertifikat resmi dari administrator.",
     cert_request_btn: "Kirim Permintaan",
     cert_request_success: "Permintaan berhasil dikirim!",
     result_id_placeholder: "Masukkan ID Hasil...",
@@ -930,11 +971,16 @@ export const translations = {
     section: "Bagian",
   },
   ph: {
+    close: "Isara",
+    processing: "Pinoproseso",
+    email: "Email",
     copy_result_id: "Kopyahin ang Result ID",
     result_id_copied: "Nakopya na!",
-    save_code_warning: "I-save ang code na ito! Kakailanganin mo ito mamaya para humiling ng iyong opisyal na sertipiko.",
+    save_code_warning:
+      "I-save ang code na ito! Kakailanganin mo ito mamaya para humiling ng iyong opisyal na sertipiko.",
     cert_request_title: "Kahilingan para sa Sertipiko",
-    cert_request_desc: "Ilagay ang iyong Result ID para humiling ng pormal na sertipiko mula sa administrator.",
+    cert_request_desc:
+      "Ilagay ang iyong Result ID para humiling ng pormal na sertipiko mula sa administrator.",
     cert_request_btn: "Ipadala ang Kahilingan",
     cert_request_success: "Matagumpay na naipadala ang kahilingan!",
     result_id_placeholder: "Ilagay ang Result ID...",

@@ -412,10 +412,10 @@ const ExamScreen = () => {
                 ref={(el) => {
                   questionRefs.current[idx] = el;
                 }}
-                onClick={() => {
-                  setCurrentQuestionIdx(idx);
-                  setSelectedOption(userAnswers[q._id] ?? null);
-                }}
+                // onClick={() => {
+                //   setCurrentQuestionIdx(idx);
+                //   setSelectedOption(userAnswers[q._id] ?? null);
+                // }}
                 className={`min-w-[42px] h-[42px] rounded-xl text-[10px] font-black transition-all border snap-center shrink-0 ${
                   currentQuestionIdx === idx
                     ? "bg-sky-500 border-sky-400 text-slate-950 scale-110 shadow-[0_0_20px_rgba(14,165,233,0.4)]"
@@ -589,21 +589,20 @@ const ExamScreen = () => {
                 {t("leave_exam")}?
               </h3>
               <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-                Your progress will not be saved. Are you sure you want to exit
-                now?
+                {t("exit_confirm")}
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setShowExitModal(false)}
                   className="py-4 bg-white/5 text-white font-bold rounded-2xl hover:bg-white/10 transition-colors border border-white/5"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   onClick={() => navigate("/test")}
                   className="py-4 bg-red-500 text-slate-950 font-black rounded-2xl hover:bg-red-600 transition-all"
                 >
-                  Exit
+                  {t("exit")}
                 </button>
               </div>
             </motion.div>
@@ -629,13 +628,14 @@ const ExamScreen = () => {
             >
               {isSubmitting ? (
                 <>
-                  Saving... <Loader2 size={20} className="animate-spin" />
+                  {t("processing")}...{" "}
+                  <Loader2 size={20} className="animate-spin" />
                 </>
               ) : (
                 <>
                   {currentQuestionIdx === questions.length - 1
-                    ? "Complete Section"
-                    : "Next Question"}
+                    ? t("complete_section")
+                    : t("next_question")}
                   <ChevronRight size={20} />
                 </>
               )}
