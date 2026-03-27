@@ -18,6 +18,77 @@ import { sectionApi, type Section } from "../api/sectionApi";
 import { questionApi, type Question } from "../api/questionApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import axios from "axios";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
+
+// --- SORTABLE ITEM COMPONENT ---
+const SortableQuestionItem = ({
+  question,
+  onRemove,
+}: {
+  question: Question;
+  onRemove: (id: string) => void;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: question._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-xl group hover:border-sky-500/30 transition-all mb-2"
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-sky-500 shrink-0"
+      >
+        <GripVertical size={16} />
+      </button>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-bold text-slate-200 truncate">
+          {question.text}
+        </p>
+        <div className="flex gap-2 text-[8px] font-black mt-1">
+          <span className="text-slate-500 uppercase">{question.category}</span>
+          <span className="text-sky-500/50">/</span>
+          <span className="text-slate-500 uppercase">{question.module}</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onRemove(question._id)}
+        className="p-1.5 text-slate-500 hover:text-red-500 transition-colors"
+      >
+        <XCircle size={14} />
+      </button>
+    </div>
+  );
+};
 
 interface ValidationError {
   message: string;
@@ -45,6 +116,28 @@ const Sections = () => {
     minPassedMark: 38,
     questions: [] as string[],
   });
+
+  // --- DND SENSORS ---
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setForm((prev) => {
+        const oldIndex = prev.questions.indexOf(active.id as string);
+        const newIndex = prev.questions.indexOf(over.id as string);
+        return {
+          ...prev,
+          questions: arrayMove(prev.questions, oldIndex, newIndex),
+        };
+      });
+    }
+  };
 
   // --- DERIVED FILTER DATA ---
   const categories = useMemo(
@@ -276,8 +369,41 @@ const Sections = () => {
                   </div>
                 </div>
 
+                {/* --- ORDERED QUESTIONS (DRAGGABLE) --- */}
+                {form.questions.length > 0 && (
+                  <div className="flex flex-col gap-3 shrink-0">
+                    <label className="text-[10px] font-black uppercase text-sky-400">
+                      Question Order (Drag to Reorder)
+                    </label>
+                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar bg-slate-950/30 p-3 rounded-2xl border border-white/5">
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                      >
+                        <SortableContext
+                          items={form.questions}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {form.questions.map((qId) => {
+                            const q = allQuestions.find((qu) => qu._id === qId);
+                            if (!q) return null;
+                            return (
+                              <SortableQuestionItem
+                                key={q._id}
+                                question={q}
+                                onRemove={toggleQuestionSelection}
+                              />
+                            );
+                          })}
+                        </SortableContext>
+                      </DndContext>
+                    </div>
+                  </div>
+                )}
+
                 {/* --- QUESTION SELECTOR --- */}
-                <div className="flex flex-col gap-3 min-h-[600px] custom-scrollbar">
+                <div className="flex flex-col gap-3 min-h-[400px] custom-scrollbar">
                   <div className="flex justify-between items-end shrink-0">
                     <label className="text-[10px] font-black uppercase text-slate-400">
                       Add Questions ({form.questions.length} Selected)

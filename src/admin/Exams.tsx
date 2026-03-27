@@ -15,6 +15,79 @@ import { examApi } from "../api/examApi";
 import { sectionApi } from "../api/sectionApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import axios from "axios";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, XCircle } from "lucide-react";
+
+// --- SORTABLE SECTION ITEM ---
+const SortableSectionItem = ({
+  section,
+  onRemove,
+}: {
+  section: Section;
+  onRemove: (id: string) => void;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: section._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-xl group hover:border-sky-500/30 transition-all mb-2"
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-sky-500 shrink-0"
+      >
+        <GripVertical size={16} />
+      </button>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-bold text-slate-200 truncate font-black uppercase italic">
+          {section.title}
+        </p>
+        <div className="flex gap-2 text-[8px] font-black mt-1">
+          <span className="text-slate-500">
+            {section.questions.length} QUESTIONS
+          </span>
+          <span className="text-sky-500/50">/</span>
+          <span className="text-slate-500">{section.duration} MIN</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onRemove(section._id)}
+        className="p-1.5 text-slate-500 hover:text-red-500 transition-colors"
+      >
+        <XCircle size={14} />
+      </button>
+    </div>
+  );
+};
 
 // --- INTERFACES ---
 interface Section {
@@ -66,6 +139,28 @@ const Exams = () => {
     passingScore: 80,
     sections: [],
   });
+
+  // --- DND SENSORS ---
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setForm((prev) => {
+        const oldIndex = prev.sections.indexOf(active.id as string);
+        const newIndex = prev.sections.indexOf(over.id as string);
+        return {
+          ...prev,
+          sections: arrayMove(prev.sections, oldIndex, newIndex),
+        };
+      });
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -306,7 +401,42 @@ const Exams = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3 min-h-[250px]">
+                {/* --- ORDERED SECTIONS (DRAGGABLE) --- */}
+                {form.sections.length > 0 && (
+                  <div className="flex flex-col gap-3 shrink-0">
+                    <label className="text-[10px] font-black uppercase text-sky-400">
+                      Section Order (Drag to Reorder)
+                    </label>
+                    <div className="max-h-[250px] overflow-y-auto custom-scrollbar bg-slate-950/30 p-3 rounded-[2rem] border border-white/5">
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                      >
+                        <SortableContext
+                          items={form.sections}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {form.sections.map((sId) => {
+                            const s = availableSections.find(
+                              (sec) => sec._id === sId,
+                            );
+                            if (!s) return null;
+                            return (
+                              <SortableSectionItem
+                                key={s._id}
+                                section={s}
+                                onRemove={toggleSectionSelection}
+                              />
+                            );
+                          })}
+                        </SortableContext>
+                      </DndContext>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-3 min-h-[150px]">
                   <label className="text-[10px] font-black uppercase text-slate-400 flex justify-between px-2">
                     <span>Add Sections</span>
                     <span className="text-sky-500 italic">
