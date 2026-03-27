@@ -478,7 +478,7 @@ const ExamScreen = () => {
                     {currentQuestion.refImage && (
                       <div className="mb-8 rounded-3xl border border-white/10 overflow-hidden bg-white/5 p-4 backdrop-blur-sm shadow-2xl">
                         <img
-                          src={`/refImages/${currentQuestion.refImage}`}
+                          src={currentQuestion.refImage}
                           alt="Ref"
                           className="max-h-80 w-full object-contain rounded-xl"
                           onError={(e) => (e.currentTarget.src = "/JLPTX.png")}
