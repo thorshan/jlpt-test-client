@@ -60,9 +60,11 @@ const Home = () => {
         setLoading(true);
         const res = await examApi.getExams();
         const resExam = res?.data?.data || [];
-        const filterByLevel = resExam.filter(
-          (ex: Exam) => ex.level === user?.level,
-        );
+        const filterByLevel = resExam.filter((ex: Exam) => {
+          if (user?.role === "s-admin") return true;
+          if (user?.role === "admin" && !user?.level) return true;
+          return ex.level === user?.level;
+        });
         setExams(filterByLevel);
       } catch (err) {
         console.error("Failed to fetch exams:", err);

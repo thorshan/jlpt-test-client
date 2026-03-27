@@ -270,20 +270,40 @@ const Questions = () => {
                   ))}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
-                    Point
-                  </label>
-                  <input
-                    type="number"
-                    className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-white"
-                    placeholder="Enter point..."
-                    value={form.point}
-                    onChange={(e) =>
-                      setForm({ ...form, point: Number(e.target.value) })
-                    }
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                      Point
+                    </label>
+                    <input
+                      type="number"
+                      className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-white"
+                      placeholder="Enter point..."
+                      value={form.point}
+                      onChange={(e) =>
+                        setForm({ ...form, point: Number(e.target.value) })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                      Tags (Comma separated)
+                    </label>
+                    <input
+                      className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-white"
+                      placeholder="e.g., N5, Kanji"
+                      value={form.tags.join(", ")}
+                      onChange={(e) => {
+                        const tags = e.target.value
+                          .split(",")
+                          .map((t) => t.trim())
+                          .filter((t) => t !== "");
+                        setForm({ ...form, tags });
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

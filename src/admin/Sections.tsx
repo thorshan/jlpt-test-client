@@ -13,6 +13,8 @@ import {
   Database,
   AlertTriangle,
   Info,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import { sectionApi, type Section } from "../api/sectionApi";
 import { questionApi, type Question } from "../api/questionApi";
@@ -100,6 +102,7 @@ const Sections = () => {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isEnlarged, setIsEnlarged] = useState(false);
 
   // --- DELETE MODAL STATE ---
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -372,9 +375,18 @@ const Sections = () => {
                 {/* --- ORDERED QUESTIONS (DRAGGABLE) --- */}
                 {form.questions.length > 0 && (
                   <div className="flex flex-col gap-3 shrink-0">
-                    <label className="text-[10px] font-black uppercase text-sky-400">
-                      Question Order (Drag to Reorder)
-                    </label>
+                    <div className="flex justify-between items-center">
+                      <label className="text-[10px] font-black uppercase text-sky-400">
+                        Question Order (Drag to Reorder)
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsEnlarged(true)}
+                        className="p-1.5 bg-sky-500/10 text-sky-500 rounded-lg hover:bg-sky-500/20 transition-all flex items-center gap-2 text-[10px] font-black uppercase"
+                      >
+                        <Maximize2 size={12} /> Enlarge View
+                      </button>
+                    </div>
                     <div className="max-h-[300px] overflow-y-auto custom-scrollbar bg-slate-950/30 p-3 rounded-2xl border border-white/5">
                       <DndContext
                         sensors={sensors}
@@ -663,6 +675,78 @@ const Sections = () => {
               .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.2); border-radius: 10px; }
               .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(14, 165, 233, 0.4); }
             `}</style>
+
+      {/* --- ENLARGED DND MODAL --- */}
+      <AnimatePresence>
+        {isEnlarged && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 md:p-12">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsEnlarged(false)}
+              className="absolute inset-0 bg-slate-950/95 backdrop-blur-xl"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative bg-[#020617] border border-sky-500/20 w-full max-w-6xl h-[90vh] rounded-[3rem] shadow-3xl flex flex-col p-8 md:p-12 overflow-hidden"
+            >
+              <div className="flex justify-between items-center mb-8 shrink-0">
+                <div>
+                  <h2 className="text-3xl font-black italic uppercase text-white flex items-center gap-4">
+                    <Maximize2 className="text-sky-500" size={24} />
+                    REORDER QUESTIONS
+                  </h2>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">
+                    Manage entry sequence for: {form.title || "Untitled Section"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsEnlarged(false)}
+                  className="p-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl transition-all active:scale-95 flex items-center gap-2 font-black uppercase text-xs"
+                >
+                  <Minimize2 size={18} /> Close View
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar bg-slate-950/50 p-6 rounded-[2rem] border border-white/5">
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={form.questions}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {form.questions.map((qId) => {
+                        const q = allQuestions.find((qu) => qu._id === qId);
+                        if (!q) return null;
+                        return (
+                          <SortableQuestionItem
+                            key={q._id}
+                            question={q}
+                            onRemove={toggleQuestionSelection}
+                          />
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              </div>
+
+              <div className="mt-8 shrink-0 flex justify-end">
+                <p className="text-[10px] font-black uppercase text-sky-500 italic">
+                  Total Questions: {form.questions.length}
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
