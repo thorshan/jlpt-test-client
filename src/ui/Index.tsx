@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { LangToggler } from "../components/LangToggler";
 import { useTranslation } from "../hooks/useTranslation";
 import { requestApi } from "../api/requestApi";
+import endorsements from "../constant/endorse.json";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -256,6 +257,36 @@ const Index = () => {
               {t("official_link")} <ExternalLink size={14} />
             </a>*/}
           </p>
+        </div>
+      </section>
+
+      {/* ENDORSEMENT SECTION */}
+      <section className="py-12 relative z-40 overflow-hidden bg-white/[0.01] border-y border-white/5">
+        <div className="flex whitespace-nowrap">
+          <motion.div
+            initial={{ x: 0 }}
+            animate={{ x: "-50%" }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            className="flex gap-20 items-center justify-around min-w-full"
+          >
+            {[...endorsements, ...endorsements, ...endorsements].map(
+              (item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-4 px-8 py-4 grayscale hover:grayscale-0 transition-all opacity-30 hover:opacity-100 group"
+                >
+                  <img
+                    src={item.logo}
+                    alt={item.name}
+                    className="h-10 w-auto object-contain brightness-200 group-hover:brightness-100 transition-all"
+                  />
+                  <span className="text-xs font-black uppercase tracking-[0.3em] text-slate-500 group-hover:text-sky-400 transition-colors">
+                    {item.name}
+                  </span>
+                </div>
+              ),
+            )}
+          </motion.div>
         </div>
       </section>
 

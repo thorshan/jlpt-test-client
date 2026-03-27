@@ -167,8 +167,8 @@ const Sections = () => {
     setLoading(true);
     try {
       const [secRes, qRes] = await Promise.all([
-        sectionApi.getSections(),
-        questionApi.getQuestions(),
+        sectionApi.getSections(true),
+        questionApi.getQuestions(true),
       ]);
       setSections(secRes.data.data || []);
       setAllQuestions(qRes.data.data || []);
@@ -275,7 +275,7 @@ const Sections = () => {
         />
       </div>
 
-      <main className="relative z-10 p-6 md:p-12 max-w-7xl mx-auto w-full h-full flex flex-col overflow-hidden">
+      <main className="relative z-10 p-6 md:p-12 max-w-5xl mx-auto w-full h-full flex flex-col overflow-hidden">
         {/* HEADER */}
         <header className="mb-8 shrink-0">
           <motion.div
@@ -292,14 +292,14 @@ const Sections = () => {
           </motion.div>
         </header>
 
-        {/* MAIN GRID */}
-        <div className="grid lg:grid-cols-2 gap-12 items-start flex-1 overflow-hidden">
-          {/* --- LEFT: FORM SECTION (PINNED/FIXED) --- */}
-          <section className="h-full flex flex-col overflow-hidden">
+        {/* MAIN STACKED CONTENT */}
+        <div className="flex flex-col gap-12 flex-1 overflow-y-auto pr-4 custom-scrollbar pb-20">
+          {/* --- TOP: FORM SECTION --- */}
+          <section className="w-full shrink-0">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white/5 border border-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] shadow-2xl flex flex-col max-h-full"
+              className="bg-white/5 border border-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] shadow-2xl flex flex-col"
             >
               <h2 className="text-sm font-black uppercase tracking-widest text-sky-500 mb-6 flex items-center gap-2 shrink-0">
                 {editingId ? <Edit3 size={16} /> : <PlusCircle size={16} />}
@@ -525,8 +525,8 @@ const Sections = () => {
             </motion.div>
           </section>
 
-          {/* --- RIGHT: LIST SECTION (SCROLLABLE) --- */}
-          <section className="h-full flex flex-col overflow-hidden">
+          {/* --- BOTTOM: LIST SECTION --- */}
+          <section className="w-full">
             <div className="shrink-0 mb-8 flex justify-between items-end px-2">
               <div>
                 <h2 className="text-xl font-black italic uppercase">
@@ -538,7 +538,7 @@ const Sections = () => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide space-y-4 pb-12">
+            <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {sections.map((s) => (
                   <motion.div

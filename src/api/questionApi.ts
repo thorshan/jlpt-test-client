@@ -28,10 +28,14 @@ export interface Question {
   point: number;
   refImage?: string;
   refAudio?: string;
+  tags: string[];
 }
 
 export const questionApi = {
-  getQuestions: () => apiClient.get<{ data: Question[] }>("/questions"),
+  getQuestions: (admin?: boolean) =>
+    apiClient.get<{ data: Question[] }>(
+      `/questions${admin ? "?admin=true" : ""}`,
+    ),
   getQuestionsBySection: (sectionId: string) =>
     apiClient.get<{ data: Question[] }>(`/questions/section/${sectionId}`),
   createQuestion: (data: Omit<Question, "_id">) =>

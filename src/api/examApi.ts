@@ -37,7 +37,8 @@ interface ApiResponse<T> {
 export type ExamFormData = Omit<Exam, "_id">;
 
 export const examApi = {
-  getExams: () => apiClient.get<ApiResponse<Exam[]>>("/exams"),
+  getExams: (admin?: boolean) =>
+    apiClient.get<ApiResponse<Exam[]>>(`/exams${admin ? "?admin=true" : ""}`),
 
   getExam: (id: string) => apiClient.get<ApiResponse<Exam>>(`/exams/${id}`),
 

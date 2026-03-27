@@ -30,6 +30,7 @@ interface QuestionForm {
   point: number;
   refImage?: string;
   refAudio?: string;
+  tags: string[];
 }
 
 const Questions = () => {
@@ -37,10 +38,10 @@ const Questions = () => {
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Search & Filter State
   const [listSearch, setListSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedModule, setSelectedModule] = useState<string>("ALL");
+  const [selectedTag, setSelectedTag] = useState<string>("ALL");
 
   // Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -56,12 +57,13 @@ const Questions = () => {
     point: 1,
     refImage: "",
     refAudio: "",
+    tags: [],
   });
 
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await questionApi.getQuestions();
+      const res = await questionApi.getQuestions(true);
       setQuestions(res.data?.data || []);
     } catch (error) {
       console.error("Fetch Error:", error);
@@ -111,13 +113,14 @@ const Questions = () => {
       point: 1,
       refImage: "",
       refAudio: "",
+      tags: [],
     });
     setEditingId(null);
   };
 
   const handleEdit = (q: Question) => {
     setEditingId(q._id);
-    setForm({ ...q, options: [...q.options] });
+    setForm({ ...q, options: [...q.options], tags: [...(q.tags || [])] });
   };
 
   const openDeleteModal = (id: string) => {
@@ -147,8 +150,14 @@ const Questions = () => {
       selectedCategory === "ALL" || q.category === selectedCategory;
     const matchesModule =
       selectedModule === "ALL" || q.module === selectedModule;
-    return matchesSearch && matchesCategory && matchesModule;
+    const matchesTag =
+      selectedTag === "ALL" || (q.tags && q.tags.includes(selectedTag));
+    return matchesSearch && matchesCategory && matchesModule && matchesTag;
   });
+
+  const allTags = Array.from(
+    new Set(questions.flatMap((q) => q.tags || [])),
+  ).sort();
 
   if (loading) return <LoadingScreen />;
 
@@ -166,7 +175,7 @@ const Questions = () => {
         />
       </div>
 
-      <main className="relative z-10 p-6 md:p-12 max-w-7xl mx-auto w-full h-[calc(100vh-40px)] flex flex-col overflow-hidden">
+      <main className="relative z-10 p-6 md:p-12 max-w-5xl mx-auto w-full h-full flex flex-col overflow-hidden">
         {/* --- HEADER (Fixed at top) --- */}
         <header className="mb-12 shrink-0">
           <motion.div
@@ -183,10 +192,10 @@ const Questions = () => {
           </motion.div>
         </header>
 
-        {/* --- BODY GRID --- */}
-        <div className="grid lg:grid-cols-2 gap-12 items-start flex-1 overflow-hidden">
-          {/* --- LEFT: FIXED FORM SECTION --- */}
-          <section className="h-full overflow-y-auto pr-2 scrollbar-hide">
+        {/* MAIN STACKED CONTENT */}
+        <div className="flex flex-col gap-12 flex-1 overflow-y-auto pr-4 custom-scrollbar pb-20">
+          {/* --- TOP: FORM SECTION --- */}
+          <section className="w-full shrink-0">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -366,8 +375,8 @@ const Questions = () => {
             </motion.div>
           </section>
 
-          {/* --- RIGHT: LIST & FILTER SECTION (SCROLLABLE LIST) --- */}
-          <section className="h-full flex flex-col overflow-hidden">
+          {/* --- BOTTOM: LIST & FILTER SECTION --- */}
+          <section className="w-full">
             {/* 1. FILTER CARD (Locked at the top of this column) */}
             <div className="shrink-0 mb-8 space-y-4">
               <div className="flex justify-between items-end px-2">
@@ -435,11 +444,30 @@ const Questions = () => {
                     </select>
                   </div>
                 </div>
+
+                <div className="relative">
+                  <Filter
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500/50"
+                    size={12}
+                  />
+                  <select
+                    className="w-full bg-slate-950/50 pl-8 pr-2 py-2 rounded-xl border border-white/5 text-[10px] font-black uppercase text-sky-500 outline-none appearance-none"
+                    value={selectedTag}
+                    onChange={(e) => setSelectedTag(e.target.value)}
+                  >
+                    <option value="ALL">All Tags</option>
+                    {allTags.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
-            {/* 2. QUESTION LIST (The only part that scrolls in this column) */}
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4 pb-12">
+            {/* 2. QUESTION LIST */}
+            <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {filteredQuestions.length > 0 ? (
                   filteredQuestions.map((q) => (
@@ -464,7 +492,10 @@ const Questions = () => {
                           {q.text}
                         </p>
                         <p className="text-[10px] font-black text-slate-500 mt-1">
-                          {q.point} Point(s)
+                          {q.point} Point(s) •{" "}
+                          {(q.tags || []).length > 0
+                            ? q.tags.join(", ")
+                            : "No Tags"}
                         </p>
                       </div>
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -550,6 +581,10 @@ const Questions = () => {
           </div>
         )}
       </AnimatePresence>
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.2); border-radius: 10px; }
+      `}</style>
     </div>
   );
 };

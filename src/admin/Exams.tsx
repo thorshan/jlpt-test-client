@@ -166,8 +166,8 @@ const Exams = () => {
     setLoading(true);
     try {
       const [examRes, sectionRes] = await Promise.all([
-        examApi.getExams(),
-        sectionApi.getSections(),
+        examApi.getExams(true),
+        sectionApi.getSections(true),
       ]);
       setExams(examRes.data?.data || []);
       setAvailableSections(sectionRes.data?.data || []);
@@ -279,7 +279,7 @@ const Exams = () => {
         <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-sky-500/5 blur-[120px] rounded-full" />
       </div>
 
-      <main className="relative z-10 p-6 md:p-12 max-w-7xl mx-auto w-full h-full flex flex-col overflow-hidden">
+      <main className="relative z-10 p-6 md:p-12 max-w-5xl mx-auto w-full h-full flex flex-col overflow-hidden">
         <header className="mb-8 shrink-0">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -295,13 +295,14 @@ const Exams = () => {
           </motion.div>
         </header>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start flex-1 overflow-hidden">
-          {/* LEFT: FORM SECTION */}
-          <section className="h-full flex flex-col overflow-hidden">
+        {/* MAIN STACKED CONTENT */}
+        <div className="flex flex-col gap-12 flex-1 overflow-y-auto pr-4 custom-scrollbar pb-20">
+          {/* --- TOP: FORM SECTION --- */}
+          <section className="w-full shrink-0">
             <motion.div
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white/5 border border-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] shadow-2xl flex flex-col max-h-full"
+              className="bg-white/5 border border-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] shadow-2xl flex flex-col"
             >
               <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500 mb-6 shrink-0 flex items-center gap-2">
                 {editingId ? <Edit3 size={14} /> : <PlusCircle size={14} />}
@@ -498,8 +499,8 @@ const Exams = () => {
             </motion.div>
           </section>
 
-          {/* RIGHT: LIST SECTION */}
-          <section className="h-full flex flex-col overflow-hidden">
+          {/* --- BOTTOM: LIST SECTION --- */}
+          <section className="w-full">
             <div className="shrink-0 mb-8 flex justify-between items-end px-2">
               <div>
                 <h2 className="text-xl font-black italic uppercase">
@@ -510,7 +511,7 @@ const Exams = () => {
                 </p>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto pr-2 space-y-4 pb-12">
+            <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {exams.map((exam) => (
                   <motion.div

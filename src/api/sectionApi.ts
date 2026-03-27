@@ -10,7 +10,10 @@ export interface Section {
 }
 
 export const sectionApi = {
-  getSections: () => apiClient.get<{ data: Section[] }>("/sections"),
+  getSections: (admin?: boolean) =>
+    apiClient.get<{ data: Section[] }>(
+      `/sections${admin ? "?admin=true" : ""}`,
+    ),
   createSection: (data: Omit<Section, "_id">) =>
     apiClient.post<{ data: Section }>("/sections", data),
   updateSection: (id: string, data: Partial<Section>) =>

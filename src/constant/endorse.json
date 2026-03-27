@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "name": "Japan Foundation",
+    "logo": "/JLPTX.png"
+  },
+  {
+    "id": "2",
+    "name": "JLPT Official",
+    "logo": "/JLPTX.png"
+  },
+  {
+    "id": "3",
+    "name": "Tokyo University",
+    "logo": "/JLPTX.png"
+  },
+  {
+    "id": "4",
+    "name": "Kyoto Academy",
+    "logo": "/JLPTX.png"
+  },
+  {
+    "id": "5",
+    "name": "NHK World",
+    "logo": "/JLPTX.png"
+  },
+  {
+    "id": "6",
+    "name": "Japan Times",
+    "logo": "/JLPTX.png"
+  }
+]
