@@ -62,7 +62,7 @@ const AppRoutes = () => {
       <Route
         path="/admin"
         element={
-          <ProtectedRoutes allowedRoles={["admin"]}>
+          <ProtectedRoutes allowedRoles={["s-admin", "admin"]}>
             <DashboardLayout />
           </ProtectedRoutes>
         }
@@ -71,9 +71,30 @@ const AppRoutes = () => {
         <Route path="exams" element={<Exams />} />
         <Route path="sections" element={<Sections />} />
         <Route path="questions" element={<Questions />} />
-        <Route path="users" element={<Users />} />
-        <Route path="requests" element={<Requests />} />
-        <Route path="logs" element={<Logs />} />
+        <Route
+          path="users"
+          element={
+            <ProtectedRoutes allowedRoles={["s-admin"]}>
+              <Users />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="requests"
+          element={
+            <ProtectedRoutes allowedRoles={["s-admin"]}>
+              <Requests />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="logs"
+          element={
+            <ProtectedRoutes allowedRoles={["s-admin"]}>
+              <Logs />
+            </ProtectedRoutes>
+          }
+        />
         <Route path="results">
           <Route index element={<AdminResults />} />
           <Route path=":id" element={<ResultDetail />} />
