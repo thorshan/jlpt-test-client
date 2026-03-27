@@ -202,6 +202,10 @@ const Users = () => {
                       <td className="px-8 py-5">
                         <span
                           className={`text-[9px] font-black uppercase px-3 py-1 rounded-full border ${
+                            user.role === "s-admin"
+                              ? "bg-emerald-500 text-slate-950 border-emerald-400"
+                              : "bg-white/5 border-white/10 text-slate-500"
+                          }${
                             user.role === "admin"
                               ? "bg-sky-500 text-slate-950 border-sky-400"
                               : "bg-white/5 border-white/10 text-slate-500"
