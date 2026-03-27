@@ -1,6 +1,6 @@
-import { useState } from "react"; // Added useState
+import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion"; // Added AnimatePresence
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   BookOpen,
@@ -19,26 +19,64 @@ const DashboardLayout = () => {
   const location = useLocation();
   const { user, logout } = useUser();
   const navigate = useNavigate();
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); // State for dialog
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
+  const isSuperAdmin = user?.role === "s-admin";
+
   const navItems = [
-    { name: "Overview", path: "/admin", icon: <LayoutDashboard size={18} /> },
-    { name: "Users", path: "/admin/users", icon: <UserIcon size={18} /> },
-    { name: "Results", path: "/admin/results", icon: <Award size={18} /> },
-    { name: "Exams", path: "/admin/exams", icon: <BookOpen size={18} /> },
-    { name: "Sections", path: "/admin/sections", icon: <Layers size={18} /> },
+    {
+      name: "Overview",
+      path: "/admin",
+      icon: <LayoutDashboard size={18} />,
+      visible: true,
+    },
+    {
+      name: "Users",
+      path: "/admin/users",
+      icon: <UserIcon size={18} />,
+      visible: isSuperAdmin ? true : false,
+    },
+    {
+      name: "Results",
+      path: "/admin/results",
+      icon: <Award size={18} />,
+      visible: true,
+    },
+    {
+      name: "Exams",
+      path: "/admin/exams",
+      icon: <BookOpen size={18} />,
+      visible: true,
+    },
+    {
+      name: "Sections",
+      path: "/admin/sections",
+      icon: <Layers size={18} />,
+      visible: true,
+    },
     {
       name: "Questions",
       path: "/admin/questions",
       icon: <HelpCircle size={18} />,
+      visible: true,
     },
-    { name: "Requests", path: "/admin/requests", icon: <MessageSquare size={18} /> },
-    { name: "Activity Logs", path: "/admin/logs", icon: <Activity size={18} /> },
+    {
+      name: "Requests",
+      path: "/admin/requests",
+      icon: <MessageSquare size={18} />,
+      visible: isSuperAdmin ? true : false,
+    },
+    {
+      name: "Activity Logs",
+      path: "/admin/logs",
+      icon: <Activity size={18} />,
+      visible: isSuperAdmin ? true : false,
+    },
   ];
 
   return (
@@ -104,35 +142,37 @@ const DashboardLayout = () => {
 
         {/* NAVIGATION AREA */}
         <nav className="flex-1 px-4 space-y-2">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`relative group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
-                  isActive
-                    ? "bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-[inset_0_0_20px_rgba(14,165,233,0.05)]"
-                    : "hover:bg-white/5 text-slate-500 hover:text-slate-200 border border-transparent"
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeGlow"
-                    className="absolute inset-0 bg-sky-500/5 blur-md rounded-2xl"
-                  />
-                )}
-                <span
-                  className={`${isActive ? "text-sky-400" : "group-hover:text-sky-400 transition-colors"}`}
+          {navItems
+            .filter((nav) => nav.visible === true)
+            .map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`relative group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
+                    isActive
+                      ? "bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-[inset_0_0_20px_rgba(14,165,233,0.05)]"
+                      : "hover:bg-white/5 text-slate-500 hover:text-slate-200 border border-transparent"
+                  }`}
                 >
-                  {item.icon}
-                </span>
-                <span className="text-[11px] font-black uppercase tracking-widest italic">
-                  {item.name}
-                </span>
-              </Link>
-            );
-          })}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeGlow"
+                      className="absolute inset-0 bg-sky-500/5 blur-md rounded-2xl"
+                    />
+                  )}
+                  <span
+                    className={`${isActive ? "text-sky-400" : "group-hover:text-sky-400 transition-colors"}`}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="text-[11px] font-black uppercase tracking-widest italic">
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
         </nav>
 
         {/* --- USER SECTION (BOTTOM) --- */}
