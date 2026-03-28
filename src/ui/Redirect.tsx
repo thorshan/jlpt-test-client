@@ -80,12 +80,13 @@ const Redirect: React.FC = () => {
                 {/* Ad Image Background */}
                 <div className="absolute inset-0 z-0">
                   <img
-                    src={`${import.meta.env.VITE_API}${ad.image}`}
+                    src={ad.image}
                     alt={ad.title}
                     className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent" />
                 </div>
+
 
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">

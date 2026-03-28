@@ -18,12 +18,13 @@ export const adApi = {
   getRandomAd: async () => {
     return apiClient.get("/ads/random");
   },
-  createAd: async (formData: FormData) => {
-    return apiClient.post("/ads", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+  createAd: async (data: {
+    title: string;
+    content: string;
+    duration: number;
+    image: string;
+  }) => {
+    return apiClient.post("/ads", data);
   },
   deleteAd: async (id: string) => {
     return apiClient.delete(`/ads/${id}`);

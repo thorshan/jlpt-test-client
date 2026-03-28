@@ -14,7 +14,6 @@ import {
 import { adApi, type Ad } from "../api/adApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 
-
 const Ads: React.FC = () => {
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(false);
@@ -26,9 +25,8 @@ const Ads: React.FC = () => {
     title: "",
     content: "",
     duration: 1,
+    image: "",
   });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -46,31 +44,16 @@ const Ads: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    }
-  };
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) {
-      alert("Please select an image");
+    if (!form.image) {
+      alert("Please provide an image URL");
       return;
     }
 
     setSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.append("title", form.title);
-      formData.append("content", form.content);
-      formData.append("duration", form.duration.toString());
-      formData.append("image", selectedFile);
-
-      const res = await adApi.createAd(formData);
+      const res = await adApi.createAd(form);
       setAds((prev) => [res.data.data, ...prev]);
       resetForm();
     } catch (error) {
@@ -82,9 +65,7 @@ const Ads: React.FC = () => {
   };
 
   const resetForm = () => {
-    setForm({ title: "", content: "", duration: 1 });
-    setSelectedFile(null);
-    setPreviewUrl(null);
+    setForm({ title: "", content: "", duration: 1, image: "" });
   };
 
   const openDeleteModal = (id: string) => {
@@ -195,44 +176,43 @@ const Ads: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* IMAGE UPLOAD */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
-                      Promotion Image (Required)
-                    </label>
-                    <div className="relative h-full min-h-[200px] bg-slate-950/50 border-2 border-dashed border-white/5 rounded-[2rem] overflow-hidden group hover:border-sky-500/50 transition-all">
-                      {previewUrl ? (
+                  {/* IMAGE URL INPUT */}
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                        Supabase Image URL
+                      </label>
+                      <input
+                        className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500 transition-all font-bold"
+                        value={form.image}
+                        onChange={(e) =>
+                          setForm({ ...form, image: e.target.value })
+                        }
+                        placeholder="https://your-project.supabase.co/storage/v1/object/public/..."
+                        required
+                      />
+                    </div>
+
+                    <div className="relative h-[180px] bg-slate-950/50 border-2 border-dashed border-white/5 rounded-[2rem] overflow-hidden group hover:border-sky-500/50 transition-all">
+                      {form.image ? (
                         <div className="absolute inset-0">
                           <img
-                            src={previewUrl}
+                            src={form.image}
                             alt="Preview"
                             className="w-full h-full object-cover opacity-60"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "https://via.placeholder.com/400x200?text=Invalid+Image+URL";
+                            }}
                           />
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <label className="cursor-pointer bg-white text-slate-950 px-6 py-2 rounded-xl font-black uppercase text-[10px]">
-                              Change Image
-                              <input
-                                type="file"
-                                className="hidden"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                              />
-                            </label>
-                          </div>
                         </div>
                       ) : (
-                        <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                           <ImageIcon size={32} className="text-slate-700 mb-2" />
                           <span className="text-[10px] font-black uppercase text-slate-600">
-                            Upload Banner
+                            URL Preview
                           </span>
-                          <input
-                            type="file"
-                            className="hidden"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                          />
-                        </label>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -282,9 +262,13 @@ const Ads: React.FC = () => {
                   >
                     <div className="h-40 overflow-hidden relative">
                       <img
-                        src={`${import.meta.env.VITE_API}${ad.image}`}
+                        src={ad.image}
                         alt={ad.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://via.placeholder.com/400x200?text=Image+Not+Found";
+                        }}
                       />
                       <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2">
                         <Calendar size={12} className="text-sky-400" />
