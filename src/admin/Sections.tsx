@@ -415,7 +415,7 @@ const Sections = () => {
                 )}
 
                 {/* --- QUESTION SELECTOR --- */}
-                <div className="flex flex-col gap-3 min-h-[400px] custom-scrollbar">
+                <div className="flex flex-col gap-3 h-[600px] custom-scrollbar">
                   <div className="flex justify-between items-end shrink-0">
                     <label className="text-[10px] font-black uppercase text-slate-400">
                       Add Questions ({form.questions.length} Selected)
@@ -467,7 +467,7 @@ const Sections = () => {
                     </div>
                   </div>
 
-                  <div className="min-h-[400px] flex-1 overflow-y-auto border border-white/5 rounded-2xl bg-slate-950/30 p-2 flex flex-col gap-2 custom-scrollbar">
+                  <div className="h-[400px] overflow-y-auto border border-white/5 rounded-2xl bg-slate-950/30 p-2 flex flex-col gap-2 custom-scrollbar">
                     {filteredQuestions.length > 0 ? (
                       filteredQuestions.map((q) => (
                         <div
