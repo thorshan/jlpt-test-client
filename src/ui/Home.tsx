@@ -276,12 +276,14 @@ const Home = () => {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -4, scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate(`/test/${exam._id}`)}
+                  onClick={() =>
+                    navigate(`/redirect?to=/test/${exam._id}&type=exam`)
+                  }
                   className="group w-full flex items-center justify-between bg-sky-950/10 backdrop-blur-md border border-sky-500/10 p-6 md:p-8 rounded-[2.5rem] transition-all hover:border-sky-500/40 hover:bg-sky-900/20 cursor-pointer overflow-hidden shadow-xl"
                 >
                   <div className="flex items-center gap-6 min-w-0 flex-1">
-                    <div className="shrink-0 w-16 h-16 md:w-20 md:h-20 bg-sky-500/5 rounded-[1.8rem] flex flex-col items-center justify-center text-sky-500 border border-sky-500/10 group-hover:bg-sky-500 group-hover:text-slate-950 transition-all duration-500 shadow-inner">
-                      <Album size={24} className="md:size-8" />
+                    <div className="shrink-0 w-14 h-14 md:w-20 md:h-20 bg-sky-500/5 rounded-2xl md:rounded-[1.8rem] flex flex-col items-center justify-center text-sky-500 border border-sky-500/10 group-hover:bg-sky-500 group-hover:text-slate-950 transition-all duration-500 shadow-inner">
+                      <Album size={20} className="md:size-8" />
                     </div>
 
                     <div className="min-w-0 flex-1 pt-1">
@@ -293,13 +295,13 @@ const Home = () => {
                           LEVEL {exam.level}
                         </span>
                       </div>
-                      <h4 className="text-lg md:text-2xl font-black text-white truncate group-hover:text-sky-400 transition-colors tracking-tight">
+                      <h4 className="text-sm md:text-2xl font-black text-white truncate group-hover:text-sky-400 transition-colors tracking-tight">
                         {exam.title}
                       </h4>
                       <div className="flex items-center gap-4 mt-4">
                         <div className="flex items-center gap-2 text-slate-500 font-bold">
                           <BookOpen size={14} className="text-sky-500/50" />
-                          <span className="text-xs tracking-tighter">
+                          <span className="text-[10px] md:text-xs tracking-tighter">
                             {exam.sections?.reduce(
                               (acc, s) => acc + (s.questions?.length || 0),
                               0,
@@ -308,7 +310,7 @@ const Home = () => {
                           </span>
                         </div>
                         <div className="w-1.5 h-1.5 bg-sky-500/20 rounded-full" />
-                        <span className="text-xs font-black text-sky-500 tracking-widest">
+                        <span className="text-[10px] md:text-xs font-black text-sky-500 tracking-widest uppercase">
                           {exam.sections?.reduce(
                             (acc, s) => acc + (s.duration || 0),
                             0,
@@ -319,8 +321,8 @@ const Home = () => {
                     </div>
                   </div>
 
-                  <div className="ml-4 shrink-0 w-12 h-12 rounded-2xl bg-sky-500/5 border border-sky-500/10 flex items-center justify-center text-sky-500 group-hover:bg-sky-500 group-hover:text-slate-950 group-hover:translate-x-2 transition-all shadow-lg">
-                    <ArrowRight size={22} strokeWidth={3} />
+                  <div className="ml-2 md:ml-4 shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-sky-500/5 border border-sky-500/10 flex items-center justify-center text-sky-500 group-hover:bg-sky-500 group-hover:text-slate-950 group-hover:translate-x-2 transition-all shadow-lg">
+                    <ArrowRight size={18} className="md:size-6" strokeWidth={3} />
                   </div>
                 </motion.div>
               ))

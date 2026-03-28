@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   MessageSquare,
   Activity,
+  BarChart3,
 } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 
@@ -75,6 +76,12 @@ const DashboardLayout = () => {
       name: "Activity Logs",
       path: "/admin/logs",
       icon: <Activity size={18} />,
+      visible: isSuperAdmin ? true : false,
+    },
+    {
+      name: "Ads Insights",
+      path: "/admin/ads-insights",
+      icon: <BarChart3 size={18} />,
       visible: isSuperAdmin ? true : false,
     },
   ];

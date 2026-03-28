@@ -9,6 +9,7 @@ import Dashboard from "../admin/Dashboard";
 import DashboardLayout from "../admin/DashboardLayout";
 import Requests from "../admin/Requests";
 import Logs from "../admin/Logs";
+import AdsInsights from "../admin/AdsInsights";
 
 // UI Imports
 import Index from "../ui/Index";
@@ -24,6 +25,7 @@ import Users from "../admin/Users";
 import Login from "../ui/Login";
 import AdminResults from "../admin/Results";
 import ResultDetail from "../admin/ResultDetail";
+import Redirect from "../ui/Redirect";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
@@ -43,6 +45,7 @@ const AppRoutes = () => {
       <Route path="/manual" element={<UserManual />} />
       <Route path="/results" element={<Results />} />
       <Route path="/auth" element={<Login />} />
+      <Route path="/redirect" element={<Redirect />} />
 
       {/* PROTECTED STUDENT ROUTES */}
       <Route
@@ -92,6 +95,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoutes allowedRoles={["s-admin"]}>
               <Logs />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="ads-insights"
+          element={
+            <ProtectedRoutes allowedRoles={["s-admin"]}>
+              <AdsInsights />
             </ProtectedRoutes>
           }
         />

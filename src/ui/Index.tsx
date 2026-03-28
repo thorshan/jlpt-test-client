@@ -12,6 +12,7 @@ import { LangToggler } from "../components/LangToggler";
 import { useTranslation } from "../hooks/useTranslation";
 import { requestApi } from "../api/requestApi";
 import endorsements from "../constant/endorse.json";
+import FloatingChatbot from "../components/FloatingChatbot";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -386,6 +387,7 @@ const Index = () => {
           </div>
         )}
       </AnimatePresence>
+      <FloatingChatbot />
     </div>
   );
 };

@@ -21,6 +21,7 @@ const ResultDetail: React.FC = () => {
 
   const [data, setData] = useState<Result | null>(null);
   const [loading, setLoading] = useState(true);
+  const [certLang, setCertLang] = useState<"en" | "jp">("en");
 
   useEffect(() => {
     const fetchLatestResult = async () => {
@@ -88,35 +89,51 @@ const ResultDetail: React.FC = () => {
                 {t("back")}
               </Link>
 
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                <div
-                  className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full border backdrop-blur-md w-full sm:w-auto ${
-                    isPassed
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
-                      : "border-red-500/30 bg-red-500/10 text-red-500"
-                  }`}
-                >
-                  {isPassed ? (
-                    <CheckCircle2 size={16} />
-                  ) : (
-                    <AlertCircle size={16} />
-                  )}
-                  <span className="text-xs font-black tracking-widest uppercase">
-                    {isPassed ? t("passed") : t("failed")}
-                  </span>
-                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                  {/* Language Toggle */}
+                  <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 shrink-0 h-14">
+                    <button
+                      onClick={() => setCertLang("en")}
+                      className={`px-4 rounded-xl text-[10px] font-black uppercase transition-all ${certLang === "en" ? "bg-sky-500 text-slate-950 shadow-lg" : "text-slate-500 hover:text-white"}`}
+                    >
+                      English
+                    </button>
+                    <button
+                      onClick={() => setCertLang("jp")}
+                      className={`px-4 rounded-xl text-[10px] font-black uppercase transition-all ${certLang === "jp" ? "bg-sky-500 text-slate-950 shadow-lg" : "text-slate-500 hover:text-white"}`}
+                    >
+                      Japanese
+                    </button>
+                  </div>
 
-                <button
-                  onClick={() =>
-                    certificateRef.current &&
-                    handlePrint(() => certificateRef.current)
-                  }
-                  className="flex items-center justify-center gap-3 bg-sky-500 hover:bg-sky-400 text-slate-950 px-8 py-4 rounded-2xl w-full sm:w-auto font-black transition-all shadow-lg active:scale-95"
-                >
-                  <Printer size={20} />
-                  <span>{t("print_cert")}</span>
-                </button>
-              </div>
+                  <div
+                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full border backdrop-blur-md w-full sm:w-auto h-14 ${
+                      isPassed
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500"
+                        : "border-red-500/30 bg-red-500/10 text-red-500"
+                    }`}
+                  >
+                    {isPassed ? (
+                      <CheckCircle2 size={16} />
+                    ) : (
+                      <AlertCircle size={16} />
+                    )}
+                    <span className="text-xs font-black tracking-widest uppercase">
+                      {isPassed ? t("passed") : t("failed")}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      certificateRef.current &&
+                      handlePrint(() => certificateRef.current)
+                    }
+                    className="flex items-center justify-center gap-3 bg-sky-500 hover:bg-sky-400 text-slate-950 px-8 py-4 rounded-2xl w-full sm:w-auto font-black transition-all shadow-lg active:scale-95 h-14"
+                  >
+                    <Printer size={20} />
+                    <span>{t("print_cert")}</span>
+                  </button>
+                </div>
             </div>
 
             {/* CERTIFICATE CONTAINER */}
@@ -155,20 +172,22 @@ const ResultDetail: React.FC = () => {
                           JLPTX
                         </h4>
                         <p className="text-sky-500 text-[10px] font-black uppercase tracking-widest">
-                          Japanese Proficiency
+                          {certLang === "en"
+                            ? "Japanese Proficiency"
+                            : "日本語能力認定"}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">
-                        Certificate No.
+                        {certLang === "en" ? "Certificate No." : "証書番号"}
                       </p>
                       <p className="text-xs font-mono text-white mb-4">
                         #{typeof data?.exam === "object" && data?.exam.title}-
                         {data?.level}-{data?._id.slice(-8).toUpperCase()}
                       </p>
                       <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">
-                        Issued Date
+                        {certLang === "en" ? "Issued Date" : "発行日"}
                       </p>
                       <p className="text-sm font-bold text-white uppercase italic">
                         {new Date(data?.createdAt || "").toLocaleDateString()}
@@ -178,20 +197,21 @@ const ResultDetail: React.FC = () => {
 
                   <div className="text-center py-6">
                     <p className="text-sky-500 uppercase text-[18px] font-black mb-4">
-                      Certificate
+                      {certLang === "en" ? "Certificate" : "認定証"}
                     </p>
                     <h2 className="text-6xl font-black text-white mb-6 underline decoration-sky-500/20 underline-offset-[12px]">
                       {(typeof data?.user === "object" && data?.user?.name) ||
                         "Examinee"}
                     </h2>
-                    <p className="text-slate-400 text-sm max-w-lg mx-auto leading-relaxed">
-                      Has successfully demonstrated proficiency in the Japanese
-                      language assessment at the level specified below.
+                    <p className="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
+                      {certLang === "en"
+                        ? "Has successfully demonstrated proficiency in the Japanese language assessment at the level specified below."
+                        : "貴殿は、当プログラムが実施した日本語能力アセスメントにおいて、下記の通り優秀な成績を収め、所定のレベルに達したことをここに証します。"}
                     </p>
                     <div className="flex items-center justify-center gap-8 mt-10">
                       <div className="h-[1px] w-20 bg-white/10" />
                       <div className="px-10 py-3 bg-white text-slate-950 font-black text-2xl rounded-sm skew-x-[-10deg] shadow-lg">
-                        LEVEL {data?.level}
+                        {certLang === "en" ? "LEVEL" : "レベル"} {data?.level}
                       </div>
                       <div className="h-[1px] w-20 bg-white/10" />
                     </div>
@@ -200,12 +220,12 @@ const ResultDetail: React.FC = () => {
                   <div className="grid grid-cols-5 gap-6 my-10">
                     <div className="col-span-2 bg-white/5 border border-white/5 p-6 rounded-xl">
                       <p className="text-[10px] text-sky-500 font-black uppercase mb-4 tracking-widest">
-                        Score Data
+                        {certLang === "en" ? "Score Data" : "得点データ"}
                       </p>
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] text-slate-400 font-bold uppercase">
-                            Total
+                            {certLang === "en" ? "Total" : "合計"}
                           </span>
                           <span className="text-2xl font-black text-white">
                             {data?.totalEarnedPoints}/
@@ -233,13 +253,19 @@ const ResultDetail: React.FC = () => {
 
                     <div className="col-span-3 bg-white/5 border border-white/5 p-6 rounded-xl">
                       <p className="text-[10px] text-sky-500 font-black uppercase mb-4 tracking-widest">
-                        Breakdown
+                        {certLang === "en" ? "Breakdown" : "得点内訳"}
                       </p>
                       <table className="w-full text-left">
                         <thead className="text-[9px] text-slate-500 uppercase border-b border-white/10">
-                          <th className="pb-2">Section</th>
-                          <th className="pb-2 text-center">Score</th>
-                          <th className="pb-2 text-right">Grade</th>
+                          <th className="pb-2">
+                            {certLang === "en" ? "Section" : "セクション"}
+                          </th>
+                          <th className="pb-2 text-center">
+                            {certLang === "en" ? "Score" : "得点"}
+                          </th>
+                          <th className="pb-2 text-right">
+                            {certLang === "en" ? "Grade" : "判定"}
+                          </th>
                         </thead>
                         <tbody className="text-[11px] font-bold">
                           {data?.sectionDetails?.map((sec, idx) => (
@@ -269,13 +295,17 @@ const ResultDetail: React.FC = () => {
                     <div className="flex items-center gap-2 text-slate-500">
                       <ShieldCheck size={14} className="text-emerald-500" />
                       <span className="text-[9px] font-black uppercase tracking-widest">
-                        Signature Verified
+                        {certLang === "en"
+                          ? "Signature Verified"
+                          : "署名検証済み"}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-slate-500">
                       <Trophy size={14} className="text-sky-500" />
                       <span className="text-[9px] font-black uppercase tracking-widest">
-                        Validated via JLPTX
+                        {certLang === "en"
+                          ? "Validated via JLPTX"
+                          : "JLPTXによる承認"}
                       </span>
                     </div>
                   </div>
@@ -285,11 +315,19 @@ const ResultDetail: React.FC = () => {
                         <span
                           className={`text-2xl font-black ${isPassed ? "text-emerald-500" : "text-red-500"}`}
                         >
-                          {isPassed ? "PASSED" : "FAILED"}
+                          {isPassed
+                            ? certLang === "en"
+                              ? "PASSED"
+                              : "合格"
+                            : certLang === "en"
+                              ? "FAILED"
+                              : "不合格"}
                         </span>
                       </div>
                       <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">
-                        Validation Status
+                        {certLang === "en"
+                          ? "Validation Status"
+                          : "検証ステータス"}
                       </p>
                     </div>
                     <img
