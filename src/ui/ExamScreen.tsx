@@ -22,24 +22,24 @@ import { useTranslation } from "../hooks/useTranslation";
 
 const title = {
   vocab: {
-    m1: "もんだい　１・＿＿＿＿＿　の　ことばは　ひらがなで　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m3: "もんだい　３・（　　）　に　なにが　はいりますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m4: "もんだい　４・＿＿＿＿＿　の　ぷんと　だいたい　おなじ　いみの　ぷんが　あります。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m1: "もんだい　・＿＿＿＿＿  に　なにが　はいりますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m2: "もんだい　・＿＿＿＿＿　の　ぷんと　だいたい　おなじ　いみの　ぷんが　あります。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   kanji: {
-    m2: "もんだい　２・＿＿＿＿＿　の　ことばは　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m1: "もんだい　・＿＿＿＿＿　の　ことばは　ひらがなで　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m2: "もんだい　・＿＿＿＿＿　の　ことばは　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   grammar: {
-    m1: "もんだい　１・（　　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m2: "もんだい　２・＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m1: "もんだい　・（　　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m2: "もんだい　・＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   reading: {
     m1: "はじめに　しつもんを　よんて　ください。\nそれから　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
     m2: "はじめに　写真を　みて　ください。\nそれから　しつもんを　よんて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m3: "もんだい　３・（　　）に　なにを　いれますか。ぶんしょうの　いみを　かんがえて\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m4: "もんだい　４・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m5: "もんだい　５・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m6: "もんだい　６・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m3: "もんだい　・（　　）に　なにを　いれますか。ぶんしょうの　いみを　かんがえて\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m4: "もんだい　・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m5: "もんだい　・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    m6: "もんだい　・つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   listening: {
     m1: "もんだい　１では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
@@ -94,13 +94,13 @@ const ExamScreen = () => {
           if (data.sections) {
             data.sections.forEach((sec: Section<Question>) => {
               if (sec.questions) {
-                sec.questions.sort((a, b) => 
+                sec.questions.sort((a, b) =>
                   extractModuleNumber(a.module) - extractModuleNumber(b.module)
                 );
               }
             });
           }
-          
+
           setExam(data);
           if (data.sections?.[0]) {
             setSectionTimeLeft(data.sections[0].duration * 60);
@@ -403,13 +403,12 @@ const ExamScreen = () => {
                 ref={(el) => {
                   questionRefs.current[idx] = el;
                 }}
-                className={`min-w-[42px] h-[42px] rounded-xl text-[10px] font-black transition-all border snap-center shrink-0 ${
-                  currentQuestionIdx === idx
-                    ? "bg-sky-500 border-sky-400 text-slate-950 scale-110 shadow-[0_0_20px_rgba(14,165,233,0.4)]"
-                    : userAnswers[q._id] !== undefined
-                      ? "bg-sky-500/20 border-sky-500/40 text-sky-400"
-                      : "bg-white/5 border-white/10 text-slate-500"
-                }`}
+                className={`min-w-[42px] h-[42px] rounded-xl text-[10px] font-black transition-all border snap-center shrink-0 ${currentQuestionIdx === idx
+                  ? "bg-sky-500 border-sky-400 text-slate-950 scale-110 shadow-[0_0_20px_rgba(14,165,233,0.4)]"
+                  : userAnswers[q._id] !== undefined
+                    ? "bg-sky-500/20 border-sky-500/40 text-sky-400"
+                    : "bg-white/5 border-white/10 text-slate-500"
+                  }`}
               >
                 {idx + 1}
               </button>
@@ -489,19 +488,17 @@ const ExamScreen = () => {
                       <button
                         key={i}
                         onClick={() => setSelectedOption(i)}
-                        className={`w-full text-left p-6 rounded-3xl border-2 transition-all flex items-center justify-between backdrop-blur-md ${
-                          selectedOption === i
-                            ? "bg-sky-500/10 border-sky-500 text-sky-400 shadow-lg"
-                            : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
-                        }`}
+                        className={`w-full text-left p-6 rounded-3xl border-2 transition-all flex items-center justify-between backdrop-blur-md ${selectedOption === i
+                          ? "bg-sky-500/10 border-sky-500 text-sky-400 shadow-lg"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
+                          }`}
                       >
                         <div className="flex gap-4 items-center">
                           <span
-                            className={`flex justify-center items-center w-9 h-9 border-2 rounded-2xl font-black text-sm transition-colors ${
-                              selectedOption === i
-                                ? "bg-sky-500 border-sky-500 text-slate-950"
-                                : "border-white/10 text-slate-500"
-                            }`}
+                            className={`flex justify-center items-center w-9 h-9 border-2 rounded-2xl font-black text-sm transition-colors ${selectedOption === i
+                              ? "bg-sky-500 border-sky-500 text-slate-950"
+                              : "border-white/10 text-slate-500"
+                              }`}
                           >
                             {i + 1}
                           </span>
@@ -603,17 +600,16 @@ const ExamScreen = () => {
           <div className="max-w-4xl w-full flex items-center justify-between">
             <div className="hidden sm:flex items-center gap-2 text-slate-500 text-[10px] font-black uppercase tracking-widest">
               <span className="flex items-center gap-2 border border-white/5 px-4 py-1.5 rounded-full">
-                 <Info size={14} className="text-sky-500" /> Session active
+                <Info size={14} className="text-sky-500" /> Session active
               </span>
             </div>
             <button
               disabled={selectedOption === null || isSubmitting}
               onClick={handleNextQuestion}
-              className={`px-10 py-4 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center gap-3 ${
-                selectedOption !== null && !isSubmitting
-                  ? "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95"
-                  : "bg-white/5 text-slate-600 opacity-50 cursor-not-allowed border border-white/5"
-              }`}
+              className={`px-10 py-4 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center gap-3 ${selectedOption !== null && !isSubmitting
+                ? "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95"
+                : "bg-white/5 text-slate-600 opacity-50 cursor-not-allowed border border-white/5"
+                }`}
             >
               {isSubmitting ? (
                 <>
