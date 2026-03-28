@@ -1,22 +1,23 @@
 import { apiClient } from "./apiClient";
+import type { Question } from "./questionApi";
 
-export interface Section {
+export interface Section<Q = string> {
   _id: string;
   title: string;
   desc: string;
   duration: number;
   minPassedMark: number;
-  questions: string[];
+  questions: Q[];
 }
 
-export interface Exam {
+export interface Exam<Q = string> {
   _id: string;
-  level: string;
+  level: "N1" | "N2" | "N3" | "N4" | "N5";
   title: string;
   desc: string;
   category: string;
   passingScore: number;
-  sections: Section[];
+  sections: Section<Q>[];
 }
 
 export interface ExamForm {
@@ -37,16 +38,17 @@ interface ApiResponse<T> {
 export type ExamFormData = Omit<Exam, "_id">;
 
 export const examApi = {
-  getExams: (admin?: boolean) =>
-    apiClient.get<ApiResponse<Exam[]>>(`/exams${admin ? "?admin=true" : ""}`),
+  getExams: <Q = string>(admin?: boolean) =>
+    apiClient.get<ApiResponse<Exam<Q>[]>>(`/exams${admin ? "?admin=true" : ""}`),
 
-  getExam: (id: string) => apiClient.get<ApiResponse<Exam>>(`/exams/${id}`),
+  getExam: <Q = Question>(id: string) => 
+    apiClient.get<ApiResponse<Exam<Q>>>(`/exams/${id}`),
 
-  createExam: (data: ExamFormData) =>
-    apiClient.post<ApiResponse<Exam>>("/exams", data),
+  createExam: <Q = string>(data: ExamFormData) =>
+    apiClient.post<ApiResponse<Exam<Q>>>("/exams", data),
 
-  updateExam: (id: string, data: Partial<ExamFormData>) =>
-    apiClient.put<ApiResponse<Exam>>(`/exams/${id}`, data),
+  updateExam: <Q = string>(id: string, data: Partial<ExamFormData>) =>
+    apiClient.put<ApiResponse<Exam<Q>>>(`/exams/${id}`, data),
 
   deleteExam: (id: string) =>
     apiClient.delete<ApiResponse<null>>(`/exams/${id}`),

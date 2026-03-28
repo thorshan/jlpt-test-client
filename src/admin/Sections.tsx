@@ -265,7 +265,7 @@ const Sections = () => {
   if (loading) return <LoadingScreen />;
 
   return (
-    <div className="h-screen bg-[#020617] text-white flex flex-col font-sans overflow-hidden">
+    <div className="bg-transparent text-white flex flex-col font-sans overflow-hidden">
       {/* Background Orbs */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-sky-500/5 blur-[120px] rounded-full" />
@@ -278,9 +278,9 @@ const Sections = () => {
         />
       </div>
 
-      <main className="relative z-10 p-6 md:p-12 max-w-5xl mx-auto w-full h-full flex flex-col overflow-hidden">
+      <main className="relative z-10 p-6 md:p-12 max-w-5xl mx-auto w-full flex flex-col">
         {/* HEADER */}
-        <header className="mb-8 shrink-0">
+        <header className="mb-4 shrink-0">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -296,7 +296,7 @@ const Sections = () => {
         </header>
 
         {/* MAIN STACKED CONTENT */}
-        <div className="flex flex-col gap-12 flex-1 overflow-y-auto pr-4 custom-scrollbar pb-20">
+        <div className="flex flex-col gap-8 flex-1 pr-4 custom-scrollbar pb-10">
           {/* --- TOP: FORM SECTION --- */}
           <section className="w-full shrink-0">
             <motion.div

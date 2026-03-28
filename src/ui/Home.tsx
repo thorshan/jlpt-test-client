@@ -15,26 +15,10 @@ import {
 import { LangToggler } from "../components/LangToggler";
 import { useUser } from "../hooks/useUser";
 import { useTranslation } from "../hooks/useTranslation";
-import { examApi } from "../api/examApi";
+import { examApi, type Exam } from "../api/examApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 
-// --- INTERFACES ---
-interface Section {
-  _id: string;
-  title: string;
-  duration: number;
-  questions: string[];
-}
-
-interface Exam {
-  _id: string;
-  level: string;
-  title: string;
-  desc: string;
-  category: string;
-  passingScore: number;
-  sections: Section[];
-}
+// Local interfaces removed in favor of shared ones from API layer
 
 const Home = () => {
   const { user, logout } = useUser();

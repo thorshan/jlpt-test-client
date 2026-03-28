@@ -13,7 +13,7 @@ import {
   Maximize2,
   Minimize2,
 } from "lucide-react";
-import { examApi } from "../api/examApi";
+import { examApi, type Exam, type Section } from "../api/examApi";
 import { sectionApi } from "../api/sectionApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import axios from "axios";
@@ -91,28 +91,10 @@ const SortableSectionItem = ({
   );
 };
 
-// --- INTERFACES ---
-interface Section {
-  _id: string;
-  title: string;
-  desc: string;
-  duration: number;
-  questions: string[];
-  minPassedMark: number;
-}
-
-interface Exam {
-  _id: string;
-  level: string;
-  title: string;
-  desc: string;
-  category: string;
-  passingScore: number;
-  sections: Section[];
-}
+// Local interfaces removed in favor of shared ones from API layer
 
 interface ExamForm {
-  level: string;
+  level: "N1" | "N2" | "N3" | "N4" | "N5" | "";
   title: string;
   desc: string;
   category: string;
@@ -200,6 +182,7 @@ const Exams = () => {
 
       const dataToSend = {
         ...form,
+        level: form.level as "N1" | "N2" | "N3" | "N4" | "N5",
         sections: selectedSectionObjects,
       };
 
@@ -209,7 +192,7 @@ const Exams = () => {
           prev.map((ex) => (ex._id === editingId ? res.data.data : ex)),
         );
       } else {
-        const res = await examApi.createExam(dataToSend);
+        const res = await examApi.createExam(dataToSend as any); // cast to any or fix createExam signature
         setExams((prev) => [...prev, res.data.data]);
       }
       resetForm();
@@ -277,13 +260,13 @@ const Exams = () => {
   if (loading) return <LoadingScreen />;
 
   return (
-    <div className="h-screen bg-[#020617] text-white flex flex-col font-sans overflow-hidden text-[13px]">
+    <div className="bg-transparent text-white flex flex-col font-sans overflow-hidden text-[13px]">
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-sky-500/5 blur-[120px] rounded-full" />
       </div>
 
-      <main className="relative z-10 p-6 md:p-12 max-w-5xl mx-auto w-full h-full flex flex-col overflow-hidden">
-        <header className="mb-8 shrink-0">
+      <main className="relative z-10 p-6 md:p-12 max-w-5xl mx-auto w-full flex flex-col">
+        <header className="mb-4 shrink-0">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -299,7 +282,7 @@ const Exams = () => {
         </header>
 
         {/* MAIN STACKED CONTENT */}
-        <div className="flex flex-col gap-12 flex-1 overflow-y-auto pr-4 custom-scrollbar pb-20">
+        <div className="flex flex-col gap-8 flex-1 pr-4 custom-scrollbar pb-10">
           {/* --- TOP: FORM SECTION --- */}
           <section className="w-full shrink-0">
             <motion.div
@@ -387,7 +370,7 @@ const Exams = () => {
                       Level
                     </label>
                     <div className="flex gap-1">
-                      {["N5", "N4", "N3", "N2", "N1"].map((lvl) => (
+                      {(["N5", "N4", "N3", "N2", "N1"] as const).map((lvl) => (
                         <button
                           key={lvl}
                           type="button"

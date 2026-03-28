@@ -143,7 +143,7 @@ const DashboardLayout = () => {
       {/* --- SIDEBAR --- */}
       <aside className="w-72 border-r border-white/5 bg-slate-950/50 backdrop-blur-3xl hidden md:flex flex-col relative z-20">
         {/* LOGO SECTION */}
-        <div className="p-8 mb-4">
+        <div className="p-8 mb-4 shrink-0">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -158,7 +158,7 @@ const DashboardLayout = () => {
         </div>
 
         {/* NAVIGATION AREA */}
-        <nav className="flex-1 px-4 space-y-2">
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar-thin pb-4">
           {navItems
             .filter((nav) => nav.visible === true)
             .map((item) => {
@@ -193,7 +193,7 @@ const DashboardLayout = () => {
         </nav>
 
         {/* --- USER SECTION (BOTTOM) --- */}
-        <div className="p-6 mt-auto border-t border-white/5 bg-white/[0.01]">
+        <div className="p-6 mt-auto border-t border-white/5 bg-white/[0.01] shrink-0">
           <div className="flex flex-col gap-4">
             {/* User Profile Card */}
             <div className="flex items-center gap-4 p-3 bg-white/5 border border-white/5 rounded-2xl backdrop-blur-md">
@@ -236,6 +236,11 @@ const DashboardLayout = () => {
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.1); border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(14, 165, 233, 0.3); }
+
+        .custom-scrollbar-thin::-webkit-scrollbar { width: 2px; }
+        .custom-scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.05); border-radius: 10px; }
+        .custom-scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(14, 165, 233, 0.2); }
       `}</style>
     </div>
   );

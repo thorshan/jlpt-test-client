@@ -11,50 +11,14 @@ import {
   Volume2,
   Loader2,
 } from "lucide-react";
-import { examApi } from "../api/examApi";
-import { resultApi, type ResultFormData } from "../api/resultApi";
+import { examApi, type Exam, type Section } from "../api/examApi";
+import { resultApi, type ResultFormData, type SectionDetail } from "../api/resultApi";
 import { LoadingScreen } from "../components/LoadingScreen";
+import { type Question } from "../api/questionApi";
 import { useUser } from "../hooks/useUser";
 import { useTranslation } from "../hooks/useTranslation";
 
-// --- INTERFACES ---
-export interface Question {
-  _id: string;
-  refText: string;
-  refImage: string;
-  refAudio: string;
-  text: string;
-  category: string;
-  module: string;
-  options: string[];
-  correctOptionIndex: number;
-  point: number;
-}
-
-export interface SectionDetail {
-  sectionTitle: string;
-  earnedPoints: number;
-  totalPoints: number;
-  gradeJLPT: "A" | "B" | "C";
-  passed: boolean;
-}
-
-export interface Section {
-  _id: string;
-  title: string;
-  desc: string;
-  duration: number;
-  minPassedMark: number;
-  questions: Question[];
-}
-
-export interface Exam {
-  _id: string;
-  title: string;
-  level: "N1" | "N2" | "N3" | "N4" | "N5";
-  passingScore: number;
-  sections: Section[];
-}
+// Local interfaces removed in favor of shared ones from API layer
 
 const title = {
   vocab: {
@@ -94,7 +58,7 @@ const ExamScreen = () => {
   const questionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // --- STATE ---
-  const [exam, setExam] = useState<Exam | null>(null);
+  const [exam, setExam] = useState<Exam<Question> | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentSectionIdx, setCurrentSectionIdx] = useState(0);
@@ -112,6 +76,12 @@ const ExamScreen = () => {
   const questions = currentSection?.questions || [];
   const currentQuestion = questions[currentQuestionIdx];
 
+  // --- HELPERS ---
+  const extractModuleNumber = (mod: string) => {
+    const match = mod.match(/\d+/);
+    return match ? parseInt(match[0]) : 99; // Default to high number if not found
+  };
+
   // --- 1. FETCH EXAM ---
   useEffect(() => {
     const fetchExam = async () => {
@@ -120,7 +90,18 @@ const ExamScreen = () => {
         const res = await examApi.getExam(id as string);
         const data = res?.data?.data;
         if (data) {
-          setExam(data as unknown as Exam);
+          // Sort questions within each section by module number
+          if (data.sections) {
+            data.sections.forEach((sec: Section<Question>) => {
+              if (sec.questions) {
+                sec.questions.sort((a, b) => 
+                  extractModuleNumber(a.module) - extractModuleNumber(b.module)
+                );
+              }
+            });
+          }
+          
+          setExam(data);
           if (data.sections?.[0]) {
             setSectionTimeLeft(data.sections[0].duration * 60);
           }
@@ -181,7 +162,7 @@ const ExamScreen = () => {
       window.clearTimeout(playTimeout);
       if (audioRef.current) audioRef.current.pause();
     };
-  }, [currentQuestionIdx, currentSectionIdx, status]);
+  }, [currentQuestionIdx, currentSectionIdx, status, currentQuestion?.refAudio]);
 
   // --- 4. CALCULATION & SUBMISSION ---
   const submitExam = async (finalAnswers: Record<string, number>) => {
@@ -331,11 +312,19 @@ const ExamScreen = () => {
     `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
   const getQuestionTitle = (category: string, module: string) => {
-    const catKey =
-      category.toLowerCase() === "vocabulary"
-        ? "vocab"
-        : category.toLowerCase();
-    const modKey = module.toLowerCase().replace("module ", "m");
+    const normalizedCat = category.toLowerCase();
+    let catKey = "";
+
+    if (normalizedCat.includes("vocab")) catKey = "vocab";
+    else if (normalizedCat.includes("kanji")) catKey = "kanji";
+    else if (normalizedCat.includes("grammar")) catKey = "grammar";
+    else if (normalizedCat.includes("reading")) catKey = "reading";
+    else if (normalizedCat.includes("listening")) catKey = "listening";
+    else catKey = normalizedCat;
+
+    const modNumber = module.match(/\d+/)?.[0];
+    const modKey = modNumber ? `m${modNumber}` : module.toLowerCase().replace(/\s+/g, "");
+
     // @ts-expect-error - dynamic access
     return title[catKey]?.[modKey] || "";
   };
@@ -414,10 +403,6 @@ const ExamScreen = () => {
                 ref={(el) => {
                   questionRefs.current[idx] = el;
                 }}
-                // onClick={() => {
-                //   setCurrentQuestionIdx(idx);
-                //   setSelectedOption(userAnswers[q._id] ?? null);
-                // }}
                 className={`min-w-[42px] h-[42px] rounded-xl text-[10px] font-black transition-all border snap-center shrink-0 ${
                   currentQuestionIdx === idx
                     ? "bg-sky-500 border-sky-400 text-slate-950 scale-110 shadow-[0_0_20px_rgba(14,165,233,0.4)]"
@@ -617,7 +602,9 @@ const ExamScreen = () => {
         <footer className="h-24 border-t border-white/5 bg-[#020617]/80 backdrop-blur-2xl px-4 md:px-10 flex items-center justify-center fixed bottom-0 left-0 right-0 z-50">
           <div className="max-w-4xl w-full flex items-center justify-between">
             <div className="hidden sm:flex items-center gap-2 text-slate-500 text-[10px] font-black uppercase tracking-widest">
-              <Info size={14} className="text-sky-500" /> Session active
+              <span className="flex items-center gap-2 border border-white/5 px-4 py-1.5 rounded-full">
+                 <Info size={14} className="text-sky-500" /> Session active
+              </span>
             </div>
             <button
               disabled={selectedOption === null || isSubmitting}
