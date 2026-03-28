@@ -9,6 +9,12 @@ import {
   Image as ImageIcon,
   Save,
   Loader2,
+  Edit3,
+  XCircle,
+  Eye,
+  MousePointer2,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 
 import { adApi, type Ad } from "../api/adApi";
@@ -20,12 +26,14 @@ const Ads: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     title: "",
     content: "",
     duration: 1,
     image: "",
+    status: "Active" as "Active" | "Paused",
   });
 
   const fetchData = async () => {
@@ -53,19 +61,57 @@ const Ads: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const res = await adApi.createAd(form);
-      setAds((prev) => [res.data.data, ...prev]);
+      if (editingId) {
+        const res = await adApi.updateAd(editingId, form);
+        setAds((prev) =>
+          prev.map((ad) => (ad._id === editingId ? res.data.data : ad)),
+        );
+      } else {
+        const res = await adApi.createAd(form);
+        setAds((prev) => [res.data.data, ...prev]);
+      }
       resetForm();
     } catch (error) {
-      console.error("Error creating ad:", error);
-      alert("Failed to create ad");
+      console.error("Error saving ad:", error);
+      alert("Failed to save ad");
     } finally {
       setSubmitting(false);
     }
   };
 
   const resetForm = () => {
-    setForm({ title: "", content: "", duration: 1, image: "" });
+    setForm({
+      title: "",
+      content: "",
+      duration: 1,
+      image: "",
+      status: "Active",
+    });
+    setEditingId(null);
+  };
+
+  const handleEdit = (ad: Ad) => {
+    setEditingId(ad._id);
+    setForm({
+      title: ad.title,
+      content: ad.content,
+      duration: ad.duration,
+      image: ad.image,
+      status: ad.status,
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const toggleStatus = async (ad: Ad) => {
+    const newStatus = ad.status === "Active" ? "Paused" : "Active";
+    try {
+      const res = await adApi.updateAd(ad._id, { status: newStatus });
+      setAds((prev) =>
+        prev.map((a) => (a._id === ad._id ? res.data.data : a)),
+      );
+    } catch (error) {
+      console.error("Error toggling status:", error);
+    }
   };
 
   const openDeleteModal = (id: string) => {
@@ -92,7 +138,7 @@ const Ads: React.FC = () => {
   return (
     <div className="h-screen bg-[#020617] text-white flex flex-col font-sans overflow-hidden text-[13px]">
       <main className="relative z-10 p-6 md:p-12 max-w-5xl mx-auto w-full h-full flex flex-col overflow-hidden">
-        <header className="mb-8 shrink-0">
+        <header className="mb-8 shrink-0 flex justify-between items-center">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -101,24 +147,34 @@ const Ads: React.FC = () => {
               <Megaphone className="text-sky-500" size={32} />
               Promotions
             </h1>
-            <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em] mt-2">
-              Ad Management System
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-2">
+              Super-Admin Control Panel
             </p>
           </motion.div>
         </header>
 
         <div className="flex flex-col gap-12 flex-1 overflow-y-auto pr-4 custom-scrollbar pb-20">
-          {/* CREATE AD FORM */}
+          {/* CREATE/EDIT AD FORM */}
           <section className="w-full shrink-0">
             <motion.div
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               className="bg-white/5 border border-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] shadow-2xl flex flex-col"
             >
-              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500 mb-6 shrink-0 flex items-center gap-2">
-                <PlusCircle size={14} />
-                Create New Promotion
-              </h2>
+              <div className="flex justify-between items-center mb-6 shrink-0">
+                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500 flex items-center gap-2">
+                  {editingId ? <Edit3 size={14} /> : <PlusCircle size={14} />}
+                  {editingId ? "Edit Promotion" : "Create New Promotion"}
+                </h2>
+                {editingId && (
+                  <button
+                    onClick={resetForm}
+                    className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    <XCircle size={14} /> Cancel Edit
+                  </button>
+                )}
+              </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,25 +209,56 @@ const Ads: React.FC = () => {
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
-                        Duration (Months)
-                      </label>
-                      <div className="flex gap-2">
-                        {[1, 3, 6, 12].map((m) => (
-                          <button
-                            key={m}
-                            type="button"
-                            onClick={() => setForm({ ...form, duration: m })}
-                            className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${
-                              form.duration === m
-                                ? "bg-white text-slate-950"
-                                : "bg-white/5 border-white/5 text-slate-500"
-                            }`}
-                          >
-                            {m}M
-                          </button>
-                        ))}
+                    <div className="flex gap-4">
+                      <div className="space-y-1 flex-1">
+                        <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                          Duration (Months)
+                        </label>
+                        <div className="flex gap-2">
+                          {[1, 3, 6, 12].map((m) => (
+                            <button
+                              key={m}
+                              type="button"
+                              onClick={() => setForm({ ...form, duration: m })}
+                              className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${
+                                form.duration === m
+                                  ? "bg-white text-slate-950"
+                                  : "bg-white/5 border-white/5 text-slate-500"
+                              }`}
+                            >
+                              {m}M
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1 flex-1">
+                        <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                          Status
+                        </label>
+                        <div className="flex gap-2">
+                          {["Active", "Paused"].map((s) => (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() =>
+                                setForm({
+                                  ...form,
+                                  status: s as "Active" | "Paused",
+                                })
+                              }
+                              className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${
+                                form.status === s
+                                  ? s === "Active"
+                                    ? "bg-emerald-500 text-slate-950"
+                                    : "bg-amber-500 text-slate-950"
+                                  : "bg-white/5 border-white/5 text-slate-500"
+                              }`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -188,7 +275,7 @@ const Ads: React.FC = () => {
                         onChange={(e) =>
                           setForm({ ...form, image: e.target.value })
                         }
-                        placeholder="https://your-project.supabase.co/storage/v1/object/public/..."
+                        placeholder="https://your-project.supabase.co/..."
                         required
                       />
                     </div>
@@ -229,7 +316,7 @@ const Ads: React.FC = () => {
                     ) : (
                       <Save size={16} />
                     )}
-                    Launch Promotion
+                    {editingId ? "Update Campaign" : "Launch Promotion"}
                   </button>
                 </div>
               </form>
@@ -241,10 +328,11 @@ const Ads: React.FC = () => {
             <div className="shrink-0 mb-8 flex justify-between items-end px-2">
               <div>
                 <h2 className="text-xl font-black italic uppercase">
-                  Active Promotions
+                  Active Campaigns
                 </h2>
                 <p className="text-[10px] font-black text-sky-500 uppercase tracking-widest">
-                  Live Campaigns: {ads.length}
+                  Live: {ads.filter((a) => a.status === "Active").length} |
+                  Paused: {ads.filter((a) => a.status === "Paused").length}
                 </p>
               </div>
             </div>
@@ -264,17 +352,46 @@ const Ads: React.FC = () => {
                       <img
                         src={ad.image}
                         alt={ad.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ${ad.status === "Paused" ? "grayscale opacity-50" : ""}`}
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
                             "https://via.placeholder.com/400x200?text=Image+Not+Found";
                         }}
                       />
-                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2">
-                        <Calendar size={12} className="text-sky-400" />
-                        <span className="text-[9px] font-black uppercase text-slate-300">
-                          {new Date(ad.expiresAt).toLocaleDateString()}
-                        </span>
+                      <div className="absolute top-4 right-4 flex gap-2">
+                        <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2">
+                          <Calendar size={12} className="text-sky-400" />
+                          <span className="text-[9px] font-black uppercase text-slate-300">
+                            {new Date(ad.expiresAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div
+                          className={`px-3 py-1.5 rounded-xl border font-black uppercase text-[9px] ${
+                            ad.status === "Active"
+                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/20"
+                              : "bg-amber-500/20 text-amber-400 border-amber-500/20"
+                          }`}
+                        >
+                          {ad.status}
+                        </div>
+                      </div>
+
+                      {/* Metrics Overlay */}
+                      <div className="absolute bottom-4 left-4 right-4 flex justify-between gap-2">
+                        <div className="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <Eye size={10} className="text-sky-400" />
+                            <span className="text-[9px] font-black text-white">
+                              {ad.impressions || 0}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <MousePointer2 size={10} className="text-emerald-400" />
+                            <span className="text-[9px] font-black text-white">
+                              {ad.clicks || 0}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -285,10 +402,34 @@ const Ads: React.FC = () => {
                       <p className="text-[11px] text-slate-400 line-clamp-2 mb-4">
                         {ad.content}
                       </p>
-                      <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                          {ad.duration} Month Duration
-                        </span>
+                      <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center text-slate-400">
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => handleEdit(ad)}
+                            className="text-white hover:text-sky-400 transition-colors flex items-center gap-1.5 text-[10px] font-black uppercase"
+                          >
+                            <Edit3 size={14} /> Edit
+                          </button>
+                          <button
+                            onClick={() => toggleStatus(ad)}
+                            className="hover:text-amber-400 transition-colors flex items-center gap-1.5 text-[10px] font-black uppercase"
+                          >
+                            {ad.status === "Active" ? (
+                              <>
+                                <ToggleRight
+                                  size={16}
+                                  className="text-emerald-500"
+                                />{" "}
+                                Pause
+                              </>
+                            ) : (
+                              <>
+                                <ToggleLeft size={16} className="text-slate-500" />{" "}
+                                Resume
+                              </>
+                            )}
+                          </button>
+                        </div>
                         <button
                           onClick={() => openDeleteModal(ad._id)}
                           className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-slate-950 rounded-xl transition-all"

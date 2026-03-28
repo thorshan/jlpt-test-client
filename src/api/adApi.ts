@@ -7,6 +7,9 @@ export interface Ad {
   image: string;
   duration: number;
   expiresAt: string;
+  status: "Active" | "Paused";
+  impressions: number;
+  clicks: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,6 +28,18 @@ export const adApi = {
     image: string;
   }) => {
     return apiClient.post("/ads", data);
+  },
+  updateAd: async (
+    id: string,
+    data: {
+      title?: string;
+      content?: string;
+      duration?: number;
+      image?: string;
+      status?: "Active" | "Paused";
+    },
+  ) => {
+    return apiClient.put(`/ads/${id}`, data);
   },
   deleteAd: async (id: string) => {
     return apiClient.delete(`/ads/${id}`);

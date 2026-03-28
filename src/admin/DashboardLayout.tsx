@@ -90,8 +90,9 @@ const DashboardLayout = () => {
       name: "Promotions",
       path: "/admin/ads",
       icon: <Megaphone size={18} />,
-      visible: true,
+      visible: isSuperAdmin ? true : false,
     },
+
   ];
 
 

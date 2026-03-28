@@ -1,65 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   TrendingUp,
-  Users,
   MousePointer2,
   Eye,
   FileSpreadsheet,
   FileText,
   Calendar,
+  AlertCircle,
 } from "lucide-react";
 
-const AD_DATA = [
-  {
-    id: 1,
-    campaign: "Kanji Master Premium",
-    impressions: 12450,
-    clicks: 850,
-    ctr: "6.8%",
-    revenue: "$425.00",
-    status: "Active",
-  },
-  {
-    id: 2,
-    campaign: "JLPT N2 Mock Series",
-    impressions: 8900,
-    clicks: 620,
-    ctr: "7.0%",
-    revenue: "$310.00",
-    status: "Paused",
-  },
-  {
-    id: 3,
-    campaign: "Grammar Intensive",
-    impressions: 15600,
-    clicks: 1100,
-    ctr: "7.1%",
-    revenue: "$550.00",
-    status: "Active",
-  },
-  {
-    id: 4,
-    campaign: "Listening Pro Pack",
-    impressions: 4200,
-    clicks: 210,
-    ctr: "5.0%",
-    revenue: "$105.00",
-    status: "Active",
-  },
-];
+import { adApi, type Ad } from "../api/adApi";
+import { LoadingScreen } from "../components/LoadingScreen";
 
 const AdsInsights: React.FC = () => {
-  const [data] = useState(AD_DATA);
+  const [ads, setAds] = useState<Ad[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await adApi.getAllAds();
+      setAds(res.data?.data || []);
+    } catch (error) {
+      console.error("Error fetching insights:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const totalImpressions = ads.reduce((acc, ad) => acc + (ad.impressions || 0), 0);
+  const totalClicks = ads.reduce((acc, ad) => acc + (ad.clicks || 0), 0);
+  const avgCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+  const estRevenue = totalClicks * 0.5; // Dummy calculation for revenue
 
   const handleExportPDF = () => {
     window.print();
   };
 
   const handleExportExcel = () => {
-    // Basic CSV export logic
-    const headers = Object.keys(data[0]).join(",");
-    const rows = data.map((row) => Object.values(row).join(",")).join("\n");
+    if (ads.length === 0) return;
+    const headers = "Campaign,Impressions,Clicks,CTR,Status,ExpiresAt";
+    const rows = ads
+      .map(
+        (ad) =>
+          `${ad.title},${ad.impressions},${ad.clicks},${((ad.clicks / ad.impressions || 0) * 100).toFixed(2)}%,${ad.status},${new Date(ad.expiresAt).toLocaleDateString()}`,
+      )
+      .join("\n");
     const blob = new Blob([`${headers}\n${rows}`], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -67,6 +58,8 @@ const AdsInsights: React.FC = () => {
     a.download = "ads_insights.csv";
     a.click();
   };
+
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="flex flex-col gap-8 p-4 md:p-8">
@@ -102,26 +95,26 @@ const AdsInsights: React.FC = () => {
         {[
           {
             label: "Total Impressions",
-            val: "41,150",
+            val: totalImpressions.toLocaleString(),
             icon: Eye,
             color: "text-sky-500",
           },
           {
             label: "Total Clicks",
-            val: "2,780",
+            val: totalClicks.toLocaleString(),
             icon: MousePointer2,
             color: "text-emerald-500",
           },
           {
             label: "Avg. CTR",
-            val: "6.7%",
+            val: `${avgCtr.toFixed(2)}%`,
             icon: TrendingUp,
             color: "text-amber-500",
           },
           {
             label: "Est. Revenue",
-            val: "$1,390.00",
-            icon: Users,
+            val: `$${estRevenue.toFixed(2)}`,
+            icon: TrendingUp, // Changed from Users to TrendingUp
             color: "text-purple-500",
           },
         ].map((s, i) => (
@@ -139,7 +132,7 @@ const AdsInsights: React.FC = () => {
                 <s.icon size={20} />
               </div>
               <span className="text-[10px] font-black text-slate-600 bg-white/5 px-2 py-1 rounded">
-                +12% vs LY
+                LIVE
               </span>
             </div>
             <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">
@@ -157,60 +150,69 @@ const AdsInsights: React.FC = () => {
             <Calendar size={14} /> Campaign Breakdown
           </h3>
           <div className="flex gap-2">
-            {["Day", "Week", "Month", "Year"].map((t) => (
-              <button
-                key={t}
-                className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${t === "Month" ? "bg-sky-500 text-slate-950" : "bg-white/5 text-slate-500 hover:text-white"}`}
-              >
-                {t}
-              </button>
-            ))}
+            <button
+               onClick={fetchData}
+               className="px-3 py-1 bg-white/5 text-sky-400 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all font-bold"
+            >
+              Refresh Data
+            </button>
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="text-[10px] font-black uppercase text-slate-500 bg-white/5 tracking-widest">
-              <tr>
-                <th className="px-8 py-5">Campaign Name</th>
-                <th className="px-8 py-5 text-center">Impressions</th>
-                <th className="px-8 py-5 text-center">Clicks</th>
-                <th className="px-8 py-5 text-center">CTR</th>
-                <th className="px-8 py-5 text-right">Revenue</th>
-                <th className="px-8 py-5 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody className="text-xs font-bold divide-y divide-white/5">
-              {data.map((row) => (
-                <tr
-                  key={row.id}
-                  className="hover:bg-white/5 transition-colors group"
-                >
-                  <td className="px-8 py-5 text-white group-hover:text-sky-400 transition-colors">
-                    {row.campaign}
-                  </td>
-                  <td className="px-8 py-5 text-center text-slate-400">
-                    {row.impressions.toLocaleString()}
-                  </td>
-                  <td className="px-8 py-5 text-center text-slate-400">
-                    {row.clicks.toLocaleString()}
-                  </td>
-                  <td className="px-8 py-5 text-center text-emerald-500">
-                    {row.ctr}
-                  </td>
-                  <td className="px-8 py-5 text-right text-white">
-                    {row.revenue}
-                  </td>
-                  <td className="px-8 py-5 text-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${row.status === "Active" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20"}`}
-                    >
-                      {row.status}
-                    </span>
-                  </td>
+          {ads.length === 0 ? (
+            <div className="p-20 flex flex-col items-center justify-center text-slate-500 gap-4">
+               <AlertCircle size={48} className="opacity-20" />
+               <p className="font-black uppercase tracking-widest text-xs">No active campaigns found</p>
+            </div>
+          ) : (
+            <table className="w-full text-left">
+              <thead className="text-[10px] font-black uppercase text-slate-500 bg-white/5 tracking-widest">
+                <tr>
+                  <th className="px-8 py-5">Campaign Name</th>
+                  <th className="px-8 py-5 text-center">Impressions</th>
+                  <th className="px-8 py-5 text-center">Clicks</th>
+                  <th className="px-8 py-5 text-center">CTR</th>
+                  <th className="px-8 py-5 text-right">Revenue</th>
+                  <th className="px-8 py-5 text-center">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="text-xs font-bold divide-y divide-white/5">
+                {ads.map((ad) => {
+                  const adCtr = ad.impressions > 0 ? (ad.clicks / ad.impressions) * 100 : 0;
+                  const adRevenue = ad.clicks * 0.5;
+                  return (
+                    <tr
+                      key={ad._id}
+                      className="hover:bg-white/5 transition-colors group"
+                    >
+                      <td className="px-8 py-5 text-white group-hover:text-sky-400 transition-colors">
+                        {ad.title}
+                      </td>
+                      <td className="px-8 py-5 text-center text-slate-400">
+                        {ad.impressions.toLocaleString()}
+                      </td>
+                      <td className="px-8 py-5 text-center text-slate-400">
+                        {ad.clicks.toLocaleString()}
+                      </td>
+                      <td className="px-8 py-5 text-center text-emerald-500">
+                        {adCtr.toFixed(2)}%
+                      </td>
+                      <td className="px-8 py-5 text-right text-white">
+                        ${adRevenue.toFixed(2)}
+                      </td>
+                      <td className="px-8 py-5 text-center">
+                        <span
+                          className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${ad.status === "Active" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border border-amber-500/20"}`}
+                        >
+                          {ad.status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
