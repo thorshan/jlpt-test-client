@@ -467,17 +467,16 @@ const Sections = () => {
                     </div>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto border border-white/5 rounded-2xl bg-slate-950/30 p-2 flex flex-col gap-2 custom-scrollbar">
+                  <div className="min-h-[400px] flex-1 overflow-y-auto border border-white/5 rounded-2xl bg-slate-950/30 p-2 flex flex-col gap-2 custom-scrollbar">
                     {filteredQuestions.length > 0 ? (
                       filteredQuestions.map((q) => (
                         <div
                           key={q._id}
                           onClick={() => toggleQuestionSelection(q._id)}
-                          className={`p-3 rounded-xl cursor-pointer text-xs flex justify-between items-start transition-all ${
-                            form.questions.includes(q._id)
-                              ? "bg-sky-500/10 border border-sky-500/50"
-                              : "bg-white/5 border border-transparent hover:bg-white/10"
-                          }`}
+                          className={`p-3 rounded-xl cursor-pointer text-xs flex justify-between items-start transition-all ${form.questions.includes(q._id)
+                            ? "bg-sky-500/10 border border-sky-500/50"
+                            : "bg-white/5 border border-transparent hover:bg-white/10"
+                            }`}
                         >
                           <div className="flex flex-col gap-1 truncate pr-4">
                             <span
@@ -514,11 +513,10 @@ const Sections = () => {
                 <div className="flex flex-col gap-3 shrink-0 pt-4">
                   <button
                     type="submit"
-                    className={`py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 ${
-                      editingId
-                        ? "bg-white text-slate-950"
-                        : "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20"
-                    }`}
+                    className={`py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 ${editingId
+                      ? "bg-white text-slate-950"
+                      : "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20"
+                      }`}
                   >
                     <Save size={18} />
                     {editingId ? "Update Section" : "Save Section"}
