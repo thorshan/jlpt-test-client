@@ -10,6 +10,8 @@ import DashboardLayout from "../admin/DashboardLayout";
 import Requests from "../admin/Requests";
 import Logs from "../admin/Logs";
 import AdsInsights from "../admin/AdsInsights";
+import Ads from "../admin/Ads";
+
 
 // UI Imports
 import Index from "../ui/Index";
@@ -106,7 +108,16 @@ const AppRoutes = () => {
             </ProtectedRoutes>
           }
         />
+        <Route
+          path="ads"
+          element={
+            <ProtectedRoutes allowedRoles={["s-admin", "admin"]}>
+              <Ads />
+            </ProtectedRoutes>
+          }
+        />
         <Route path="results">
+
           <Route index element={<AdminResults />} />
           <Route path=":id" element={<ResultDetail />} />
         </Route>

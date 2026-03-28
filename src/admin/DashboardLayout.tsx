@@ -13,7 +13,9 @@ import {
   MessageSquare,
   Activity,
   BarChart3,
+  Megaphone,
 } from "lucide-react";
+
 import { useUser } from "../hooks/useUser";
 
 const DashboardLayout = () => {
@@ -84,7 +86,14 @@ const DashboardLayout = () => {
       icon: <BarChart3 size={18} />,
       visible: isSuperAdmin ? true : false,
     },
+    {
+      name: "Promotions",
+      path: "/admin/ads",
+      icon: <Megaphone size={18} />,
+      visible: true,
+    },
   ];
+
 
   return (
     <div className="flex min-h-screen bg-[#020617] text-slate-200 font-sans overflow-hidden">
