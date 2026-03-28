@@ -5,6 +5,7 @@ export interface Ad {
   title: string;
   content: string;
   image: string;
+  ctaUrl?: string;
   duration: number;
   expiresAt: string;
   status: "Active" | "Paused";
@@ -26,6 +27,7 @@ export const adApi = {
     content: string;
     duration: number;
     image: string;
+    ctaUrl?: string;
   }) => {
     return apiClient.post("/ads", data);
   },
@@ -36,6 +38,7 @@ export const adApi = {
       content?: string;
       duration?: number;
       image?: string;
+      ctaUrl?: string;
       status?: "Active" | "Paused";
     },
   ) => {
@@ -48,4 +51,3 @@ export const adApi = {
     return apiClient.post(`/ads/${id}/click`);
   },
 };
-

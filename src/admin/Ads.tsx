@@ -15,6 +15,7 @@ import {
   MousePointer2,
   ToggleLeft,
   ToggleRight,
+  Link as LinkIcon,
 } from "lucide-react";
 
 import { adApi, type Ad } from "../api/adApi";
@@ -34,6 +35,7 @@ const Ads: React.FC = () => {
     duration: 1,
     image: "",
     status: "Active" as "Active" | "Paused",
+    ctaUrl: "",
   });
 
   const fetchData = async () => {
@@ -86,6 +88,7 @@ const Ads: React.FC = () => {
       duration: 1,
       image: "",
       status: "Active",
+      ctaUrl: "",
     });
     setEditingId(null);
   };
@@ -98,6 +101,7 @@ const Ads: React.FC = () => {
       duration: ad.duration,
       image: ad.image,
       status: ad.status,
+      ctaUrl: ad.ctaUrl || "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -263,7 +267,7 @@ const Ads: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* IMAGE URL INPUT */}
+                  {/* IMAGE & CTA URL INPUT */}
                   <div className="space-y-4">
                     <div className="space-y-1">
                       <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
@@ -280,7 +284,26 @@ const Ads: React.FC = () => {
                       />
                     </div>
 
-                    <div className="relative h-[180px] bg-slate-950/50 border-2 border-dashed border-white/5 rounded-[2rem] overflow-hidden group hover:border-sky-500/50 transition-all">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                        CTA URL (Optional)
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                          <LinkIcon size={14} />
+                        </div>
+                        <input
+                          className="w-full bg-slate-950/50 p-4 pl-10 rounded-2xl border border-white/5 outline-none focus:border-sky-500 transition-all font-bold"
+                          value={form.ctaUrl}
+                          onChange={(e) =>
+                            setForm({ ...form, ctaUrl: e.target.value })
+                          }
+                          placeholder="https://external-link.com"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="relative h-[120px] bg-slate-950/50 border-2 border-dashed border-white/5 rounded-[2rem] overflow-hidden group hover:border-sky-500/50 transition-all">
                       {form.image ? (
                         <div className="absolute inset-0">
                           <img
@@ -396,9 +419,14 @@ const Ads: React.FC = () => {
                     </div>
 
                     <div className="p-6 flex-1 flex flex-col">
-                      <h3 className="font-black text-lg truncate uppercase italic group-hover:text-sky-400 transition-colors mb-2">
+                      <h3 className="font-black text-lg truncate uppercase italic group-hover:text-sky-400 transition-colors mb-1">
                         {ad.title}
                       </h3>
+                      {ad.ctaUrl && (
+                        <p className="text-[9px] text-sky-500/50 font-black uppercase tracking-widest mb-2 flex items-center gap-1">
+                          <LinkIcon size={10} /> {new URL(ad.ctaUrl).hostname}
+                        </p>
+                      )}
                       <p className="text-[11px] text-slate-400 line-clamp-2 mb-4">
                         {ad.content}
                       </p>

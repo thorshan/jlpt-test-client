@@ -107,12 +107,13 @@ const Redirect: React.FC = () => {
                     {ad.content}
                   </p>
                   <a
-                    href="https://jlpt.jp" // Placeholder or actual link if provided in model
+                    href={ad.ctaUrl || ad.image}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleAdClick}
                     className="mt-2 text-sky-400 text-[11px] font-black uppercase tracking-widest flex items-center gap-2 hover:text-white transition-colors group w-fit"
                   >
+
                     See More Details
                     <ExternalLink size={12} className="group-hover:translate-x-1 transition-transform" />
                   </a>
@@ -122,7 +123,7 @@ const Redirect: React.FC = () => {
               {/* Action Section */}
               <div className="flex flex-col items-center gap-6 mt-4">
                 <div className="flex items-center gap-3 bg-white/5 border border-white/5 py-2 px-4 rounded-full">
-                   <div className="text-xl font-black text-white tabular-nums">
+                  <div className="text-xl font-black text-white tabular-nums">
                     {timeLeft > 0 ? timeLeft : 0}
                     <span className="text-sky-500 ml-1 italic text-xs">S</span>
                   </div>
@@ -137,11 +138,10 @@ const Redirect: React.FC = () => {
 
                 <button
                   onClick={handleContinue}
-                  className={`w-full py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[12px] transition-all flex items-center justify-center gap-3 shadow-2xl ${
-                    timeLeft <= 0
+                  className={`w-full py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[12px] transition-all flex items-center justify-center gap-3 shadow-2xl ${timeLeft <= 0
                       ? "bg-white text-slate-950 scale-100 opacity-100 hover:bg-sky-400 hover:scale-[1.02]"
                       : "bg-white/5 text-slate-500 cursor-not-allowed opacity-50"
-                  }`}
+                    }`}
                   disabled={timeLeft > 0}
                 >
                   Continue to Exam
