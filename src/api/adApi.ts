@@ -44,4 +44,8 @@ export const adApi = {
   deleteAd: async (id: string) => {
     return apiClient.delete(`/ads/${id}`);
   },
+  trackClick: async (id: string) => {
+    return apiClient.post(`/ads/${id}/click`);
+  },
 };
+

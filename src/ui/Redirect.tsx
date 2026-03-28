@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-
-import { ShieldCheck, Loader2 } from "lucide-react";
-
+import { ShieldCheck, Loader2, ArrowRight, ExternalLink } from "lucide-react";
 import { adApi, type Ad } from "../api/adApi";
 
 const Redirect: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [timeLeft, setTimeLeft] = useState(20);
+  const [timeLeft, setTimeLeft] = useState(10); // Reduced to 10s for better UX
   const [ad, setAd] = useState<Ad | null>(null);
   const [loadingAd, setLoadingAd] = useState(true);
 
@@ -30,20 +28,31 @@ const Redirect: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      navigate(targetUrl);
-      return;
-    }
+    if (timeLeft <= 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, navigate, targetUrl]);
+  }, [timeLeft]);
+
+  const handleAdClick = async () => {
+    if (ad) {
+      try {
+        await adApi.trackClick(ad._id);
+      } catch (error) {
+        console.error("Error tracking click:", error);
+      }
+    }
+  };
+
+  const handleContinue = () => {
+    navigate(targetUrl);
+  };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
       {/* Background Decor */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-sky-500/10 blur-[120px] rounded-full" />
@@ -53,7 +62,7 @@ const Redirect: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 max-w-2xl w-full"
+        className="relative z-10 max-w-md w-full"
       >
         <AnimatePresence mode="wait">
           {loadingAd ? (
@@ -71,81 +80,103 @@ const Redirect: React.FC = () => {
               key="ad"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative group transition-all duration-500"
+              className="flex flex-col gap-6"
             >
-              {/* Outer Glow Effect */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-sky-500/20 to-blue-500/20 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
-
-              <div className="relative bg-white/5 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-3xl shadow-2xl overflow-hidden min-h-[400px] flex flex-col justify-end">
-                {/* Ad Image Background */}
-                <div className="absolute inset-0 z-0">
+              {/* Ad Card */}
+              <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden backdrop-blur-3xl shadow-2xl flex flex-col">
+                {/* Square Image Block */}
+                <div className="w-full aspect-square bg-slate-900 relative overflow-hidden">
                   <img
                     src={ad.image}
                     alt={ad.title}
-                    className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity duration-700"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent" />
+                  <div className="absolute top-4 left-4">
+                    <span className="text-[9px] font-black bg-sky-500 text-slate-950 px-3 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg">
+                      Sponsored
+                    </span>
+                  </div>
                 </div>
 
-
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-black bg-sky-500 text-slate-950 px-3 py-1 rounded-full uppercase tracking-[0.2em]">
-                        Sponsored
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest opacity-60">
-                        Official Partner
-                      </span>
-                    </div>
-                  </div>
-
-                  <h2 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight tracking-tight group-hover:text-sky-400 transition-colors uppercase italic">
+                {/* Content Block */}
+                <div className="p-8 flex flex-col gap-3">
+                  <h2 className="text-2xl font-black text-white leading-tight uppercase italic tracking-tight">
                     {ad.title}
                   </h2>
-
-                  <p className="text-slate-300 text-base md:text-lg leading-relaxed mb-4 font-medium max-w-lg">
+                  <p className="text-slate-400 text-sm leading-relaxed line-clamp-3">
                     {ad.content}
                   </p>
+                  <a
+                    href="https://jlpt.jp" // Placeholder or actual link if provided in model
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleAdClick}
+                    className="mt-2 text-sky-400 text-[11px] font-black uppercase tracking-widest flex items-center gap-2 hover:text-white transition-colors group w-fit"
+                  >
+                    See More Details
+                    <ExternalLink size={12} className="group-hover:translate-x-1 transition-transform" />
+                  </a>
                 </div>
+              </div>
+
+              {/* Action Section */}
+              <div className="flex flex-col items-center gap-6 mt-4">
+                <div className="flex items-center gap-3 bg-white/5 border border-white/5 py-2 px-4 rounded-full">
+                   <div className="text-xl font-black text-white tabular-nums">
+                    {timeLeft > 0 ? timeLeft : 0}
+                    <span className="text-sky-500 ml-1 italic text-xs">S</span>
+                  </div>
+                  <div className="w-[1px] h-4 bg-white/10" />
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck size={14} className="text-emerald-500" />
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                      Ready to Proceed
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleContinue}
+                  className={`w-full py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[12px] transition-all flex items-center justify-center gap-3 shadow-2xl ${
+                    timeLeft <= 0
+                      ? "bg-white text-slate-950 scale-100 opacity-100 hover:bg-sky-400 hover:scale-[1.02]"
+                      : "bg-white/5 text-slate-500 cursor-not-allowed opacity-50"
+                  }`}
+                  disabled={timeLeft > 0}
+                >
+                  Continue to Exam
+                  <ArrowRight size={18} />
+                </button>
               </div>
             </motion.div>
           ) : (
-            <motion.div
-              key="fallback"
-              className="text-center p-20 bg-white/5 border border-white/10 rounded-[2.5rem] backdrop-blur-md"
-            >
-              <h2 className="text-2xl font-black italic uppercase text-slate-500">
-                JLPTX Mock System
-              </h2>
-              <p className="text-xs text-slate-600 mt-2 uppercase tracking-widest">
-                Preparing your resources...
-              </p>
-            </motion.div>
+            <div className="flex flex-col gap-8">
+              <motion.div
+                key="fallback"
+                className="text-center p-16 bg-white/5 border border-white/10 rounded-[2.5rem] backdrop-blur-md"
+              >
+                <h2 className="text-2xl font-black italic uppercase text-slate-300">
+                  JLPTX Mock System
+                </h2>
+                <p className="text-[10px] text-slate-500 mt-2 uppercase tracking-[0.3em] font-bold">
+                  Preparing your safe environment...
+                </p>
+              </motion.div>
+              <button
+                onClick={handleContinue}
+                className="w-full py-5 bg-white text-slate-950 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[12px] flex items-center justify-center gap-3"
+              >
+                Skip to Destination
+                <ArrowRight size={18} />
+              </button>
+            </div>
           )}
         </AnimatePresence>
-
-        {/* REFINED COUNTDOWN */}
-        <div className="mt-12 flex flex-col items-center gap-3">
-          <div className="flex items-center gap-4 bg-white/5 border border-white/10 px-6 py-3 rounded-full backdrop-blur-md">
-            <div className="text-3xl font-black text-white tabular-nums">
-              {timeLeft}
-              <span className="text-sky-500 ml-1 italic">S</span>
-            </div>
-            <div className="w-[1px] h-6 bg-white/10" />
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-500" />
-              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                Safe Redirect
-              </span>
-            </div>
-          </div>
-        </div>
       </motion.div>
 
-      <footer className="absolute bottom-8 left-0 w-full text-center opacity-30">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600">
-          Powered by JLPTX Infrastructure
+      <footer className="absolute bottom-8 left-0 w-full text-center opacity-20">
+        <p className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-600">
+          JLPTX Cloud Infrastructure • Security Verified
         </p>
       </footer>
     </div>
@@ -153,4 +184,3 @@ const Redirect: React.FC = () => {
 };
 
 export default Redirect;
-
