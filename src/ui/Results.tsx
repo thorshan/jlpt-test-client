@@ -12,7 +12,8 @@ import {
   AlertCircle,
   Award,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+
 import { resultApi, type Result } from "../api/resultApi";
 import { useUser } from "../hooks/useUser";
 import { useTranslation } from "../hooks/useTranslation";
@@ -46,7 +47,9 @@ const Results: React.FC = () => {
 
   const [data, setData] = useState<Result | null>(null);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(0);
+  const [searchParams] = useSearchParams();
+  const step = parseInt(searchParams.get("step") || "0");
+
   const [certLang, setCertLang] = useState<"en" | "jp">("en");
 
   useEffect(() => {
