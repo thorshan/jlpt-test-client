@@ -90,13 +90,26 @@ const ExamScreen = () => {
         const res = await examApi.getExam(id as string);
         const data = res?.data?.data;
         if (data) {
-          // Sort questions within each section by module number
+          // Sort questions within each section by category then module number
           if (data.sections) {
+            const getCategoryPriority = (cat: string) => {
+              const norm = cat.toLowerCase();
+              if (norm.includes("vocab")) return 1;
+              if (norm.includes("kanji")) return 2;
+              if (norm.includes("grammar")) return 3;
+              if (norm.includes("reading")) return 4;
+              if (norm.includes("listening")) return 5;
+              return 99;
+            };
+
             data.sections.forEach((sec: Section<Question>) => {
               if (sec.questions) {
-                sec.questions.sort((a, b) =>
-                  extractModuleNumber(a.module) - extractModuleNumber(b.module)
-                );
+                sec.questions.sort((a, b) => {
+                  const pA = getCategoryPriority(a.category);
+                  const pB = getCategoryPriority(b.category);
+                  if (pA !== pB) return pA - pB;
+                  return extractModuleNumber(a.module) - extractModuleNumber(b.module);
+                });
               }
             });
           }
@@ -283,15 +296,6 @@ const ExamScreen = () => {
     }
   };
 
-  const handleSectionEnd = (updatedAnswers: Record<string, number>) => {
-    if (exam && currentSectionIdx < exam.sections.length - 1) {
-      setExamTimeLeft(sectionTimeLeft);
-      setStatus("rest");
-    } else {
-      submitExam(updatedAnswers);
-    }
-  };
-
   const startNextSection = () => {
     if (!exam) return;
     const nextIdx = currentSectionIdx + 1;
@@ -306,6 +310,19 @@ const ExamScreen = () => {
     setStatus("exam");
     setSelectedOption(null);
     setRestTimeLeft(10 * 60);
+  };
+
+  const handleSectionEnd = (updatedAnswers: Record<string, number>) => {
+    if (exam && currentSectionIdx < exam.sections.length - 1) {
+      if (exam.category === "Level Test") {
+        startNextSection();
+      } else {
+        setExamTimeLeft(sectionTimeLeft);
+        setStatus("rest");
+      }
+    } else {
+      submitExam(updatedAnswers);
+    }
   };
 
   const formatTime = (s: number) =>

@@ -139,8 +139,8 @@ const Redirect: React.FC = () => {
                 <button
                   onClick={handleContinue}
                   className={`w-full py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[12px] transition-all flex items-center justify-center gap-3 shadow-2xl ${timeLeft <= 0
-                      ? "bg-white text-slate-950 scale-100 opacity-100 hover:bg-sky-400 hover:scale-[1.02]"
-                      : "bg-white/5 text-slate-500 cursor-not-allowed opacity-50"
+                    ? "bg-white text-slate-950 scale-100 opacity-100 hover:bg-sky-400 hover:scale-[1.02]"
+                    : "bg-white/5 text-slate-500 cursor-not-allowed opacity-50"
                     }`}
                   disabled={timeLeft > 0}
                 >
@@ -173,12 +173,6 @@ const Redirect: React.FC = () => {
           )}
         </AnimatePresence>
       </motion.div>
-
-      <footer className="absolute bottom-8 left-0 w-full text-center opacity-20">
-        <p className="text-[8px] font-black uppercase tracking-[0.5em] text-slate-600">
-          JLPTX Cloud Infrastructure • Security Verified
-        </p>
-      </footer>
     </div>
   );
 };
