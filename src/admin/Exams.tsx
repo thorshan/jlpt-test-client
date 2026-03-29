@@ -12,6 +12,8 @@ import {
   Database,
   Maximize2,
   Minimize2,
+  Search,
+  X,
 } from "lucide-react";
 import { examApi, type Exam, type Section } from "../api/examApi";
 import { sectionApi } from "../api/sectionApi";
@@ -168,16 +170,13 @@ const Exams = () => {
     fetchData();
   }, []);
 
-  const tags = useMemo(() => {
-    const rawTags = availableSections
-      .map((s) => s.tag)
-      .filter((t): t is string => !!t);
-    return ["All", ...new Set(rawTags)];
-  }, [availableSections]);
 
   const filteredSections = useMemo(() => {
-    if (filterTag === "All") return availableSections;
-    return availableSections.filter((s) => s.tag === filterTag);
+    if (filterTag === "All" || !filterTag) return availableSections;
+    const query = filterTag.toLowerCase();
+    return availableSections.filter((s) =>
+      s.tag?.toLowerCase().includes(query),
+    );
   }, [availableSections, filterTag]);
 
   const handleApiError = (error: unknown) => {
@@ -453,24 +452,32 @@ const Exams = () => {
                     </span>
                   </label>
 
-                  <div className="flex flex-wrap gap-2 px-2 py-3 bg-slate-950/30 rounded-2xl border border-white/5 shrink-0">
-                    <span className="text-[9px] text-slate-600 font-black w-full mb-1 ml-1 uppercase">
-                      Filter by Tag
-                    </span>
-                    {tags.map((tag: string) => (
-                      <button
-                        key={tag}
-                        type="button"
-                        onClick={() => setFilterTag(tag)}
-                        className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase border transition-all ${
-                          filterTag === tag
-                            ? "bg-sky-500 border-sky-400 text-slate-950 shadow-lg"
-                            : "bg-white/5 border-white/5 text-slate-500 hover:text-white"
-                        }`}
-                      >
-                        {tag}
-                      </button>
-                    ))}
+                  <div className="px-2 py-3 bg-slate-950/30 rounded-2xl border border-white/5 shrink-0">
+                    <label className="text-[9px] text-slate-600 font-black w-full mb-1 ml-1 uppercase block">
+                      Search by Tag
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Type to filter sections by tag..."
+                        className="w-full bg-slate-950/50 p-3 rounded-xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-[11px] font-bold text-sky-400 pl-10"
+                        value={filterTag === "All" ? "" : filterTag}
+                        onChange={(e) => setFilterTag(e.target.value || "All")}
+                      />
+                      <Search
+                        size={14}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                      />
+                      {filterTag !== "All" && (
+                        <button
+                          type="button"
+                          onClick={() => setFilterTag("All")}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-sky-500 transition-colors"
+                        >
+                          <X size={12} />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex-1 overflow-y-auto border border-white/5 rounded-[2rem] bg-slate-950/30 p-2 flex flex-col gap-2 custom-scrollbar">

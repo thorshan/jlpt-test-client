@@ -158,7 +158,7 @@ const DashboardLayout = () => {
         </div>
 
         {/* NAVIGATION AREA */}
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar-thin pb-4">
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar pb-4">
           {navItems
             .filter((nav) => nav.visible === true)
             .map((item) => {
