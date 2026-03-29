@@ -8,6 +8,7 @@ export interface Section<Q = string> {
   duration: number;
   minPassedMark: number;
   questions: Q[];
+  tag?: string;
 }
 
 export interface Exam<Q = string> {

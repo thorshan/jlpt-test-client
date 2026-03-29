@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, useMemo, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlusCircle,
@@ -115,6 +115,7 @@ const Exams = () => {
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [filterTag, setFilterTag] = useState<string>("All");
 
   const [form, setForm] = useState<ExamForm>({
     level: "",
@@ -166,6 +167,18 @@ const Exams = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const tags = useMemo(() => {
+    const rawTags = availableSections
+      .map((s) => s.tag)
+      .filter((t): t is string => !!t);
+    return ["All", ...new Set(rawTags)];
+  }, [availableSections]);
+
+  const filteredSections = useMemo(() => {
+    if (filterTag === "All") return availableSections;
+    return availableSections.filter((s) => s.tag === filterTag);
+  }, [availableSections, filterTag]);
 
   const handleApiError = (error: unknown) => {
     if (axios.isAxiosError<ValidationError>(error)) {
@@ -440,8 +453,28 @@ const Exams = () => {
                     </span>
                   </label>
 
+                  <div className="flex flex-wrap gap-2 px-2 py-3 bg-slate-950/30 rounded-2xl border border-white/5 shrink-0">
+                    <span className="text-[9px] text-slate-600 font-black w-full mb-1 ml-1 uppercase">
+                      Filter by Tag
+                    </span>
+                    {tags.map((tag: string) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => setFilterTag(tag)}
+                        className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase border transition-all ${
+                          filterTag === tag
+                            ? "bg-sky-500 border-sky-400 text-slate-950 shadow-lg"
+                            : "bg-white/5 border-white/5 text-slate-500 hover:text-white"
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+
                   <div className="flex-1 overflow-y-auto border border-white/5 rounded-[2rem] bg-slate-950/30 p-2 flex flex-col gap-2 custom-scrollbar">
-                    {availableSections.map((s) => {
+                    {filteredSections.map((s: Section) => {
                       const isSelected = form.sections.includes(s._id);
                       return (
                         <div
@@ -459,6 +492,11 @@ const Exams = () => {
                             >
                               {s.title}
                             </span>
+                            {s.tag && (
+                              <span className="ml-2 text-[8px] font-black uppercase bg-white/5 px-2 py-0.5 rounded text-slate-500 border border-white/5">
+                                {s.tag}
+                              </span>
+                            )}
                             <div className="flex gap-3 text-[8px] font-black uppercase text-slate-600 mt-1">
                               <span className="flex items-center gap-1">
                                 <Database size={8} /> {s.questions.length} Qs
@@ -489,6 +527,15 @@ const Exams = () => {
                     <Save size={16} />
                     {editingId ? "Update System" : "Save Exam"}
                   </button>
+                  {editingId && (
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      className="mt-4 flex items-center justify-center gap-2 w-full text-red-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors"
+                    >
+                      <XCircle size={14} /> Abort Edit
+                    </button>
+                  )}
                 </div>
               </form>
             </motion.div>

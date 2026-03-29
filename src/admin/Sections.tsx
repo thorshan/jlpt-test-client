@@ -118,6 +118,7 @@ const Sections = () => {
     duration: 30,
     minPassedMark: 38,
     questions: [] as string[],
+    tag: "",
   });
 
   // --- DND SENSORS ---
@@ -224,6 +225,7 @@ const Sections = () => {
       duration: 30,
       minPassedMark: 38,
       questions: [],
+      tag: "",
     });
     setEditingId(null);
   };
@@ -240,6 +242,7 @@ const Sections = () => {
       duration: section.duration,
       minPassedMark: section.minPassedMark,
       questions: questionIds,
+      tag: section.tag || "",
     });
   };
 
@@ -325,6 +328,18 @@ const Sections = () => {
                       setForm({ ...form, title: e.target.value })
                     }
                     required
+                  />
+                </div>
+
+                <div className="space-y-2 shrink-0">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                    Tag (for filtering)
+                  </label>
+                  <input
+                    className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-bold text-sky-400"
+                    placeholder="e.g., N5, Vocabulary, Kanji..."
+                    value={form.tag}
+                    onChange={(e) => setForm({ ...form, tag: e.target.value })}
                   />
                 </div>
 
@@ -565,8 +580,14 @@ const Sections = () => {
                       </h3>
                       {s.desc && (
                         <p className="text-[10px] text-slate-500 mt-1 line-clamp-1 italic">
-                          {s.desc}
                         </p>
+                      )}
+                      {s.tag && (
+                        <div className="mt-2">
+                          <span className="text-[8px] font-black uppercase bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded border border-sky-500/20 shadow-inner tracking-widest">
+                            {s.tag}
+                          </span>
+                        </div>
                       )}
                       <div className="flex flex-wrap gap-3 mt-3">
                         <div className="flex items-center gap-1.5 text-slate-500">

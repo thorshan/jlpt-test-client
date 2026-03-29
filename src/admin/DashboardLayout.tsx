@@ -97,7 +97,7 @@ const DashboardLayout = () => {
 
 
   return (
-    <div className="flex min-h-screen bg-[#020617] text-slate-200 font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#020617] text-slate-200 font-sans overflow-hidden">
       {/* --- LOGOUT CONFIRMATION DIALOG --- */}
       <AnimatePresence>
         {showLogoutConfirm && (
@@ -141,7 +141,7 @@ const DashboardLayout = () => {
       </AnimatePresence>
 
       {/* --- SIDEBAR --- */}
-      <aside className="w-72 border-r border-white/5 bg-slate-950/50 backdrop-blur-3xl hidden md:flex flex-col relative z-20">
+      <aside className="w-72 h-screen sticky top-0 border-r border-white/5 bg-slate-950/50 backdrop-blur-3xl hidden md:flex flex-col relative z-20 shrink-0">
         {/* LOGO SECTION */}
         <div className="p-8 mb-4 shrink-0">
           <motion.div

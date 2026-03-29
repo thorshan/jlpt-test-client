@@ -7,6 +7,7 @@ export interface Section {
   duration: number;
   questions: string[];
   minPassedMark: number;
+  tag?: string;
 }
 
 export const sectionApi = {
