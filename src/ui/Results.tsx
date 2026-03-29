@@ -195,15 +195,15 @@ const Results: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white/5 border border-sky-500/20 p-6 rounded-3xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 mb-4">
-                <div className="text-left space-y-1">
+              <div className="bg-white/5 border border-sky-500/20 p-4 md:p-6 rounded-3xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-6 mt-8 mb-4">
+                <div className="text-center sm:text-left space-y-1">
                   <p className="text-sm font-black text-white">{t("result_id")}</p>
                   <p className="text-[10px] text-sky-400 font-bold uppercase tracking-widest leading-relaxed max-w-sm">
                     {t("save_code_warning")}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-black/40 p-2 rounded-2xl w-full sm:w-auto">
-                  <code className="px-4 py-2 font-mono text-sky-300 font-bold tracking-widest text-sm">
+                <div className="flex items-center gap-2 bg-black/40 p-2 rounded-2xl w-full sm:w-auto overflow-hidden">
+                  <code className="flex-1 px-3 sm:px-4 py-2 font-mono text-sky-300 font-bold tracking-widest text-[10px] sm:text-sm truncate text-center sm:text-left">
                     {data._id}
                   </code>
                   <button
@@ -214,7 +214,20 @@ const Results: React.FC = () => {
                     className="p-3 bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-xl transition-colors shrink-0"
                     title={t("copy_result_id")}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
                   </button>
                 </div>
               </div>
