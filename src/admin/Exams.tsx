@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, type FormEvent } from "react";
+import { useEffect, useState, useMemo, useCallback, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlusCircle,
@@ -113,6 +113,7 @@ const Exams = () => {
   const [exams, setExams] = useState<Exam[]>([]);
   const [availableSections, setAvailableSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -150,7 +151,7 @@ const Exams = () => {
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [examRes, sectionRes] = await Promise.all([
@@ -164,12 +165,11 @@ const Exams = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
-
+  }, [fetchData]);
 
   const filteredSections = useMemo(() => {
     if (filterTag === "All" || !filterTag) return availableSections;
@@ -187,6 +187,7 @@ const Exams = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setIsProcessing(true);
     try {
       const selectedSectionObjects = form.sections
         .map((id) => availableSections.find((s) => s._id === id))
@@ -204,12 +205,14 @@ const Exams = () => {
           prev.map((ex) => (ex._id === editingId ? res.data.data : ex)),
         );
       } else {
-        const res = await examApi.createExam(dataToSend as any); // cast to any or fix createExam signature
+        const res = await examApi.createExam(dataToSend);
         setExams((prev) => [...prev, res.data.data]);
       }
       resetForm();
     } catch (error) {
       handleApiError(error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -525,14 +528,19 @@ const Exams = () => {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] transition-all active:scale-95 flex items-center justify-center gap-2 ${
+                    disabled={isProcessing}
+                    className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 ${
                       editingId
                         ? "bg-white text-slate-950"
                         : "bg-sky-500 text-slate-950"
                     }`}
                   >
                     <Save size={16} />
-                    {editingId ? "Update System" : "Save Exam"}
+                    {isProcessing
+                      ? "Processing"
+                      : editingId
+                        ? "Update System"
+                        : "Save Exam"}
                   </button>
                   {editingId && (
                     <button
@@ -588,14 +596,16 @@ const Exams = () => {
 
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-4">
                       <button
+                        disabled={isProcessing}
                         onClick={() => handleEdit(exam)}
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sky-400 transition-all"
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sky-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Edit3 size={16} />
                       </button>
                       <button
+                        disabled={isProcessing}
                         onClick={() => openDeleteModal(exam._id)}
-                        className="p-3 bg-white/5 hover:bg-red-500/10 rounded-2xl text-red-500 transition-all"
+                        className="p-3 bg-white/5 hover:bg-red-500/10 rounded-2xl text-red-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -626,14 +636,16 @@ const Exams = () => {
               </h3>
               <div className="flex flex-col gap-3">
                 <button
+                  disabled={isProcessing}
                   onClick={confirmDelete}
-                  className="w-full py-4 bg-red-500 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl"
+                  className="w-full py-4 bg-red-500 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl disabled:opacity-50"
                 >
-                  Confirm
+                  {isProcessing ? "Processing" : "Confirm"}
                 </button>
                 <button
+                  disabled={isProcessing}
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="w-full py-4 bg-white/5 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl"
+                  className="w-full py-4 bg-white/5 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Abort
                 </button>

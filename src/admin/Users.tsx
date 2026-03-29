@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -37,6 +37,7 @@ interface Toast {
 const Users = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -47,7 +48,7 @@ const Users = () => {
     user: UserData | null;
   }>({ isOpen: false, type: null, user: null });
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const res = await userApi.getAllUsers();
@@ -58,11 +59,11 @@ const Users = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const handleApiError = (error: unknown) => {
     if (axios.isAxiosError<ValidationError>(error)) {
@@ -82,7 +83,7 @@ const Users = () => {
   const handleConfirmAction = async () => {
     if (!modal.user || !modal.type) return;
     const { _id, name } = modal.user;
-
+    setIsProcessing(true);
     try {
       if (modal.type === "role") {
         await userApi.updateRole(_id);
@@ -97,6 +98,7 @@ const Users = () => {
       handleApiError(err);
       showToast("Protocol execution failed", "error");
     } finally {
+      setIsProcessing(false);
       setModal({ isOpen: false, type: null, user: null });
     }
   };
@@ -215,18 +217,20 @@ const Users = () => {
                       <td className="px-8 py-5 text-right">
                         <div className="flex justify-end gap-1">
                           <button
+                            disabled={isProcessing}
                             onClick={() =>
                               setModal({ isOpen: true, type: "role", user })
                             }
-                            className="p-2 rounded-xl text-slate-500 hover:text-sky-400 hover:bg-sky-500/10 transition-all"
+                            className="p-2 rounded-xl text-slate-500 hover:text-sky-400 hover:bg-sky-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <ShieldCheck size={18} />
                           </button>
                           <button
+                            disabled={isProcessing}
                             onClick={() =>
                               setModal({ isOpen: true, type: "delete", user })
                             }
-                            className="p-2 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                            className="p-2 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Trash2 size={18} />
                           </button>
@@ -313,18 +317,20 @@ const Users = () => {
 
               <div className="flex flex-col gap-3">
                 <button
+                  disabled={isProcessing}
                   onClick={handleConfirmAction}
-                  className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] transition-all active:scale-95 ${
+                  className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                     modal.type === "delete"
                       ? "bg-red-500 text-slate-950"
                       : "bg-sky-500 text-slate-950"
                   }`}
                 >
-                  Execute Protocol
+                  {isProcessing ? "Processing..." : "Execute Protocol"}
                 </button>
                 <button
+                  disabled={isProcessing}
                   onClick={() => setModal({ ...modal, isOpen: false })}
-                  className="w-full py-5 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all"
+                  className="w-full py-5 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Abort
                 </button>

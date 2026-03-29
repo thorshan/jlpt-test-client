@@ -53,7 +53,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     verifyUser();
-  }, [logout]);
+  }, [logout, user?._id]);
 
   const login = async (formData: UserForm) => {
     try {

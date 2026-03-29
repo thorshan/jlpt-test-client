@@ -51,6 +51,7 @@ const Results: React.FC = () => {
   const step = parseInt(searchParams.get("step") || "0");
 
   const [certLang, setCertLang] = useState<"en" | "jp">("en");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const fetchLatestResult = async () => {
@@ -175,24 +176,24 @@ const Results: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {data.sectionDetails?.map((sec, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-white/5 border border-white/5 p-6 rounded-3xl backdrop-blur-sm"
-                    >
-                      <p className="text-[10px] text-slate-500 font-black uppercase truncate mb-2 tracking-widest">
-                        {sec.sectionTitle}
-                      </p>
-                      <div className="text-3xl font-black text-sky-400">
-                        <CountUp end={sec.earnedPoints} />
-                        <span className="text-sm text-slate-600 font-normal ml-1">
-                          / {sec.totalPoints}
-                        </span>
-                      </div>
+              <div className="grid grid-cols-3 md:grid-cols-3 gap-3 md:gap-6">
+                {data.sectionDetails?.map((sec, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white/5 border border-white/5 p-3 md:p-6 rounded-2xl md:rounded-3xl backdrop-blur-sm flex flex-col items-center justify-center text-center"
+                  >
+                    <p className="text-[7px] md:text-[10px] text-slate-500 font-black uppercase truncate mb-1 md:mb-2 tracking-[0.1em] md:tracking-widest w-full">
+                      {sec.sectionTitle}
+                    </p>
+                    <div className="text-xl md:text-3xl font-black text-sky-400">
+                      <CountUp end={sec.earnedPoints} />
+                      <span className="text-[9px] md:text-sm text-slate-600 font-normal ml-0.5">
+                        / {sec.totalPoints}
+                      </span>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
               </div>
 
               <div className="bg-white/5 border border-sky-500/20 p-4 md:p-6 rounded-3xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-6 mt-8 mb-4">
@@ -233,15 +234,17 @@ const Results: React.FC = () => {
               </div>
 
               <button
-                onClick={() =>
+                disabled={isProcessing}
+                onClick={async () => {
+                  setIsProcessing(true);
                   navigate(
                     `/redirect?to=/results?step=1&type=cert&id=${data._id}`,
-                  )
-                }
-                className="group relative inline-flex items-center gap-3 bg-white text-slate-950 px-12 py-5 rounded-[2rem] font-black text-xl hover:bg-sky-500 transition-all active:scale-95 shadow-xl"
+                  );
+                }}
+                className="group relative inline-flex items-center gap-3 bg-white text-slate-950 px-12 py-5 rounded-[2rem] font-black text-xl hover:bg-sky-500 transition-all active:scale-95 shadow-xl disabled:opacity-50"
               >
                 <Award size={24} />
-                {t("print_cert")}
+                {isProcessing ? t("processing") : t("print_cert")}
               </button>
             </motion.div>
           ) : (
@@ -298,14 +301,21 @@ const Results: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={() =>
-                      certificateRef.current &&
-                      handlePrint(() => certificateRef.current)
-                    }
-                    className="flex items-center justify-center gap-3 bg-sky-500 hover:bg-sky-400 text-slate-950 px-8 py-4 rounded-2xl w-full sm:w-auto font-black transition-all shadow-lg active:scale-95 h-14"
+                    disabled={isProcessing}
+                    onClick={async () => {
+                      if (certificateRef.current) {
+                        setIsProcessing(true);
+                        try {
+                          await handlePrint(() => certificateRef.current);
+                        } finally {
+                          setIsProcessing(false);
+                        }
+                      }
+                    }}
+                    className="flex items-center justify-center gap-3 bg-sky-500 hover:bg-sky-400 text-slate-950 px-8 py-4 rounded-2xl w-full sm:w-auto font-black transition-all shadow-lg active:scale-95 h-14 disabled:opacity-50"
                   >
                     <Printer size={20} />
-                    <span>{t("print_cert")}</span>
+                    <span>{isProcessing ? t("processing") : t("print_cert")}</span>
                   </button>
                 </div>
               </div>

@@ -61,6 +61,7 @@ const Index = () => {
   }, [mouseX, mouseY]);
 
   const [showModal, setOpenModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#020617] text-white selection:bg-sky-500/30 overflow-x-hidden relative font-sans">
@@ -306,6 +307,7 @@ const Index = () => {
               const resultId = formData.get("resultId") as string;
               const email = formData.get("email") as string;
               if (!resultId || !email) return;
+              setIsSubmitting(true);
               try {
                 await requestApi.createRequest({ resultId, email });
                 setOpenModal(true);
@@ -313,6 +315,8 @@ const Index = () => {
               } catch (err) {
                 console.error(err);
                 alert("Error sending request.");
+              } finally {
+                setIsSubmitting(false);
               }
             }}
           >
@@ -332,9 +336,10 @@ const Index = () => {
             />
             <button
               type="submit"
-              className="bg-sky-500 hover:bg-sky-400 text-slate-300 font-black px-5 py-3 sm:px-8 sm:py-4 text-sm sm:text-base rounded-xl sm:rounded-2xl transition-all shadow-lg active:scale-95 whitespace-nowrap"
+              disabled={isSubmitting}
+              className="bg-sky-500 hover:bg-sky-400 text-slate-300 font-black px-5 py-3 sm:px-8 sm:py-4 text-sm sm:text-base rounded-xl sm:rounded-2xl transition-all shadow-lg active:scale-95 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t("cert_request_btn")}
+              {isSubmitting ? "Sending..." : t("cert_request_btn")}
             </button>
           </form>
         </div>

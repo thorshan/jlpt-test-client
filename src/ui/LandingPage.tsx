@@ -13,6 +13,7 @@ const LandingPage = () => {
   const [generatedToken, setGeneratedToken] = useState("");
   const [inputToken, setInputToken] = useState("");
   const [copied, setCopied] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const { login, user, updateUser } = useUser();
   const navigate = useNavigate();
@@ -30,12 +31,15 @@ const LandingPage = () => {
 
   const handleCreateUser = async () => {
     if (!name || !generatedToken) return;
+    setIsProcessing(true);
     try {
       const res = await userApi.createUser(name, generatedToken);
       login(res.data.data);
       setStep(2);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -45,12 +49,15 @@ const LandingPage = () => {
   };
 
   const selectLevel = async (lvl: string) => {
+    setIsProcessing(true);
     try {
       await userApi.updateUser(user!._id!, lvl);
       updateUser({ level: lvl });
       navigate("/test");
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -160,10 +167,11 @@ const LandingPage = () => {
                       </button>
                     </div>
                     <button
+                      disabled={isProcessing}
                       onClick={handleCreateUser}
-                      className="w-full py-5 bg-sky-600 font-black rounded-2xl flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(14,165,233,0.3)] active:scale-[0.98] transition-transform"
+                      className="w-full py-5 bg-sky-600 font-black rounded-2xl flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(14,165,233,0.3)] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {t("proceed")} <ArrowRight size={20} />
+                      {isProcessing ? "Processing..." : <>{t("proceed")} <ArrowRight size={20} /></>}
                     </button>
                   </motion.div>
                 )}
@@ -230,8 +238,9 @@ const LandingPage = () => {
                 {["N1", "N2", "N3", "N4", "N5"].map((lvl, index) => (
                   <button
                     key={lvl}
+                    disabled={isProcessing}
                     onClick={() => selectLevel(lvl)}
-                    className={`group w-full p-4 md:p-5 bg-sky-950/40 border border-sky-900/40 rounded-2xl font-black text-lg transition-all active:scale-[0.96] hover:bg-sky-600 hover:border-sky-400 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 ${
+                    className={`group w-full p-4 md:p-5 bg-sky-950/40 border border-sky-900/40 rounded-2xl font-black text-lg transition-all active:scale-[0.96] hover:bg-sky-600 hover:border-sky-400 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 disabled:opacity-50 disabled:cursor-not-allowed ${
                       index === 4 ? "col-span-2 sm:col-span-1" : ""
                     }`}
                   >

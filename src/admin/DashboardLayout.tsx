@@ -158,7 +158,7 @@ const DashboardLayout = () => {
         </div>
 
         {/* NAVIGATION AREA */}
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scrollbar pb-4">
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto scrollbar-hide pb-4">
           {navItems
             .filter((nav) => nav.visible === true)
             .map((item) => {
@@ -167,11 +167,10 @@ const DashboardLayout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`relative group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
-                    isActive
+                  className={`relative group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${isActive
                       ? "bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-[inset_0_0_20px_rgba(14,165,233,0.05)]"
                       : "hover:bg-white/5 text-slate-500 hover:text-slate-200 border border-transparent"
-                  }`}
+                    }`}
                 >
                   {isActive && (
                     <motion.div

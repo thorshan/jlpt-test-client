@@ -37,6 +37,7 @@ const Questions = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [listSearch, setListSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
@@ -78,6 +79,7 @@ const Questions = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsProcessing(true);
     try {
       if (editingId) {
         const res = await questionApi.updateQuestion(editingId, form);
@@ -99,6 +101,8 @@ const Questions = () => {
       resetForm();
     } catch (error) {
       console.error("Submission Error:", error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -130,6 +134,7 @@ const Questions = () => {
 
   const confirmDelete = async () => {
     if (itemToDelete) {
+      setIsProcessing(true);
       try {
         await questionApi.deleteQuestion(itemToDelete);
         setQuestions((prev) => prev.filter((q) => q._id !== itemToDelete));
@@ -138,6 +143,7 @@ const Questions = () => {
       } finally {
         setIsDeleteModalOpen(false);
         setItemToDelete(null);
+        setIsProcessing(false);
       }
     }
   };
@@ -238,11 +244,10 @@ const Questions = () => {
                   {form.options.map((opt, i) => (
                     <div
                       key={i}
-                      className={`relative rounded-2xl border transition-all ${
-                        form.correctOptionIndex === i
+                      className={`relative rounded-2xl border transition-all ${form.correctOptionIndex === i
                           ? "border-sky-500 bg-sky-500/5"
                           : "border-white/5 bg-slate-950/50"
-                      }`}
+                        }`}
                     >
                       <input
                         className="w-full bg-transparent p-3 pr-10 outline-none text-sm font-bold text-white"
@@ -260,11 +265,10 @@ const Questions = () => {
                         onClick={() =>
                           setForm({ ...form, correctOptionIndex: i })
                         }
-                        className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 transition-all ${
-                          form.correctOptionIndex === i
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 transition-all ${form.correctOptionIndex === i
                             ? "bg-sky-500 border-sky-400 scale-110 shadow-[0_0_8px_#0ea5e9]"
                             : "border-slate-700"
-                        }`}
+                          }`}
                       />
                     </div>
                   ))}
@@ -372,14 +376,14 @@ const Questions = () => {
 
                 <button
                   type="submit"
-                  className={`mt-4 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 ${
-                    editingId
+                  disabled={isProcessing}
+                  className={`mt-4 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 ${editingId
                       ? "bg-white text-slate-950"
                       : "bg-sky-500 text-slate-950 hover:bg-sky-400 shadow-lg shadow-sky-500/20"
-                  }`}
+                    }`}
                 >
                   <Save size={18} />
-                  {editingId ? "Update Registry" : "Commit to Bank"}
+                  {isProcessing ? "Processing" : editingId ? "Update Registry" : "Commit to Bank"}
                 </button>
 
                 {editingId && (
@@ -520,14 +524,16 @@ const Questions = () => {
                       </div>
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
+                          disabled={isProcessing}
                           onClick={() => handleEdit(q)}
-                          className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sky-400 transition-all"
+                          className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sky-400 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <Edit3 size={18} />
                         </button>
                         <button
+                          disabled={isProcessing}
                           onClick={() => openDeleteModal(q._id)}
-                          className="p-3 bg-white/5 hover:bg-red-500/10 rounded-2xl text-red-500 transition-all"
+                          className="p-3 bg-white/5 hover:bg-red-500/10 rounded-2xl text-red-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -584,14 +590,16 @@ const Questions = () => {
                 </p>
                 <div className="flex flex-col gap-3">
                   <button
+                    disabled={isProcessing}
                     onClick={confirmDelete}
-                    className="w-full py-4 bg-red-500 hover:bg-red-600 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all active:scale-95 shadow-lg shadow-red-500/20"
+                    className="w-full py-4 bg-red-500 hover:bg-red-600 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all active:scale-95 shadow-lg shadow-red-500/20 disabled:opacity-50"
                   >
-                    Confirm Delete
+                    {isProcessing ? "Processing" : "Confirm Delete"}
                   </button>
                   <button
+                    disabled={isProcessing}
                     onClick={() => setIsDeleteModalOpen(false)}
-                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>

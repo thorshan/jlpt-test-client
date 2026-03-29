@@ -57,7 +57,7 @@ const Home = () => {
       }
     };
     fetchExams();
-  }, [user?.level]);
+  }, [user?.level, user?.role]);
 
   const filteredExams = useMemo(() => {
     return exams.filter((exam) => {

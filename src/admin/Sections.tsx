@@ -102,6 +102,7 @@ const Sections = () => {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [isEnlarged, setIsEnlarged] = useState(false);
 
   // --- DELETE MODAL STATE ---
@@ -191,6 +192,7 @@ const Sections = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsProcessing(true);
     try {
       if (editingId) {
         const res = await sectionApi.updateSection(editingId, form);
@@ -206,6 +208,8 @@ const Sections = () => {
       if (axios.isAxiosError<ValidationError>(error)) {
         console.error("Submission Error:", error.response);
       }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -253,6 +257,7 @@ const Sections = () => {
 
   const confirmDelete = async () => {
     if (itemToDelete) {
+      setIsProcessing(true);
       try {
         await sectionApi.deleteSection(itemToDelete);
         setSections((prev) => prev.filter((s) => s._id !== itemToDelete));
@@ -261,6 +266,7 @@ const Sections = () => {
       } finally {
         setIsDeleteModalOpen(false);
         setItemToDelete(null);
+        setIsProcessing(false);
       }
     }
   };
@@ -528,13 +534,14 @@ const Sections = () => {
                 <div className="flex flex-col gap-3 shrink-0 pt-4">
                   <button
                     type="submit"
-                    className={`py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 ${editingId
+                    disabled={isProcessing}
+                    className={`py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 ${editingId
                       ? "bg-white text-slate-950"
                       : "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20"
                       }`}
                   >
                     <Save size={18} />
-                    {editingId ? "Update Section" : "Save Section"}
+                    {isProcessing ? "Processing" : editingId ? "Update Section" : "Save Section"}
                   </button>
                   {editingId && (
                     <button
@@ -613,14 +620,16 @@ const Sections = () => {
 
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                       <button
+                        disabled={isProcessing}
                         onClick={() => handleEdit(s)}
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sky-400 transition-all active:scale-90"
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-sky-400 transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Edit3 size={18} />
                       </button>
                       <button
+                        disabled={isProcessing}
                         onClick={() => openDeleteModal(s._id)}
-                        className="p-3 bg-white/5 hover:bg-red-500/10 rounded-2xl text-red-500 transition-all active:scale-90"
+                        className="p-3 bg-white/5 hover:bg-red-500/10 rounded-2xl text-red-500 transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -671,14 +680,16 @@ const Sections = () => {
                 </p>
                 <div className="flex flex-col gap-3">
                   <button
+                    disabled={isProcessing}
                     onClick={confirmDelete}
-                    className="w-full py-4 bg-red-500 hover:bg-red-600 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all shadow-lg shadow-red-500/20"
+                    className="w-full py-4 bg-red-500 hover:bg-red-600 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all shadow-lg shadow-red-500/20 disabled:opacity-50"
                   >
-                    Confirm Deletion
+                    {isProcessing ? "Processing" : "Confirm Deletion"}
                   </button>
                   <button
+                    disabled={isProcessing}
                     onClick={() => setIsDeleteModalOpen(false)}
-                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Cancel Action
                   </button>

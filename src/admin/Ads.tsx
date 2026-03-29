@@ -125,6 +125,7 @@ const Ads: React.FC = () => {
 
   const confirmDelete = async () => {
     if (itemToDelete) {
+      setSubmitting(true);
       try {
         await adApi.deleteAd(itemToDelete);
         setAds((prev) => prev.filter((ad) => ad._id !== itemToDelete));
@@ -133,6 +134,7 @@ const Ads: React.FC = () => {
       } finally {
         setIsDeleteModalOpen(false);
         setItemToDelete(null);
+        setSubmitting(false);
       }
     }
   };
@@ -224,11 +226,10 @@ const Ads: React.FC = () => {
                               key={m}
                               type="button"
                               onClick={() => setForm({ ...form, duration: m })}
-                              className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${
-                                form.duration === m
+                              className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${form.duration === m
                                   ? "bg-white text-slate-950"
                                   : "bg-white/5 border-white/5 text-slate-500"
-                              }`}
+                                }`}
                             >
                               {m}M
                             </button>
@@ -251,13 +252,12 @@ const Ads: React.FC = () => {
                                   status: s as "Active" | "Paused",
                                 })
                               }
-                              className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${
-                                form.status === s
+                              className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${form.status === s
                                   ? s === "Active"
                                     ? "bg-emerald-500 text-slate-950"
                                     : "bg-amber-500 text-slate-950"
                                   : "bg-white/5 border-white/5 text-slate-500"
-                              }`}
+                                }`}
                             >
                               {s}
                             </button>
@@ -335,11 +335,16 @@ const Ads: React.FC = () => {
                     className="w-full py-4 bg-sky-500 text-slate-950 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {submitting ? (
-                      <Loader2 size={16} className="animate-spin" />
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        {"Processing"}
+                      </>
                     ) : (
-                      <Save size={16} />
+                      <>
+                        <Save size={16} />
+                        {editingId ? "Update Campaign" : "Launch Promotion"}
+                      </>
                     )}
-                    {editingId ? "Update Campaign" : "Launch Promotion"}
                   </button>
                 </div>
               </form>
@@ -389,11 +394,10 @@ const Ads: React.FC = () => {
                           </span>
                         </div>
                         <div
-                          className={`px-3 py-1.5 rounded-xl border font-black uppercase text-[9px] ${
-                            ad.status === "Active"
+                          className={`px-3 py-1.5 rounded-xl border font-black uppercase text-[9px] ${ad.status === "Active"
                               ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/20"
                               : "bg-amber-500/20 text-amber-400 border-amber-500/20"
-                          }`}
+                            }`}
                         >
                           {ad.status}
                         </div>
@@ -433,14 +437,16 @@ const Ads: React.FC = () => {
                       <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center text-slate-400">
                         <div className="flex items-center gap-4">
                           <button
+                            disabled={submitting}
                             onClick={() => handleEdit(ad)}
-                            className="text-white hover:text-sky-400 transition-colors flex items-center gap-1.5 text-[10px] font-black uppercase"
+                            className="text-white hover:text-sky-400 transition-colors flex items-center gap-1.5 text-[10px] font-black uppercase disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Edit3 size={14} /> Edit
                           </button>
                           <button
+                            disabled={submitting}
                             onClick={() => toggleStatus(ad)}
-                            className="hover:text-amber-400 transition-colors flex items-center gap-1.5 text-[10px] font-black uppercase"
+                            className="hover:text-amber-400 transition-colors flex items-center gap-1.5 text-[10px] font-black uppercase disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             {ad.status === "Active" ? (
                               <>
@@ -459,8 +465,9 @@ const Ads: React.FC = () => {
                           </button>
                         </div>
                         <button
+                          disabled={submitting}
                           onClick={() => openDeleteModal(ad._id)}
-                          className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-slate-950 rounded-xl transition-all"
+                          className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-slate-950 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -495,14 +502,17 @@ const Ads: React.FC = () => {
               </p>
               <div className="flex flex-col gap-3">
                 <button
+                  disabled={submitting}
                   onClick={confirmDelete}
-                  className="w-full py-4 bg-red-500 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl"
+                  className="w-full py-4 bg-red-500 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  Confirm Delete
+                  {submitting && <Loader2 size={14} className="animate-spin" />}
+                  {submitting ? "Processing" : "Confirm Delete"}
                 </button>
                 <button
+                  disabled={submitting}
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="w-full py-4 bg-white/5 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl"
+                  className="w-full py-4 bg-white/5 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Abort
                 </button>
