@@ -60,6 +60,7 @@ const Questions = () => {
     refAudio: "",
     tags: [],
   });
+  const [tagsInput, setTagsInput] = useState("");
 
   const fetchQuestions = async () => {
     setLoading(true);
@@ -120,11 +121,13 @@ const Questions = () => {
       tags: [],
     });
     setEditingId(null);
+    setTagsInput("");
   };
 
   const handleEdit = (q: Question) => {
     setEditingId(q._id);
     setForm({ ...q, options: [...q.options], tags: [...(q.tags || [])] });
+    setTagsInput((q.tags || []).join(", "));
   };
 
   const openDeleteModal = (id: string) => {
@@ -298,8 +301,9 @@ const Questions = () => {
                     <input
                       className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-white"
                       placeholder="e.g., N5, Kanji"
-                      value={form.tags.join(", ")}
+                      value={tagsInput}
                       onChange={(e) => {
+                        setTagsInput(e.target.value);
                         const tags = e.target.value
                           .split(",")
                           .map((t) => t.trim())
