@@ -33,6 +33,38 @@ interface QuestionForm {
   tags: string[];
 }
 
+const CATEGORY_TO_MODULES: Record<QuestionCategory, QuestionModule[]> = {
+  [QuestionCategory.Moji_Goi]: [
+    QuestionModule.kanji_reading,
+    QuestionModule.orthography,
+    QuestionModule.word_formation,
+    QuestionModule.contextually_defined_expression,
+    QuestionModule.paraphrases,
+    QuestionModule.usage,
+  ],
+  [QuestionCategory.Grammar]: [
+    QuestionModule.selecting_grammar_form,
+    QuestionModule.sentence_composition,
+    QuestionModule.text_grammar,
+  ],
+  [QuestionCategory.Reading]: [
+    QuestionModule.short_passage,
+    QuestionModule.mid_passage,
+    QuestionModule.long_passage,
+    QuestionModule.integrated_reading_comprehension,
+    QuestionModule.thematic_comprehension,
+    QuestionModule.information_retrieval,
+  ],
+  [QuestionCategory.Listening]: [
+    QuestionModule.text_based_comprehension,
+    QuestionModule.keypoints_comprehension,
+    QuestionModule.general_outline_comprehension,
+    QuestionModule.verbal_expression,
+    QuestionModule.quick_response,
+    QuestionModule.integrated_listening_comprehension,
+  ],
+};
+
 const Questions = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
@@ -318,12 +350,14 @@ const Questions = () => {
                   <select
                     className="w-full bg-slate-950/50 p-3 rounded-xl border border-white/5 outline-none text-xs font-bold text-sky-400 appearance-none"
                     value={form.category}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const newCat = e.target.value as QuestionCategory;
                       setForm({
                         ...form,
-                        category: e.target.value as QuestionCategory,
-                      })
-                    }
+                        category: newCat,
+                        module: CATEGORY_TO_MODULES[newCat][0],
+                      });
+                    }}
                   >
                     {Object.values(QuestionCategory).map((c) => (
                       <option key={c} value={c}>
@@ -341,7 +375,7 @@ const Questions = () => {
                       })
                     }
                   >
-                    {Object.values(QuestionModule).map((m) => (
+                    {CATEGORY_TO_MODULES[form.category].map((m) => (
                       <option key={m} value={m}>
                         {m}
                       </option>
@@ -442,7 +476,10 @@ const Questions = () => {
                     <select
                       className="w-full bg-slate-950/50 pl-8 pr-2 py-2 rounded-xl border border-white/5 text-[10px] font-black uppercase text-sky-500 outline-none appearance-none"
                       value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedCategory(e.target.value);
+                        setSelectedModule("ALL");
+                      }}
                     >
                       <option value="ALL">All Categories</option>
                       {Object.values(QuestionCategory).map((c) => (
@@ -464,7 +501,10 @@ const Questions = () => {
                       onChange={(e) => setSelectedModule(e.target.value)}
                     >
                       <option value="ALL">All Modules</option>
-                      {Object.values(QuestionModule).map((m) => (
+                      {(selectedCategory === "ALL" 
+                        ? Object.values(QuestionModule) 
+                        : CATEGORY_TO_MODULES[selectedCategory as QuestionCategory]
+                      ).map((m) => (
                         <option key={m} value={m}>
                           {m}
                         </option>
