@@ -1,18 +1,32 @@
 import { apiClient } from "./apiClient";
 
 export enum QuestionModule {
-  M1 = "Module 1",
-  M2 = "Module 2",
-  M3 = "Module 3",
-  M4 = "Module 4",
-  M5 = "Module 5",
-  M6 = "Module 6",
+  kanji_reading = "Kanji Reading",
+  orthography = "Orthography",
+  word_formation = "Word Formation",
+  paraphrases = "Paraphrases",
+  contextually_defined_expression = "Contextually Defined Expression",
+  usage = "Usage",
+  selecting_grammar_form = "Selecting Grammar Form",
+  sentence_composition = "Sentence Composition",
+  text_grammar = "Text Grammar",
+  short_passage = "Short Passage",
+  mid_passage = "Mid Passage",
+  long_passage = "Long Passage",
+  integrated_reading_comprehension = "Integrated Reading Comprehension",
+  thematic_comprehension = "Thematic Comprehension",
+  information_retrieval = "Information Retrieval",
+  text_based_comprehension = "Text-Based Comprehension",
+  keypoints_comprehension = "Keypoints Comprehension",
+  general_outline_comprehension = "General Outline Comprehension",
+  verbal_expression = "Verbal Expression",
+  quick_response = "Quick Response",
+  integrated_listening_comprehension = "Integrated Listening Comprehension",
 }
 
 export enum QuestionCategory {
-  Vocab = "Vocabulary",
+  Moji_Goi = "Moji_Goi",
   Grammar = "Grammar",
-  Kanji = "Kanji",
   Reading = "Reading",
   Listening = "Listening",
 }

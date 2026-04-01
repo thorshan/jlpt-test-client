@@ -21,31 +21,34 @@ import { useTranslation } from "../hooks/useTranslation";
 // Local interfaces removed in favor of shared ones from API layer
 
 const title = {
-  vocab: {
-    m1: "＿＿＿＿＿  に　なにが　はいりますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m2: "＿＿＿＿＿　の　ぷんと　だいたい　おなじ　いみの　ぷんが　あります。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-  },
-  kanji: {
-    m1: "＿＿＿＿＿　の　ことばは　ひらがなで　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m2: "＿＿＿＿＿　の　ことばは　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+  moji_goi: {
+    kanji_reading: "もんだい　１　＿＿＿＿＿　の　ことばは　どう　よみますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    orthography: "もんだい　２　＿＿＿＿＿　の　ことばは　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    word_formation: "もんだい　３　＿＿＿＿＿  に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    paraphrases: "もんだい　３ ＿＿＿＿＿  に　なにが　はいりますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    contextually_defined_expression: "もんだい　４　＿＿＿＿＿　の　ぷんと　だいたい　おなじ　いみの　ぷんが　あります。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    usage: "もんだい　５ つぎの　ことばの　つかいかたで　いちばん　いいものを\n１・２・３・４　から　ひとつ　えらんでください。",
   },
   grammar: {
-    m1: "（　　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m2: "＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    selecting_grammar_form: "もんだい　１　（　　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    sentence_composition: "もんだい　２　＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    text_grammar: "もんだい　３（　番　）から（　番　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   reading: {
-    m1: "はじめに　しつもんを　よんて　ください。\nそれから　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m2: "はじめに　写真を　みて　ください。\nそれから　しつもんを　よんて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m3: "（　　）に　なにを　いれますか。ぶんしょうの　いみを　かんがえて\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m4: "つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m5: "つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m6: "つぎの（　　）から（　　）　ぶんしょうを　よんで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    short_passage: "もんだい　４　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    mid_passage: "もんだい　５　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    long_passage: "もんだい　６　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    integrated_reading_comprehension: "もんだい　６　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    thematic_comprehension: "もんだい　６　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    information_retrieval: "もんだい　７　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   listening: {
-    m1: "もんだい　１では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m2: "もんだい　２では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m3: "もんだい　３では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    m4: "もんだい　４では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    text_based_comprehension: "もんだい　１では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    keypoints_comprehension: "もんだい　２では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    general_outline_comprehension: "もんだい　３では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    verbal_expression: "もんだい　３では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    quick_response: "もんだい　３では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    integrated_listening_comprehension: "もんだい　４では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
 };
 
@@ -77,9 +80,33 @@ const ExamScreen = () => {
   const currentQuestion = questions[currentQuestionIdx];
 
   // --- HELPERS ---
-  const extractModuleNumber = (mod: string) => {
-    const match = mod.match(/\d+/);
-    return match ? parseInt(match[0]) : 99; // Default to high number if not found
+  const moduleOrder = [
+    "Kanji Reading",
+    "Orthography",
+    "Word Formation",
+    "Paraphrases",
+    "Contextually Defined Expression",
+    "Usage",
+    "Selecting Grammar Form",
+    "Sentence Composition",
+    "Text Grammar",
+    "Short Passage",
+    "Mid Passage",
+    "Long Passage",
+    "Integrated Reading Comprehension",
+    "Thematic Comprehension",
+    "Information Retrieval",
+    "Text-Based Comprehension",
+    "Keypoints Comprehension",
+    "General Outline Comprehension",
+    "Verbal Expression",
+    "Quick Response",
+    "Integrated Listening Comprehension",
+  ];
+
+  const getModulePriority = (mod: string) => {
+    const index = moduleOrder.indexOf(mod);
+    return index !== -1 ? index : 99;
   };
 
   // --- 1. FETCH EXAM ---
@@ -90,15 +117,14 @@ const ExamScreen = () => {
         const res = await examApi.getExam(id as string);
         const data = res?.data?.data;
         if (data) {
-          // Sort questions within each section by category then module number
+          // Sort questions within each section by category then module order
           if (data.sections) {
             const getCategoryPriority = (cat: string) => {
               const norm = cat.toLowerCase();
-              if (norm.includes("vocab")) return 1;
-              if (norm.includes("kanji")) return 2;
-              if (norm.includes("grammar")) return 3;
-              if (norm.includes("reading")) return 4;
-              if (norm.includes("listening")) return 5;
+              if (norm.includes("moji_goi") || norm.includes("vocab") || norm.includes("kanji")) return 1;
+              if (norm.includes("grammar")) return 2;
+              if (norm.includes("reading")) return 3;
+              if (norm.includes("listening")) return 4;
               return 99;
             };
 
@@ -108,7 +134,7 @@ const ExamScreen = () => {
                   const pA = getCategoryPriority(a.category);
                   const pB = getCategoryPriority(b.category);
                   if (pA !== pB) return pA - pB;
-                  return extractModuleNumber(a.module) - extractModuleNumber(b.module);
+                  return getModulePriority(a.module) - getModulePriority(b.module);
                 });
               }
             });
@@ -141,7 +167,7 @@ const ExamScreen = () => {
       }
     }, 1000);
     return () => clearInterval(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, loading, exam, userAnswers, isSubmitting, sectionTimeLeft]);
 
   useEffect(() => {
@@ -333,15 +359,13 @@ const ExamScreen = () => {
     const normalizedCat = category.toLowerCase();
     let catKey = "";
 
-    if (normalizedCat.includes("vocab")) catKey = "vocab";
-    else if (normalizedCat.includes("kanji")) catKey = "kanji";
+    if (normalizedCat.includes("moji_goi") || normalizedCat.includes("vocab") || normalizedCat.includes("kanji")) catKey = "moji_goi";
     else if (normalizedCat.includes("grammar")) catKey = "grammar";
     else if (normalizedCat.includes("reading")) catKey = "reading";
     else if (normalizedCat.includes("listening")) catKey = "listening";
     else catKey = normalizedCat;
 
-    const modNumber = module.match(/\d+/)?.[0];
-    const modKey = modNumber ? `m${modNumber}` : module.toLowerCase().replace(/\s+/g, "");
+    const modKey = module.toLowerCase().replace(/\s+/g, "_");
 
     // @ts-expect-error - dynamic access
     return title[catKey]?.[modKey] || "";
