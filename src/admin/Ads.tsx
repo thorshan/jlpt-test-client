@@ -221,17 +221,17 @@ const Ads: React.FC = () => {
                           Duration (Months)
                         </label>
                         <div className="flex gap-2">
-                          {[1, 3, 6, 12].map((m) => (
+                          {[1, 3, 6, 12, 99999].map((m) => (
                             <button
                               key={m}
                               type="button"
                               onClick={() => setForm({ ...form, duration: m })}
                               className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${form.duration === m
-                                  ? "bg-white text-slate-950"
-                                  : "bg-white/5 border-white/5 text-slate-500"
+                                ? "bg-white text-slate-950"
+                                : "bg-white/5 border-white/5 text-slate-500"
                                 }`}
                             >
-                              {m}M
+                              {m === 99999 ? "Constant" : `${m}M`}
                             </button>
                           ))}
                         </div>
@@ -253,10 +253,10 @@ const Ads: React.FC = () => {
                                 })
                               }
                               className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${form.status === s
-                                  ? s === "Active"
-                                    ? "bg-emerald-500 text-slate-950"
-                                    : "bg-amber-500 text-slate-950"
-                                  : "bg-white/5 border-white/5 text-slate-500"
+                                ? s === "Active"
+                                  ? "bg-emerald-500 text-slate-950"
+                                  : "bg-amber-500 text-slate-950"
+                                : "bg-white/5 border-white/5 text-slate-500"
                                 }`}
                             >
                               {s}
@@ -390,13 +390,13 @@ const Ads: React.FC = () => {
                         <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2">
                           <Calendar size={12} className="text-sky-400" />
                           <span className="text-[9px] font-black uppercase text-slate-300">
-                            {new Date(ad.expiresAt).toLocaleDateString()}
+                            {ad.duration === 999 ? "Infinite" : new Date(ad.expiresAt).toLocaleDateString()}
                           </span>
                         </div>
                         <div
                           className={`px-3 py-1.5 rounded-xl border font-black uppercase text-[9px] ${ad.status === "Active"
-                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/20"
-                              : "bg-amber-500/20 text-amber-400 border-amber-500/20"
+                            ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/20"
+                            : "bg-amber-500/20 text-amber-400 border-amber-500/20"
                             }`}
                         >
                           {ad.status}

@@ -20,35 +20,39 @@ import { useTranslation } from "../hooks/useTranslation";
 
 // Local interfaces removed in favor of shared ones from API layer
 
+const toFullWidth = (num: number) => {
+  return num.toString().replace(/[0-9]/g, (s) => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
+};
+
 const title = {
   moji_goi: {
-    kanji_reading: "もんだい　１　＿＿＿＿＿　の　ことばは　どう　よみますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    orthography: "もんだい　２　＿＿＿＿＿　の　ことばは　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    word_formation: "もんだい　３　＿＿＿＿＿  に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    paraphrases: "もんだい　３ ＿＿＿＿＿  に　なにが　はいりますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    contextually_defined_expression: "もんだい　４　＿＿＿＿＿　の　ぷんと　だいたい　おなじ　いみの　ぷんが　あります。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    usage: "もんだい　５ つぎの　ことばの　つかいかたで　いちばん　いいものを\n１・２・３・４　から　ひとつ　えらんでください。",
+    kanji_reading: "＿＿＿＿＿　の　ことばは　どう　よみますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    orthography: "＿＿＿＿＿　の　ことばは　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    word_formation: "＿＿＿＿＿  に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    contextually_defined_expression: "＿＿＿＿＿  に　なにが　はいりますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    paraphrases: "＿＿＿＿＿　の　ぷんと　だいたい　おなじ　いみの　ぷんが　あります。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    usage: "つぎの　ことばの　つかいかたで　いちばん　いいものを\n１・２・３・４　から　ひとつ　えらんでください。",
   },
   grammar: {
-    selecting_grammar_form: "もんだい　１　（　　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    sentence_composition: "もんだい　２　＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    text_grammar: "もんだい　３（　番　）から（　番　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    selecting_grammar_form: "＿＿＿＿＿　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    sentence_composition: "＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    text_grammar: "（　番　）から（　番　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   reading: {
-    short_passage: "もんだい　４　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    mid_passage: "もんだい　５　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    long_passage: "もんだい　６　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    integrated_reading_comprehension: "もんだい　６　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    thematic_comprehension: "もんだい　６　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    information_retrieval: "もんだい　７　つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    short_passage: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    mid_passage: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    long_passage: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    information_retrieval: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    thematic_comprehension: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    integrated_reading_comprehension: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   listening: {
-    text_based_comprehension: "もんだい　１では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    keypoints_comprehension: "もんだい　２では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    general_outline_comprehension: "もんだい　３では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    verbal_expression: "もんだい　３では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    quick_response: "もんだい　３では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    integrated_listening_comprehension: "もんだい　４では、はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    text_based_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    keypoints_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    general_outline_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    verbal_expression: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    quick_response: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    integrated_listening_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
 };
 
@@ -80,33 +84,104 @@ const ExamScreen = () => {
   const currentQuestion = questions[currentQuestionIdx];
 
   // --- HELPERS ---
-  const moduleOrder = [
-    "Kanji Reading",
-    "Orthography",
-    "Word Formation",
-    "Paraphrases",
-    "Contextually Defined Expression",
-    "Usage",
-    "Selecting Grammar Form",
-    "Sentence Composition",
-    "Text Grammar",
-    "Short Passage",
-    "Mid Passage",
-    "Long Passage",
-    "Integrated Reading Comprehension",
-    "Thematic Comprehension",
-    "Information Retrieval",
-    "Text-Based Comprehension",
-    "Keypoints Comprehension",
-    "General Outline Comprehension",
-    "Verbal Expression",
-    "Quick Response",
-    "Integrated Listening Comprehension",
-  ];
+  const jlptModuleConfig: Record<string, Record<string, number>> = {
+    N5: {
+      "Kanji Reading": 1,
+      "Orthography": 2,
+      "Contextually Defined Expression": 3,
+      "Paraphrases": 4,
+      "Selecting Grammar Form": 1,
+      "Sentence Composition": 2,
+      "Text Grammar": 3,
+      "Short Passage": 4,
+      "Mid Passage": 5,
+      "Information Retrieval": 6,
+      "Text-Based Comprehension": 1,
+      "Keypoints Comprehension": 2,
+      "Verbal Expression": 3,
+      "Quick Response": 4,
+    },
+    N4: {
+      "Kanji Reading": 1,
+      "Orthography": 2,
+      "Contextually Defined Expression": 3,
+      "Paraphrases": 4,
+      "Usage": 5,
+      "Selecting Grammar Form": 1,
+      "Sentence Composition": 2,
+      "Text Grammar": 3,
+      "Short Passage": 4,
+      "Mid Passage": 5,
+      "Information Retrieval": 6,
+      "Text-Based Comprehension": 1,
+      "Keypoints Comprehension": 2,
+      "Verbal Expression": 3,
+      "Quick Response": 4,
+    },
+    N3: {
+      "Kanji Reading": 1,
+      "Orthography": 2,
+      "Contextually Defined Expression": 3,
+      "Paraphrases": 4,
+      "Usage": 5,
+      "Selecting Grammar Form": 1,
+      "Sentence Composition": 2,
+      "Text Grammar": 3,
+      "Short Passage": 4,
+      "Mid Passage": 5,
+      "Long Passage": 6,
+      "Information Retrieval": 7,
+      "Text-Based Comprehension": 1,
+      "Keypoints Comprehension": 2,
+      "General Outline Comprehension": 3,
+      "Verbal Expression": 4,
+      "Quick Response": 5,
+    },
+    N2: {
+      "Kanji Reading": 1,
+      "Orthography": 2,
+      "Word Formation": 3,
+      "Contextually Defined Expression": 4,
+      "Paraphrases": 5,
+      "Usage": 6,
+      "Selecting Grammar Form": 7,
+      "Sentence Composition": 8,
+      "Text Grammar": 9,
+      "Short Passage": 10,
+      "Mid Passage": 11,
+      "Integrated Reading Comprehension": 12,
+      "Thematic Comprehension": 13,
+      "Information Retrieval": 14,
+      "Text-Based Comprehension": 1,
+      "Keypoints Comprehension": 2,
+      "General Outline Comprehension": 3,
+      "Quick Response": 4,
+      "Integrated Listening Comprehension": 5,
+    },
+    N1: {
+      "Kanji Reading": 1,
+      "Contextually Defined Expression": 2,
+      "Paraphrases": 3,
+      "Usage": 4,
+      "Selecting Grammar Form": 5,
+      "Sentence Composition": 6,
+      "Text Grammar": 7,
+      "Short Passage": 8,
+      "Mid Passage": 9,
+      "Long Passage": 10,
+      "Integrated Reading Comprehension": 11,
+      "Thematic Comprehension": 12,
+      "Information Retrieval": 13,
+      "Text-Based Comprehension": 1,
+      "Keypoints Comprehension": 2,
+      "General Outline Comprehension": 3,
+      "Quick Response": 4,
+      "Integrated Listening Comprehension": 5,
+    }
+  };
 
-  const getModulePriority = (mod: string) => {
-    const index = moduleOrder.indexOf(mod);
-    return index !== -1 ? index : 99;
+  const getModuleNumber = (level: string, mod: string) => {
+    return jlptModuleConfig[level]?.[mod] || 99;
   };
 
   // --- 1. FETCH EXAM ---
@@ -134,7 +209,7 @@ const ExamScreen = () => {
                   const pA = getCategoryPriority(a.category);
                   const pB = getCategoryPriority(b.category);
                   if (pA !== pB) return pA - pB;
-                  return getModulePriority(a.module) - getModulePriority(b.module);
+                  return getModuleNumber(data.level || "N5", a.module) - getModuleNumber(data.level || "N5", b.module);
                 });
               }
             });
@@ -355,7 +430,7 @@ const ExamScreen = () => {
   const formatTime = (s: number) =>
     `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
-  const getQuestionTitle = (category: string, module: string) => {
+  const getQuestionTitle = (category: string, module: string, level: string) => {
     const normalizedCat = category.toLowerCase();
     let catKey = "";
 
@@ -368,7 +443,16 @@ const ExamScreen = () => {
     const modKey = module.toLowerCase().replace(/\s+/g, "_");
 
     // @ts-expect-error - dynamic access
-    return title[catKey]?.[modKey] || "";
+    const bareTitle = title[catKey]?.[modKey] || "";
+    if (!bareTitle) return "";
+
+    const mondaiNum = getModuleNumber(level, module);
+    const numStr = mondaiNum !== 99 ? toFullWidth(mondaiNum) : toFullWidth(1);
+
+    if (catKey === "listening") {
+      return `もんだい　${numStr}では、${bareTitle}`;
+    }
+    return `もんだい　${numStr}　${bareTitle}`;
   };
 
   const renderHighlightedText = (text: string) => {
@@ -497,6 +581,7 @@ const ExamScreen = () => {
                         {getQuestionTitle(
                           currentQuestion.category,
                           currentQuestion.module,
+                          exam?.level || "N5"
                         )}
                       </h2>
                     </div>

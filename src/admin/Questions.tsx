@@ -560,7 +560,8 @@ const Questions = () => {
                           {q.text}
                         </p>
                         <p className="text-[10px] font-black text-slate-500 mt-1">
-                          {q.point} Point(s) •{" "}
+                          {q.point} Point(s) • Correct Option: {q.correctOptionIndex + 1}
+                          {" • "}
                           {(q.tags || []).length > 0
                             ? q.tags.join(", ")
                             : "No Tags"}

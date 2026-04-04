@@ -15,6 +15,8 @@ import {
   Info,
   Maximize2,
   Minimize2,
+  Search,
+  X,
 } from "lucide-react";
 import { sectionApi, type Section } from "../api/sectionApi";
 import { questionApi, type Question } from "../api/questionApi";
@@ -113,6 +115,10 @@ const Sections = () => {
   const [filterCategory, setFilterCategory] = useState<string>("All");
   const [filterModule, setFilterModule] = useState<string>("All");
 
+  // --- SECTIONS SEARCH & FILTER ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sectionsFilterTag, setSectionsFilterTag] = useState("All");
+
   const [form, setForm] = useState({
     title: "",
     desc: "",
@@ -161,11 +167,31 @@ const Sections = () => {
     [allQuestions],
   );
 
+  const availableTags = useMemo(
+    () => [
+      "All",
+      ...new Set(sections.map((s) => s.tag).filter(Boolean) as string[]),
+    ],
+    [sections],
+  );
+
   const filteredQuestions = allQuestions.filter((q) => {
     const categoryMatch =
       filterCategory === "All" || q.category === filterCategory;
     const moduleMatch = filterModule === "All" || q.module === filterModule;
     return categoryMatch && moduleMatch;
+  });
+
+  const filteredSectionsEntries = sections.filter((s) => {
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch =
+      s.title.toLowerCase().includes(searchLower) ||
+      (s.tag && s.tag.toLowerCase().includes(searchLower));
+    
+    const matchesTag =
+      sectionsFilterTag === "All" || s.tag === sectionsFilterTag;
+
+    return matchesSearch && matchesTag;
   });
 
   const fetchData = async () => {
@@ -559,7 +585,7 @@ const Sections = () => {
 
           {/* --- BOTTOM: LIST SECTION --- */}
           <section className="w-full">
-            <div className="shrink-0 mb-8 flex justify-between items-end px-2">
+            <div className="shrink-0 mb-6 flex flex-col md:flex-row justify-between items-start md:items-end px-2 gap-4">
               <div>
                 <h2 className="text-xl font-black italic uppercase">
                   Sections Entries
@@ -568,11 +594,53 @@ const Sections = () => {
                   Active Sections: {sections.length}
                 </p>
               </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div className="relative w-full sm:w-64">
+                  <input
+                    type="text"
+                    placeholder="Search by title or tag..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-slate-950/50 p-3 pl-10 rounded-xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-[11px] font-bold text-sky-400 placeholder-slate-600"
+                  />
+                  <Search
+                    size={14}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-sky-500 transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Tag Filter */}
+            <div className="flex flex-wrap gap-2 px-2 mb-6">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSectionsFilterTag(tag)}
+                  className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border ${
+                    sectionsFilterTag === tag
+                      ? "bg-sky-500 border-sky-400 text-slate-950 shadow-md"
+                      : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
             </div>
 
             <div className="space-y-4">
               <AnimatePresence mode="popLayout">
-                {sections.map((s) => (
+                {filteredSectionsEntries.map((s) => (
                   <motion.div
                     layout
                     key={s._id}
@@ -638,10 +706,10 @@ const Sections = () => {
                 ))}
               </AnimatePresence>
 
-              {sections.length === 0 && (
+              {filteredSectionsEntries.length === 0 && (
                 <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-[2.5rem]">
                   <p className="text-slate-600 text-xs font-black uppercase tracking-widest">
-                    Database Clean
+                    No matching sections found 
                   </p>
                 </div>
               )}
