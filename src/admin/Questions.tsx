@@ -65,6 +65,25 @@ const CATEGORY_TO_MODULES: Record<QuestionCategory, QuestionModule[]> = {
   ],
 };
 
+const formatText = (text: string) => {
+  if (!text) return null;
+  return text.split("\n").map((line, i) => (
+    <React.Fragment key={i}>
+      {line.split(/(\*.*?\*)/g).map((part, j) => {
+        if (part.startsWith("*") && part.endsWith("*")) {
+          return (
+            <strong key={j} className="text-sky-400">
+              {part.slice(1, -1)}
+            </strong>
+          );
+        }
+        return part;
+      })}
+      {i < text.split("\n").length - 1 && <br />}
+    </React.Fragment>
+  ));
+};
+
 const Questions = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
@@ -556,9 +575,14 @@ const Questions = () => {
                             {q.module}
                           </span>
                         </div>
-                        <p className="font-bold text-sm tracking-tight truncate group-hover:text-sky-400 transition-colors text-white">
-                          {q.text}
-                        </p>
+                        <div className="font-bold text-sm tracking-tight group-hover:text-sky-400/80 transition-colors text-white leading-relaxed">
+                          {formatText(q.text)}
+                        </div>
+                        {q.refText && (
+                          <div className="text-[10px] text-slate-400 mt-2 p-3 bg-white/5 rounded-xl border border-white/5 italic line-clamp-2">
+                            {formatText(q.refText)}
+                          </div>
+                        )}
                         <p className="text-[10px] font-black text-slate-500 mt-1">
                           {q.point} Point(s) • Correct Option: {q.correctOptionIndex + 1}
                           {" • "}

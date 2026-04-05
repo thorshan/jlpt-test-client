@@ -11,7 +11,15 @@ const Redirect: React.FC = () => {
   const [ad, setAd] = useState<Ad | null>(null);
   const [loadingAd, setLoadingAd] = useState(true);
 
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const targetUrl = searchParams.get("to") || "/test";
+
+  const getTruncatedText = (text: string, limit: number) => {
+    const words = text.split(/\s+/);
+    if (words.length <= limit) return text;
+    return words.slice(0, limit).join(" ") + "... ";
+  };
 
   useEffect(() => {
     const fetchAd = async () => {
@@ -103,8 +111,16 @@ const Redirect: React.FC = () => {
                   <h2 className="text-2xl font-black text-white leading-tight uppercase italic tracking-tight">
                     {ad.title}
                   </h2>
-                  <p className="text-slate-400 text-sm leading-relaxed line-clamp-3">
-                    {ad.content}
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {isExpanded ? ad.content : getTruncatedText(ad.content, 15)}
+                    {!isExpanded && ad.content.split(/\s+/).length > 15 && (
+                      <button
+                        onClick={() => setIsExpanded(true)}
+                        className="text-sky-400 hover:text-sky-300 font-bold ml-1 transition-colors"
+                      >
+                        See more
+                      </button>
+                    )}
                   </p>
                   <a
                     href={ad.ctaUrl || ad.image}
@@ -113,7 +129,6 @@ const Redirect: React.FC = () => {
                     onClick={handleAdClick}
                     className="mt-2 text-sky-400 text-[11px] font-black uppercase tracking-widest flex items-center gap-2 hover:text-white transition-colors group w-fit"
                   >
-
                     See More Details
                     <ExternalLink size={12} className="group-hover:translate-x-1 transition-transform" />
                   </a>

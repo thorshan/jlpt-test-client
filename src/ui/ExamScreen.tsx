@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -455,24 +455,30 @@ const ExamScreen = () => {
     return `もんだい　${numStr}　${bareTitle}`;
   };
 
-  const renderHighlightedText = (text: string) => {
-    const parts = text.split(/(（.*?）)/g);
-
-    return parts.map((part, index) => {
-      if (part.startsWith("（") && part.endsWith("）")) {
-        const content = part.slice(1, -1);
-        return (
-          <span
-            key={index}
-            className="inline-block mx-1.5 text-sky-500 underline underline-offset-8"
-          >
-            {content}
-          </span>
-        );
-      }
-      return part;
-    });
-  };
+const formatText = (text: string) => {
+  if (!text) return null;
+  return text.split("\n").map((line, i) => (
+    <React.Fragment key={i}>
+      {line.split(/(\*.*?\*|（.*?）)/g).map((part, j) => {
+        if (part.startsWith("*") && part.endsWith("*")) {
+          return <strong key={j}>{part.slice(1, -1)}</strong>;
+        }
+        if (part.startsWith("（") && part.endsWith("）")) {
+          return (
+            <span
+              key={j}
+              className="inline-block mx-1.5 text-sky-500 underline underline-offset-8"
+            >
+              {part.slice(1, -1)}
+            </span>
+          );
+        }
+        return part;
+      })}
+      {i < text.split("\n").length - 1 && <br />}
+    </React.Fragment>
+  ));
+};
 
   if (loading || !exam) return <LoadingScreen />;
 
@@ -598,13 +604,13 @@ const ExamScreen = () => {
                     )}
 
                     {currentQuestion.refText && (
-                      <div className="mb-8 p-8 bg-[#0f172a]/60 rounded-3xl border border-white/5 shadow-inner text-slate-200 text-xl leading-relaxed">
-                        {currentQuestion.refText}
+                      <div className="mb-8 p-8 bg-[#0f172a]/60 rounded-3xl border border-white/5 shadow-inner text-slate-200 text-xl leading-relaxed whitespace-pre-line">
+                        {formatText(currentQuestion.refText)}
                       </div>
                     )}
                     {currentQuestion.category !== "Listening" && (
                       <h2 className="text-2xl md:text-3xl font-black text-white leading-tight tracking-tight">
-                        {renderHighlightedText(currentQuestion.text)}
+                        {formatText(currentQuestion.text)}
                       </h2>
                     )}
                   </header>
