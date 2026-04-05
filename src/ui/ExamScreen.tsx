@@ -462,7 +462,7 @@ const formatText = (text: string) => {
   const lines = processedText.split("\n");
   return lines.map((line, i) => (
     <React.Fragment key={i}>
-      {line.split(/(\*.*?\*|（.*?）)/g).map((part, j) => {
+      {line.split(/(\*.*?\*|（.*?）|#=.*?=#)/g).map((part, j) => {
         if (part.startsWith("*") && part.endsWith("*")) {
           return <strong key={j}>{part.slice(1, -1)}</strong>;
         }
@@ -473,6 +473,16 @@ const formatText = (text: string) => {
               className="inline-block mx-1.5 text-sky-500 underline underline-offset-8"
             >
               {part.slice(1, -1)}
+            </span>
+          );
+        }
+        if (part.startsWith("#=") && part.endsWith("=#")) {
+          return (
+            <span
+              key={j}
+              className="inline-block px-4 py-2 border-2 border-sky-500/30 bg-sky-500/5 rounded-xl mx-2 my-1 text-sky-400 font-black shadow-[0_0_15px_rgba(14,165,233,0.1)]"
+            >
+              {part.slice(2, -2)}
             </span>
           );
         }
