@@ -457,7 +457,9 @@ const ExamScreen = () => {
 
 const formatText = (text: string) => {
   if (!text) return null;
-  return text.split("\n").map((line, i) => (
+  // Handle literal "\n" strings (e.g. from JSON or manual input)
+  const processedText = text.replace(/\\n/g, "\n");
+  return processedText.split("\n").map((line, i) => (
     <React.Fragment key={i}>
       {line.split(/(\*.*?\*|（.*?）)/g).map((part, j) => {
         if (part.startsWith("*") && part.endsWith("*")) {
