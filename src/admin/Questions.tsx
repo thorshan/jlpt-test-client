@@ -69,7 +69,8 @@ const formatText = (text: string) => {
   if (!text) return null;
   // Handle literal "\n" strings (e.g. from JSON or manual input)
   const processedText = text.replace(/\\n/g, "\n");
-  return processedText.split("\n").map((line, i) => (
+  const lines = processedText.split("\n");
+  return lines.map((line, i) => (
     <React.Fragment key={i}>
       {line.split(/(\*.*?\*)/g).map((part, j) => {
         if (part.startsWith("*") && part.endsWith("*")) {
@@ -81,7 +82,7 @@ const formatText = (text: string) => {
         }
         return part;
       })}
-      {i < text.split("\n").length - 1 && <br />}
+      {i < lines.length - 1 && <br />}
     </React.Fragment>
   ));
 };
@@ -135,8 +136,15 @@ const Questions = () => {
     e.preventDefault();
     setIsProcessing(true);
     try {
+      // Convert literal \n to actual newlines before saving
+      const processedForm = {
+        ...form,
+        text: form.text.replace(/\\n/g, "\n"),
+        refText: form.refText.replace(/\\n/g, "\n"),
+      };
+
       if (editingId) {
-        const res = await questionApi.updateQuestion(editingId, form);
+        const res = await questionApi.updateQuestion(editingId, processedForm);
         const updatedQuestion = res.data?.data || res.data;
 
         if (updatedQuestion) {
@@ -145,7 +153,7 @@ const Questions = () => {
           );
         }
       } else {
-        const res = await questionApi.createQuestion(form);
+        const res = await questionApi.createQuestion(processedForm);
         const newQuestion = res.data?.data || res.data;
 
         if (newQuestion) {
