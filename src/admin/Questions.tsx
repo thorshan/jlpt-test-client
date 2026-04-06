@@ -67,34 +67,32 @@ const CATEGORY_TO_MODULES: Record<QuestionCategory, QuestionModule[]> = {
 
 const formatText = (text: string) => {
   if (!text) return null;
-  // Handle literal "\n" strings (e.g. from JSON or manual input)
   const processedText = text.replace(/\\n/g, "\n");
-  const lines = processedText.split("\n");
-  return lines.map((line, i) => (
-    <React.Fragment key={i}>
-      {line.split(/(\*.*?\*|#=.*?=#)/g).map((part, j) => {
-        if (part.startsWith("*") && part.endsWith("*")) {
-          return (
-            <strong key={j} className="text-sky-400">
-              {part.slice(1, -1)}
-            </strong>
-          );
-        }
-        if (part.startsWith("#=") && part.endsWith("=#")) {
-          return (
-            <span
-              key={j}
-              className="inline-block px-3 py-1 border border-white/20 bg-white/5 rounded-lg mx-1 my-0.5 text-sky-400 font-bold shadow-inner"
-            >
-              {part.slice(2, -2)}
-            </span>
-          );
-        }
-        return part;
-      })}
-      {i < lines.length - 1 && <br />}
-    </React.Fragment>
-  ));
+  const parts = processedText.split(/(\*[\s\S]*?\*|#=[\s\S]*?=#|\n)/g);
+
+  return parts.map((part, i) => {
+    if (part === "\n") {
+      return <br key={i} />;
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return (
+        <strong key={i} className="text-sky-400">
+          {part.slice(1, -1)}
+        </strong>
+      );
+    }
+    if (part.startsWith("#=") && part.endsWith("=#")) {
+      return (
+        <span
+          key={i}
+          className="inline-block px-3 py-1 border border-white/20 bg-white/5 rounded-lg mx-1 my-0.5 text-sky-400 font-bold shadow-inner"
+        >
+          {part.slice(2, -2)}
+        </span>
+      );
+    }
+    return part;
+  });
 };
 
 const Questions = () => {

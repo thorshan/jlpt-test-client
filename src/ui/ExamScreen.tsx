@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -457,40 +457,38 @@ const ExamScreen = () => {
 
 const formatText = (text: string) => {
   if (!text) return null;
-  // Handle literal "\n" strings (e.g. from JSON or manual input)
   const processedText = text.replace(/\\n/g, "\n");
-  const lines = processedText.split("\n");
-  return lines.map((line, i) => (
-    <React.Fragment key={i}>
-      {line.split(/(\*.*?\*|（.*?）|#=.*?=#)/g).map((part, j) => {
-        if (part.startsWith("*") && part.endsWith("*")) {
-          return <strong key={j}>{part.slice(1, -1)}</strong>;
-        }
-        if (part.startsWith("（") && part.endsWith("）")) {
-          return (
-            <span
-              key={j}
-              className="inline-block mx-1.5 text-sky-500 underline underline-offset-8"
-            >
-              {part.slice(1, -1)}
-            </span>
-          );
-        }
-        if (part.startsWith("#=") && part.endsWith("=#")) {
-          return (
-            <span
-              key={j}
-              className="inline-block px-4 py-2 border-2 border-sky-500/30 bg-sky-500/5 rounded-xl mx-2 my-1 text-sky-400 font-black shadow-[0_0_15px_rgba(14,165,233,0.1)]"
-            >
-              {part.slice(2, -2)}
-            </span>
-          );
-        }
-        return part;
-      })}
-      {i < lines.length - 1 && <br />}
-    </React.Fragment>
-  ));
+  const parts = processedText.split(/(\*[\s\S]*?\*|（[\s\S]*?）|#=[\s\S]*?=#|\n)/g);
+
+  return parts.map((part, i) => {
+    if (part === "\n") {
+      return <br key={i} />;
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return <strong key={i}>{part.slice(1, -1)}</strong>;
+    }
+    if (part.startsWith("（") && part.endsWith("）")) {
+      return (
+        <span
+          key={i}
+          className="inline-block mx-1.5 text-sky-500 underline underline-offset-8"
+        >
+          {part.slice(1, -1)}
+        </span>
+      );
+    }
+    if (part.startsWith("#=") && part.endsWith("=#")) {
+      return (
+        <span
+          key={i}
+          className="inline-block px-4 py-2 border-2 border-sky-500/30 bg-sky-500/5 rounded-xl mx-2 my-1 text-sky-400 font-black shadow-[0_0_15px_rgba(14,165,233,0.1)]"
+        >
+          {part.slice(2, -2)}
+        </span>
+      );
+    }
+    return part;
+  });
 };
 
   if (loading || !exam) return <LoadingScreen />;
@@ -519,36 +517,37 @@ const formatText = (text: string) => {
 
       {/* --- NAVBAR --- */}
       <nav className="h-16 md:h-20 border-b border-white/5 bg-[#020617]/60 backdrop-blur-2xl flex items-center justify-between px-4 md:px-8 sticky top-0 z-[60]">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <img
             src="/JLPTX.png"
             alt="Logo"
-            className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(14,165,233,0.3)]"
+            className="w-8 h-8 md:w-10 md:h-10 object-contain drop-shadow-[0_0_8px_rgba(14,165,233,0.3)]"
           />
-          <div className="text-sky-400 font-mono text-sm font-black bg-sky-500/10 px-4 py-1.5 rounded-full border border-sky-500/20 flex items-center gap-2 shadow-inner">
-            <Clock size={16} className="text-sky-500" />
+          <div className="text-sky-400 font-mono text-[10px] md:text-sm font-black bg-sky-500/10 px-3 md:px-4 py-1 md:py-1.5 rounded-full border border-sky-500/20 flex items-center gap-1.5 md:gap-2 shadow-inner">
+            <Clock size={14} className="text-sky-500 md:hidden" />
+            <Clock size={16} className="text-sky-500 hidden md:block" />
             {status === "exam" ? formatTime(sectionTimeLeft) : "REST"}
           </div>
         </div>
         <button
           onClick={() => setShowExitModal(true)}
-          className="text-neutral-500 hover:text-red-400 text-xs font-black uppercase flex items-center gap-2 transition-colors px-3 py-2 rounded-lg hover:bg-red-500/5"
+          className="text-neutral-500 hover:text-red-400 text-[10px] md:text-xs font-black uppercase flex items-center gap-1.5 md:gap-2 transition-colors px-2 md:px-3 py-1.5 md:py-2 rounded-lg hover:bg-red-500/5"
         >
-          {t("exit")} <LogOut size={16} />
+          <span className="hidden sm:inline">{t("exit")}</span> <LogOut size={14} className="md:w-4 md:h-4" />
         </button>
       </nav>
 
       {/* --- PROGRESS BAR --- */}
       {status === "exam" && (
-        <div className="w-full bg-[#020617]/40 border-b border-white/5 py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory relative z-10">
-          <div className="flex gap-2 min-w-max px-[calc(50vw-20px)]">
+        <div className="w-full bg-[#020617]/40 border-b border-white/5 py-3 md:py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory relative z-10">
+          <div className="flex gap-1.5 md:gap-2 min-w-max px-[calc(50vw-18px)] md:px-[calc(50vw-20px)]">
             {questions.map((q, idx) => (
               <button
                 key={q._id}
                 ref={(el) => {
                   questionRefs.current[idx] = el;
                 }}
-                className={`min-w-[42px] h-[42px] rounded-xl text-[10px] font-black transition-all border snap-center shrink-0 ${currentQuestionIdx === idx
+                className={`min-w-[36px] h-[36px] md:min-w-[42px] md:h-[42px] rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black transition-all border snap-center shrink-0 ${currentQuestionIdx === idx
                   ? "bg-sky-500 border-sky-400 text-slate-950 scale-110 shadow-[0_0_20px_rgba(14,165,233,0.4)]"
                   : userAnswers[q._id] !== undefined
                     ? "bg-sky-500/20 border-sky-500/40 text-sky-400"
@@ -595,8 +594,8 @@ const formatText = (text: string) => {
                       )}
                     </div>
 
-                    <div className="mb-8">
-                      <h2 className="text-slate-300 text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line bg-white/5 p-6 rounded-3xl border border-white/5 shadow-xl backdrop-blur-sm">
+                    <div className="mb-6 md:mb-8">
+                      <h2 className="text-slate-300 text-sm md:text-xl font-medium leading-relaxed whitespace-pre-line bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 shadow-xl backdrop-blur-sm">
                         {getQuestionTitle(
                           currentQuestion.category,
                           currentQuestion.module,
@@ -606,59 +605,65 @@ const formatText = (text: string) => {
                     </div>
 
                     {currentQuestion.refImage && (
-                      <div className="mb-8 rounded-3xl border border-white/10 overflow-hidden bg-white/5 p-4 backdrop-blur-sm shadow-2xl">
+                      <div className="mb-6 md:mb-8 rounded-2xl md:rounded-3xl border border-white/10 overflow-hidden bg-white/5 p-2 md:p-4 backdrop-blur-sm shadow-2xl">
                         <img
                           src={currentQuestion.refImage}
                           alt="Ref"
-                          className="max-h-80 w-full object-contain rounded-xl"
+                          className="max-h-60 md:max-h-80 w-full object-contain rounded-lg md:rounded-xl"
                           onError={(e) => (e.currentTarget.src = "/JLPTX.png")}
                         />
                       </div>
                     )}
 
                     {currentQuestion.refText && (
-                      <div className="mb-8 p-8 bg-[#0f172a]/60 rounded-3xl border border-white/5 shadow-inner text-slate-200 text-xl leading-relaxed whitespace-pre-line">
+                      <div className="mb-6 md:mb-8 p-4 md:p-8 bg-[#0f172a]/60 rounded-2xl md:rounded-3xl border border-white/5 shadow-inner text-slate-200 text-lg md:text-xl leading-relaxed whitespace-pre-line">
                         {formatText(currentQuestion.refText)}
                       </div>
                     )}
                     {currentQuestion.category !== "Listening" && (
-                      <h2 className="text-2xl md:text-3xl font-black text-white leading-tight tracking-tight">
+                      <h2 className="text-xl md:text-3xl font-black text-white leading-tight tracking-tight">
                         {formatText(currentQuestion.text)}
                       </h2>
                     )}
                   </header>
 
                   {/* OPTIONS */}
-                  <div className="grid gap-4">
+                  <div className="grid gap-3 md:gap-4">
                     {currentQuestion.options?.map((opt, i) => (
                       <button
                         key={i}
                         onClick={() => setSelectedOption(i)}
-                        className={`w-full text-left p-6 rounded-3xl border-2 transition-all flex items-center justify-between backdrop-blur-md ${selectedOption === i
+                        className={`w-full text-left p-4 md:p-6 rounded-2xl md:rounded-3xl border-2 transition-all flex items-center justify-between backdrop-blur-md ${selectedOption === i
                           ? "bg-sky-500/10 border-sky-500 text-sky-400 shadow-lg"
                           : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
                           }`}
                       >
-                        <div className="flex gap-4 items-center">
+                        <div className="flex gap-3 md:gap-4 items-center">
                           <span
-                            className={`flex justify-center items-center w-9 h-9 border-2 rounded-2xl font-black text-sm transition-colors ${selectedOption === i
+                            className={`flex justify-center items-center w-7 h-7 md:w-9 md:h-9 border-2 rounded-lg md:rounded-2xl font-black text-xs md:text-sm transition-colors ${selectedOption === i
                               ? "bg-sky-500 border-sky-500 text-slate-950"
                               : "border-white/10 text-slate-500"
                               }`}
                           >
                             {i + 1}
                           </span>
-                          <span className="font-bold text-lg md:text-xl">
+                          <span className="font-bold text-base md:text-xl">
                             {opt}
                           </span>
                         </div>
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedOption === i ? "bg-sky-500 border-sky-500" : "border-white/10"}`}
+                          className={`w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center ${selectedOption === i ? "bg-sky-500 border-sky-500" : "border-white/10"}`}
                         >
                           {selectedOption === i && (
                             <CheckCircle2
+                              size={12}
+                              className="text-slate-950 md:hidden"
+                            />
+                          )}
+                          {selectedOption === i && (
+                            <CheckCircle2
                               size={14}
-                              className="text-slate-950"
+                              className="text-slate-950 hidden md:block"
                             />
                           )}
                         </div>
@@ -742,7 +747,7 @@ const formatText = (text: string) => {
 
       {/* --- FOOTER --- */}
       {status === "exam" && (
-        <footer className="h-24 border-t border-white/5 bg-[#020617]/80 backdrop-blur-2xl px-4 md:px-10 flex items-center justify-center fixed bottom-0 left-0 right-0 z-50">
+        <footer className="h-20 md:h-24 border-t border-white/5 bg-[#020617]/80 backdrop-blur-2xl px-4 md:px-10 flex items-center justify-center fixed bottom-0 left-0 right-0 z-50">
           <div className="max-w-4xl w-full flex items-center justify-between">
             <div className="hidden sm:flex items-center gap-2 text-slate-500 text-[10px] font-black uppercase tracking-widest">
               <span className="flex items-center gap-2 border border-white/5 px-4 py-1.5 rounded-full">
@@ -752,22 +757,24 @@ const formatText = (text: string) => {
             <button
               disabled={selectedOption === null || isSubmitting}
               onClick={handleNextQuestion}
-              className={`px-10 py-4 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center gap-3 ${selectedOption !== null && !isSubmitting
+              className={`flex-1 sm:flex-none px-6 md:px-10 py-3 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 md:gap-3 ${selectedOption !== null && !isSubmitting
                 ? "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95"
                 : "bg-white/5 text-slate-600 opacity-50 cursor-not-allowed border border-white/5"
                 }`}
             >
               {isSubmitting ? (
                 <>
-                  {t("processing")}...{" "}
-                  <Loader2 size={20} className="animate-spin" />
+                  <span className="text-xs md:text-sm">{t("processing")}...</span>{" "}
+                  <Loader2 size={18} className="animate-spin md:w-5 md:h-5" />
                 </>
               ) : (
                 <>
-                  {currentQuestionIdx === questions.length - 1
-                    ? t("complete_section")
-                    : t("next_question")}
-                  <ChevronRight size={20} />
+                  <span className="text-xs md:text-sm">
+                    {currentQuestionIdx === questions.length - 1
+                      ? t("complete_section")
+                      : t("next_question")}
+                  </span>
+                  <ChevronRight size={18} className="md:w-5 md:h-5" />
                 </>
               )}
             </button>
