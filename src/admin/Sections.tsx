@@ -683,6 +683,20 @@ const Sections = () => {
                             {s.minPassedMark} Min Mark
                           </span>
                         </div>
+                        <div className="flex items-center gap-1.5 text-sky-500">
+                          <div className="w-1 h-1 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.5)]" />
+                          <span className="text-[10px] font-black uppercase">
+                            {(() => {
+                              const total = s.questions.reduce((acc, q) => {
+                                const questionObj = typeof q === 'string' 
+                                  ? allQuestions.find(aq => aq._id === q)
+                                  : q;
+                                return acc + (questionObj?.point || 0);
+                              }, 0);
+                              return `${total} Total Points`;
+                            })()}
+                          </span>
+                        </div>
                       </div>
                     </div>
 

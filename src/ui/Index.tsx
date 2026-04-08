@@ -6,7 +6,7 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Zap, Globe, Lock, UserStar } from "lucide-react";
+import { Zap, Globe, Lock, UserStar, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LangToggler } from "../components/LangToggler";
 import { useTranslation } from "../hooks/useTranslation";
@@ -249,15 +249,15 @@ const Index = () => {
             {t("integrity_title")}
           </h2>
           <p className="text-slate-400 text-sm md:text-base leading-relaxed max-w-xl mx-auto">
-            {t("hero_desc")}{" "}
-            {/*<a
+            {t("integrity_desc")}{" "}
+            <a
               href="https://jlpt.jp"
               target="_blank"
               rel="noreferrer"
               className="text-sky-400 font-bold hover:text-sky-300 transition-colors inline-flex items-center gap-1 border-b border-sky-500/30 pb-0.5"
             >
               {t("official_link")} <ExternalLink size={14} />
-            </a>*/}
+            </a>
           </p>
         </div>
       </section>

@@ -47,7 +47,7 @@ const title = {
     integrated_reading_comprehension: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   listening: {
-    text_based_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    task_based_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
     keypoints_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
     general_outline_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
     verbal_expression: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
@@ -62,6 +62,8 @@ const ExamScreen = () => {
   const { id } = useParams();
   const { user } = useUser();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const backgroundAudioRef = useRef<HTMLAudioElement | null>(null);
+  const restAudioRef = useRef<HTMLAudioElement | null>(null);
   const questionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // --- STATE ---
@@ -96,7 +98,7 @@ const ExamScreen = () => {
       "Short Passage": 4,
       "Mid Passage": 5,
       "Information Retrieval": 6,
-      "Text-Based Comprehension": 1,
+      "Task Based Comprehension": 1,
       "Keypoints Comprehension": 2,
       "Verbal Expression": 3,
       "Quick Response": 4,
@@ -113,7 +115,7 @@ const ExamScreen = () => {
       "Short Passage": 4,
       "Mid Passage": 5,
       "Information Retrieval": 6,
-      "Text-Based Comprehension": 1,
+      "Task Based Comprehension": 1,
       "Keypoints Comprehension": 2,
       "Verbal Expression": 3,
       "Quick Response": 4,
@@ -131,7 +133,7 @@ const ExamScreen = () => {
       "Mid Passage": 5,
       "Long Passage": 6,
       "Information Retrieval": 7,
-      "Text-Based Comprehension": 1,
+      "Task Based Comprehension": 1,
       "Keypoints Comprehension": 2,
       "General Outline Comprehension": 3,
       "Verbal Expression": 4,
@@ -152,7 +154,7 @@ const ExamScreen = () => {
       "Integrated Reading Comprehension": 12,
       "Thematic Comprehension": 13,
       "Information Retrieval": 14,
-      "Text-Based Comprehension": 1,
+      "Task Based Comprehension": 1,
       "Keypoints Comprehension": 2,
       "General Outline Comprehension": 3,
       "Quick Response": 4,
@@ -172,7 +174,7 @@ const ExamScreen = () => {
       "Integrated Reading Comprehension": 11,
       "Thematic Comprehension": 12,
       "Information Retrieval": 13,
-      "Text-Based Comprehension": 1,
+      "Task Based Comprehension": 1,
       "Keypoints Comprehension": 2,
       "General Outline Comprehension": 3,
       "Quick Response": 4,
@@ -279,7 +281,41 @@ const ExamScreen = () => {
     };
   }, [currentQuestionIdx, currentSectionIdx, status, currentQuestion?.refAudio]);
 
-  // --- 4. CALCULATION & SUBMISSION ---
+  // --- 4. AMBIENT & REST AUDIO LOGIC ---
+  useEffect(() => {
+    if (loading || isSubmitting) {
+      backgroundAudioRef.current?.pause();
+      restAudioRef.current?.pause();
+      return;
+    }
+
+    if (!backgroundAudioRef.current) {
+      backgroundAudioRef.current = new Audio("/background.mp3");
+      backgroundAudioRef.current.loop = true;
+      backgroundAudioRef.current.volume = 0.4;
+    }
+
+    if (!restAudioRef.current) {
+      restAudioRef.current = new Audio("/rest.mp3");
+      restAudioRef.current.loop = true;
+      restAudioRef.current.volume = 0.6;
+    }
+
+    if (status === "exam") {
+      restAudioRef.current.pause();
+      backgroundAudioRef.current.play().catch(e => console.error("BG Audio fail:", e));
+    } else if (status === "rest") {
+      backgroundAudioRef.current.pause();
+      restAudioRef.current.play().catch(e => console.error("Rest Audio fail:", e));
+    }
+
+    return () => {
+      backgroundAudioRef.current?.pause();
+      restAudioRef.current?.pause();
+    };
+  }, [status, loading, isSubmitting]);
+
+  // --- 5. CALCULATION & SUBMISSION ---
   const submitExam = async (finalAnswers: Record<string, number>) => {
     if (!exam || !user?._id || isSubmitting) return;
 
@@ -455,41 +491,41 @@ const ExamScreen = () => {
     return `もんだい　${numStr}　${bareTitle}`;
   };
 
-const formatText = (text: string) => {
-  if (!text) return null;
-  const processedText = text.replace(/\\n/g, "\n");
-  const parts = processedText.split(/(\*[\s\S]*?\*|（[\s\S]*?）|#=[\s\S]*?=#|\n)/g);
+  const formatText = (text: string) => {
+    if (!text) return null;
+    const processedText = text.replace(/\\n/g, "\n");
+    const parts = processedText.split(/(\*[\s\S]*?\*|（[\s\S]*?）|#=[\s\S]*?=#|\n)/g);
 
-  return parts.map((part, i) => {
-    if (part === "\n") {
-      return <br key={i} />;
-    }
-    if (part.startsWith("*") && part.endsWith("*")) {
-      return <strong key={i}>{part.slice(1, -1)}</strong>;
-    }
-    if (part.startsWith("（") && part.endsWith("）")) {
-      return (
-        <span
-          key={i}
-          className="inline-block mx-1.5 text-sky-500 underline underline-offset-8"
-        >
-          {part.slice(1, -1)}
-        </span>
-      );
-    }
-    if (part.startsWith("#=") && part.endsWith("=#")) {
-      return (
-        <span
-          key={i}
-          className="inline-block px-4 py-2 border-2 border-sky-500/30 bg-sky-500/5 rounded-xl mx-2 my-1 text-sky-400 font-black shadow-[0_0_15px_rgba(14,165,233,0.1)]"
-        >
-          {part.slice(2, -2)}
-        </span>
-      );
-    }
-    return part;
-  });
-};
+    return parts.map((part, i) => {
+      if (part === "\n") {
+        return <br key={i} />;
+      }
+      if (part.startsWith("*") && part.endsWith("*")) {
+        return <strong key={i}>{part.slice(1, -1)}</strong>;
+      }
+      if (part.startsWith("（") && part.endsWith("）")) {
+        return (
+          <span
+            key={i}
+            className="inline-block mx-1.5 text-sky-500 underline underline-offset-8"
+          >
+            {part.slice(1, -1)}
+          </span>
+        );
+      }
+      if (part.startsWith("#=") && part.endsWith("=#")) {
+        return (
+          <span
+            key={i}
+            className="inline-block px-4 py-2 border-2 border-sky-500/30 bg-sky-500/5 rounded-xl mx-2 my-1 text-sky-400 font-black shadow-[0_0_15px_rgba(14,165,233,0.1)]"
+          >
+            {part.slice(2, -2)}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
 
   if (loading || !exam) return <LoadingScreen />;
 

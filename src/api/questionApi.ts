@@ -16,7 +16,7 @@ export enum QuestionModule {
   integrated_reading_comprehension = "Integrated Reading Comprehension",
   thematic_comprehension = "Thematic Comprehension",
   information_retrieval = "Information Retrieval",
-  text_based_comprehension = "Text-Based Comprehension",
+  task_based_comprehension = "Task Based Comprehension",
   keypoints_comprehension = "Keypoints Comprehension",
   general_outline_comprehension = "General Outline Comprehension",
   verbal_expression = "Verbal Expression",
