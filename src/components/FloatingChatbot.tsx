@@ -75,17 +75,17 @@ const FloatingChatbot: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[100]">
+    <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-[100]">
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="absolute bottom-20 right-0 w-[350px] md:w-[400px] h-[550px] bg-[#0f172a] border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden backdrop-blur-3xl"
+            className="absolute bottom-20 right-0 w-[calc(100vw-2rem)] md:w-[400px] h-[60vh] md:h-[550px] bg-[#0f172a] border border-white/10 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden backdrop-blur-3xl"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-sky-500 to-blue-600 p-8 flex justify-between items-center relative overflow-hidden">
+            <div className="bg-gradient-to-r from-sky-500 to-blue-600 p-6 md:p-8 flex justify-between items-center relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2" />
               <div className="flex items-center gap-4 text-slate-950 relative z-10">
                 <div className="bg-white/20 p-2.5 rounded-2xl backdrop-blur-md border border-white/20">

@@ -62,8 +62,6 @@ const ExamScreen = () => {
   const { id } = useParams();
   const { user } = useUser();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const backgroundAudioRef = useRef<HTMLAudioElement | null>(null);
-  const restAudioRef = useRef<HTMLAudioElement | null>(null);
   const questionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // --- STATE ---
@@ -281,47 +279,7 @@ const ExamScreen = () => {
     };
   }, [currentQuestionIdx, currentSectionIdx, status, currentQuestion?.refAudio]);
 
-  // --- 4. AMBIENT & REST AUDIO LOGIC ---
-  useEffect(() => {
-    if (loading || isSubmitting) {
-      backgroundAudioRef.current?.pause();
-      restAudioRef.current?.pause();
-      return;
-    }
-
-    if (!backgroundAudioRef.current) {
-      backgroundAudioRef.current = new Audio("/background.mp3");
-      backgroundAudioRef.current.loop = true;
-      backgroundAudioRef.current.volume = 0.1; // Lowered from 0.4
-    }
-
-    if (!restAudioRef.current) {
-      restAudioRef.current = new Audio("/rest.mp3");
-      restAudioRef.current.loop = true;
-      restAudioRef.current.volume = 0.3; // Lowered from 0.6
-    }
-
-    if (status === "exam") {
-      restAudioRef.current.pause();
-      // If there's a listening track, we duck the background volume even further
-      if (currentQuestion?.refAudio) {
-        backgroundAudioRef.current.volume = 0.03;
-      } else {
-        backgroundAudioRef.current.volume = 0.1;
-      }
-      backgroundAudioRef.current.play().catch(e => console.error("BG Audio fail:", e));
-    } else if (status === "rest") {
-      backgroundAudioRef.current.pause();
-      restAudioRef.current.play().catch(e => console.error("Rest Audio fail:", e));
-    }
-
-    return () => {
-      backgroundAudioRef.current?.pause();
-      restAudioRef.current?.pause();
-    };
-  }, [status, loading, isSubmitting]);
-
-  // --- 5. CALCULATION & SUBMISSION ---
+  // --- 4. CALCULATION & SUBMISSION ---
   const submitExam = async (finalAnswers: Record<string, number>) => {
     if (!exam || !user?._id || isSubmitting) return;
 
@@ -581,7 +539,7 @@ const ExamScreen = () => {
 
       {/* --- PROGRESS BAR --- */}
       {status === "exam" && (
-        <div className="w-full bg-[#020617]/40 border-b border-white/5 py-3 md:py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory relative z-10">
+        <div className="w-full bg-[#020617]/40 border-b border-white/5 py-3 md:py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory sticky top-16 md:top-20 z-[60] backdrop-blur-xl">
           <div className="flex gap-1.5 md:gap-2 min-w-max px-[calc(50vw-18px)] md:px-[calc(50vw-20px)]">
             {questions.map((q, idx) => (
               <button
