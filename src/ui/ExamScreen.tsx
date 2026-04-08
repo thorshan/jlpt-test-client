@@ -292,17 +292,23 @@ const ExamScreen = () => {
     if (!backgroundAudioRef.current) {
       backgroundAudioRef.current = new Audio("/background.mp3");
       backgroundAudioRef.current.loop = true;
-      backgroundAudioRef.current.volume = 0.4;
+      backgroundAudioRef.current.volume = 0.1; // Lowered from 0.4
     }
 
     if (!restAudioRef.current) {
       restAudioRef.current = new Audio("/rest.mp3");
       restAudioRef.current.loop = true;
-      restAudioRef.current.volume = 0.6;
+      restAudioRef.current.volume = 0.3; // Lowered from 0.6
     }
 
     if (status === "exam") {
       restAudioRef.current.pause();
+      // If there's a listening track, we duck the background volume even further
+      if (currentQuestion?.refAudio) {
+        backgroundAudioRef.current.volume = 0.03;
+      } else {
+        backgroundAudioRef.current.volume = 0.1;
+      }
       backgroundAudioRef.current.play().catch(e => console.error("BG Audio fail:", e));
     } else if (status === "rest") {
       backgroundAudioRef.current.pause();
