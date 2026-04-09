@@ -5,6 +5,7 @@ import { userApi } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 import { useUser } from "../hooks/useUser";
+import SEO from "../components/SEO";
 
 const LandingPage = () => {
   const { t } = useTranslation();
@@ -63,6 +64,11 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex items-center justify-center p-4 md:p-6 overflow-hidden relative">
+      <SEO
+        title="Get Started - Join JLPTX"
+        description="Join JLPTX and start practicing for your Japanese Language Proficiency Test. Practice N1, N2, N3, N4, and N5 levels."
+        canonical="/get-started"
+      />
       {/* 1. ANIMATED GRID (Matches Home Page) */}
       <motion.div
         className="fixed inset-0 pointer-events-none z-0"

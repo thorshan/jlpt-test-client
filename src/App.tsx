@@ -3,14 +3,18 @@ import AppRoutes from "./routes/AppRoutes";
 import { UserProvider } from "./providers/UserProvider";
 import { Analytics } from "@vercel/analytics/react";
 
+import { HelmetProvider } from "react-helmet-async";
+
 const App = () => {
   return (
-    <UserProvider>
-      <BrowserRouter>
-        <AppRoutes />
-        <Analytics />
-      </BrowserRouter>
-    </UserProvider>
+    <HelmetProvider>
+      <UserProvider>
+        <BrowserRouter>
+          <AppRoutes />
+          <Analytics />
+        </BrowserRouter>
+      </UserProvider>
+    </HelmetProvider>
   );
 };
 

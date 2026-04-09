@@ -17,6 +17,7 @@ import { useUser } from "../hooks/useUser";
 import { useTranslation } from "../hooks/useTranslation";
 import { examApi, type Exam } from "../api/examApi";
 import { LoadingScreen } from "../components/LoadingScreen";
+import SEO from "../components/SEO";
 
 // Local interfaces removed in favor of shared ones from API layer
 
@@ -79,6 +80,11 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white font-sans overflow-x-hidden selection:bg-sky-500/30 relative">
+      <SEO
+        title="Student Dashboard - JLPTX"
+        description="Access your JLPT mock exams, track your progress, and prepare for your Japanese Language Proficiency Test."
+        canonical="/test"
+      />
       {/* 1. ANIMATED GRID BACKGROUND */}
       <motion.div
         className="fixed inset-0 pointer-events-none z-0"
