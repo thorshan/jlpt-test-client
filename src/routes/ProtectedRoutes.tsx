@@ -20,7 +20,7 @@ export const ProtectedRoutes = ({
     return <Navigate to="/" replace state={{ from: location }} />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && !allowedRoles.includes(user.role as string)) {
     return <Navigate to="/auth" replace />;
   }
 

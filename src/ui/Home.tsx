@@ -19,8 +19,6 @@ import { examApi, type Exam } from "../api/examApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import SEO from "../components/SEO";
 
-// Local interfaces removed in favor of shared ones from API layer
-
 const Home = () => {
   const { user, logout } = useUser();
   const { t } = useTranslation();
@@ -312,7 +310,11 @@ const Home = () => {
                   </div>
 
                   <div className="ml-2 md:ml-4 shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-sky-500/5 border border-sky-500/10 flex items-center justify-center text-sky-500 group-hover:bg-sky-500 group-hover:text-slate-950 group-hover:translate-x-2 transition-all shadow-lg">
-                    <ArrowRight size={18} className="md:size-6" strokeWidth={3} />
+                    <ArrowRight
+                      size={18}
+                      className="md:size-6"
+                      strokeWidth={3}
+                    />
                   </div>
                 </motion.div>
               ))

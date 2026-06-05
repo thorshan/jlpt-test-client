@@ -4,15 +4,19 @@ export interface User {
   _id: string;
   name: string;
   level?: string;
-  role: string;
-  token: string;
+  role?: string;
+  token?: string;
+  email?: string;
+  password?: string;
 }
 
 export interface UserForm {
   name?: string;
   level?: string;
   role?: string;
-  token: string;
+  token?: string;
+  email?: string;
+  password?: string;
 }
 
 export interface ApiResponse<T> {
@@ -24,8 +28,11 @@ export interface ApiResponse<T> {
 export type UserFormData = Omit<User, "_id">;
 
 export const userApi = {
-  createUser: (name: string, token: string) =>
-    apiClient.post<ApiResponse<User>>("/users", { name, token }),
+  createGuest: (data: UserForm) =>
+    apiClient.post<ApiResponse<UserForm>>("/users/guest", data),
+
+  createUser: (data: UserForm) =>
+    apiClient.post<ApiResponse<UserForm>>("/users", data),
 
   updateUser: (id: string, level: string) =>
     apiClient.put<ApiResponse<User>>(`/users/${id}`, { level }),
@@ -42,4 +49,7 @@ export const userApi = {
 
   login: (data: UserForm) =>
     apiClient.post<ApiResponse<User>>("/users/auth", data),
+
+  loginCollab: (data: UserForm) =>
+    apiClient.post<ApiResponse<User>>("/users/auth/collabs", data),
 };

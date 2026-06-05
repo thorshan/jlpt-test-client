@@ -5,16 +5,16 @@ import type { LanguageCode } from "../constant/translations";
 import { useTranslation } from "../hooks/useTranslation";
 
 const LANGUAGES: { code: LanguageCode; label: string }[] = [
-  { code: "ja", label: "日本語" },
   { code: "en", label: "English" },
   { code: "my", label: "မြန်မာဘာသာ" },
-  { code: "ko", label: "한국어" },
-  { code: "zh", label: "中文" },
-  { code: "ne", label: "नेपाली" },
-  { code: "vi", label: "Việt Nam" },
-  { code: "ru", label: "Русский" },
-  { code: "id", label: "Indonesia" },
-  { code: "ph", label: "Tagalog" },
+  // { code: "ja", label: "日本語" },
+  // { code: "ko", label: "한국어" },
+  // { code: "zh", label: "中文" },
+  // { code: "ne", label: "नेपाली" },
+  // { code: "vi", label: "Việt Nam" },
+  // { code: "ru", label: "Русский" },
+  // { code: "id", label: "Indonesia" },
+  // { code: "ph", label: "Tagalog" },
 ];
 
 export const LangToggler = () => {

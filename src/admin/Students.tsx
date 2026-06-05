@@ -2,17 +2,17 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
-  ShieldCheck,
   Trash2,
   User as UserIcon,
-  AlertTriangle,
   CheckCircle2,
   Info,
-  User,
+  AlertTriangle,
 } from "lucide-react";
 import { userApi } from "../api/userApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import axios from "axios";
+import { useUser } from "../hooks/useUser";
+import { collabsApi, type Collabs } from "../api/collabsApi";
 
 // --- INTERFACES ---
 interface UserData {
@@ -23,6 +23,8 @@ interface UserData {
   email?: string;
   level?: string;
   role?: string;
+  expireAt?: Date;
+  createdAt?: string;
 }
 
 interface ValidationError {
@@ -36,19 +38,16 @@ interface Toast {
   type: "success" | "error" | "info";
 }
 
-const Users = () => {
+const Students = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [toasts, setToasts] = useState<Toast[]>([]);
-
-  // Modal State
-  const [modal, setModal] = useState<{
-    isOpen: boolean;
-    type: "role" | "delete" | null;
-    user: UserData | null;
-  }>({ isOpen: false, type: null, user: null });
+  const [isOpenInfo, setIsOpenInfo] = useState(false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -82,32 +81,71 @@ const Users = () => {
     }, 3000);
   };
 
-  const handleConfirmAction = async () => {
-    if (!modal.user || !modal.type) return;
-    const { _id, name } = modal.user;
-    setIsProcessing(true);
-    try {
-      if (modal.type === "role") {
-        await userApi.updateRole(_id);
-        showToast(`${name}'s permissions updated`, "success");
-        fetchUsers();
-      } else {
-        await userApi.clearUser(_id);
-        setUsers((prev) => prev.filter((u) => u._id !== _id));
-        showToast(`${name} purged from database`, "info");
-      }
-    } catch (err) {
-      handleApiError(err);
-      showToast("Protocol execution failed", "error");
-    } finally {
-      setIsProcessing(false);
-      setModal({ isOpen: false, type: null, user: null });
-    }
+  const { user } = useUser();
+  const [collabs, setCollabs] = useState<Collabs[]>([]);
+  const isS_Admin = user?.role === "s-admin";
+
+  const fetchCollabs = async () => {
+    const collabs = await collabsApi.getAllCollabs();
+    setCollabs(collabs.data.data);
   };
 
-  const filteredUsers = users.filter((u) =>
-    u.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  useEffect(() => {
+    fetchCollabs();
+  }, []);
+
+  const collabsByIncharge = collabs.filter(
+    (c) => c.incharge?._id === user?._id,
   );
+
+  const collabsData = collabsByIncharge.flatMap((c) => c.students);
+  const filterStudents = collabsData.filter((c) => c?.role === "user");
+  const filterAccess = isS_Admin
+    ? users.filter((u) => u.role === "user")
+    : filterStudents;
+
+  const filteredUsers = filterAccess.filter((u) => {
+    return (
+      u?._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u?._id?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  const getStudentAssociation = (studentId: string) => {
+    const parentCollab = collabs.find((c) =>
+      c?.students?.some((s) => s._id === studentId),
+    );
+
+    return parentCollab?.name;
+  };
+
+  // Modal Ops
+  const openInfoModal = (data: UserData) => {
+    setIsOpenInfo(true);
+    setUserData(data);
+  };
+
+  const openDeleteModal = (id: string) => {
+    setIsOpenDelete(true);
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId) {
+      setIsProcessing(true);
+      try {
+        await userApi.clearUser(deleteId);
+        setUsers((prev) => prev.filter((u) => u._id !== deleteId));
+      } catch (error) {
+        console.error("Delete Error:", error);
+      } finally {
+        setIsOpenDelete(false);
+        setIsProcessing(false);
+      }
+    }
+  };
 
   if (loading) return <LoadingScreen />;
 
@@ -127,11 +165,11 @@ const Users = () => {
             animate={{ opacity: 1, x: 0 }}
           >
             <h1 className="text-4xl font-black tracking-tighter italic text-white flex items-center gap-3 uppercase">
-              <User className="text-sky-500" size={32} />
-              Users
+              <UserIcon className="text-sky-500" size={32} />
+              Students
             </h1>
             <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1 italic">
-              User Management
+              Student Management
             </p>
           </motion.div>
 
@@ -162,13 +200,16 @@ const Users = () => {
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.01]">
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                    Identity
+                    Info
                   </th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                    Token
+                    ID
                   </th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                    Protocol
+                    Email
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                    Level
                   </th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">
                     Ops
@@ -179,7 +220,7 @@ const Users = () => {
                 <AnimatePresence mode="popLayout">
                   {filteredUsers.map((user) => (
                     <motion.tr
-                      key={user._id}
+                      key={user?._id}
                       layout
                       className="hover:bg-sky-500/[0.03] transition-colors group"
                     >
@@ -190,48 +231,39 @@ const Users = () => {
                           </div>
                           <div>
                             <p className="font-black text-xs uppercase italic">
-                              {user.name}
+                              {user?.name}
                             </p>
                             <p className="text-[9px] text-slate-600 font-mono italic uppercase tracking-tighter">
-                              ID: {user._id.slice(-6)}
+                              ID: {user?._id.slice(-10)}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-5">
-                        <code className="text-[10px] font-mono text-sky-400 bg-sky-500/5 px-2 py-1 rounded-lg border border-sky-500/10">
-                          {user.password}
+                        <code className="text-xs font-mono text-sky-500">
+                          {user?._id.slice(-10)}
                         </code>
                       </td>
                       <td className="px-8 py-5">
-                        <span
-                          className={`text-[9px] font-black uppercase px-3 py-1 rounded-full border transition-all ${
-                            user.role === "s-admin"
-                              ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
-                              : user.role === "admin"
-                                ? "bg-sky-500 text-slate-950 border-sky-400 shadow-[0_0_10px_rgba(14,165,233,0.2)]"
-                                : "bg-white/5 border-white/10 text-slate-500"
-                          }`}
-                        >
-                          {user.role}
-                        </span>
+                        <code className="text-xs font-mono">{user?.email}</code>
+                      </td>
+                      <td className="px-8 py-5">
+                        <code className="text-[10px] font-mono text-white bg-sky-500/5 px-2 py-1 rounded-lg border border-sky-500/10">
+                          {user?.level}
+                        </code>
                       </td>
                       <td className="px-8 py-5 text-right">
                         <div className="flex justify-end gap-1">
                           <button
                             disabled={isProcessing}
-                            onClick={() =>
-                              setModal({ isOpen: true, type: "role", user })
-                            }
+                            onClick={() => openInfoModal(user!)}
                             className="p-2 rounded-xl text-slate-500 hover:text-sky-400 hover:bg-sky-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                           >
-                            <ShieldCheck size={18} />
+                            <Info size={18} />
                           </button>
                           <button
                             disabled={isProcessing}
-                            onClick={() =>
-                              setModal({ isOpen: true, type: "delete", user })
-                            }
+                            onClick={() => openDeleteModal(user?._id as string)}
                             className="p-2 rounded-xl text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Trash2 size={18} />
@@ -279,13 +311,12 @@ const Users = () => {
 
       {/* --- MODAL SYSTEM --- */}
       <AnimatePresence>
-        {modal.isOpen && (
+        {isOpenInfo && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setModal({ ...modal, isOpen: false })}
               className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
             />
 
@@ -293,49 +324,108 @@ const Users = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative bg-[#0f172a] border border-white/10 p-10 rounded-[3rem] max-w-sm w-full shadow-3xl text-center"
+              className="relative bg-[#0f172a] border border-white/10 p-10 rounded-[3rem] max-w-lg w-full shadow-3xl text-center"
             >
-              <div
-                className={`w-20 h-20 rounded-[2rem] flex items-center justify-center mx-auto mb-8 border-2 ${
-                  modal.type === "delete"
-                    ? "bg-red-500/10 border-red-500/20 text-red-500"
-                    : "bg-sky-500/10 border-sky-500/20 text-sky-500"
-                }`}
-              >
-                {modal.type === "delete" ? (
-                  <AlertTriangle size={40} />
-                ) : (
-                  <ShieldCheck size={40} />
-                )}
+              <div className="w-full flex flex-col items-center gap-3 mb-5">
+                <h1 className="text-3xl font-black mb-5">
+                  Student Informations
+                </h1>
+                <div className="w-full flex justify-between items-center border border-sky-900 rounded-2xl p-3">
+                  <span className="text-md font-black text-sky-500">Name</span>
+                  <span className="text-md text-white">{userData?.name}</span>
+                </div>
+                <div className="w-full flex justify-between items-center border border-sky-900 rounded-2xl p-3">
+                  <span className="text-md font-black text-sky-500">Email</span>
+                  <span className="text-md text-white">{userData?.email}</span>
+                </div>
+                <div className="w-full flex justify-between items-center border border-sky-900 rounded-2xl p-3">
+                  <span className="text-md font-black text-sky-500">Level</span>
+                  <span className="text-md text-white">{userData?.level}</span>
+                </div>
+                <div className="w-full flex justify-between items-center border border-sky-900 rounded-2xl p-3">
+                  <span className="text-md font-black text-sky-500">
+                    Valid Until
+                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-md text-white">
+                      {typeof userData?.expireAt === "string"
+                        ? new Date(userData?.expireAt).toLocaleDateString()
+                        : ""}
+                    </span>
+                    <span className="text-[9px] text-sky-500 text-end italic">
+                      1 Year
+                    </span>
+                  </div>
+                </div>
+                <div className="w-full flex justify-between items-center border border-sky-900 rounded-2xl p-3">
+                  <span className="text-md font-black text-sky-500 whitespace-nowrap">
+                    Associated with
+                  </span>
+                  {/* Added 'text-right' to align nicely if it wraps, and fixed the class name */}
+                  <div className="text-md text-white break-words whitespace-normal max-w-[50%] text-right">
+                    {getStudentAssociation(userData?._id as string)}
+                  </div>
+                </div>
               </div>
 
-              <h3 className="text-2xl font-black italic uppercase mb-2 tracking-tighter">
-                {modal.type === "delete" ? "Purge User?" : "Update Role?"}
-              </h3>
-              <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-10 leading-relaxed">
-                Confirm action for{" "}
-                <span className="text-white italic">{modal.user?.name}</span>
-              </p>
+              <button
+                disabled={isProcessing}
+                onClick={() => {
+                  setIsOpenInfo(false);
+                  setUserData(null);
+                }}
+                className="w-full py-3 bg-white/5 hover:bg-white/10 text-white font-black rounded-2xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Dismiss
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
-              <div className="flex flex-col gap-3">
-                <button
-                  disabled={isProcessing}
-                  onClick={handleConfirmAction}
-                  className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    modal.type === "delete"
-                      ? "bg-red-500 text-slate-950"
-                      : "bg-sky-500 text-slate-950"
-                  }`}
-                >
-                  {isProcessing ? "Processing..." : "Execute Protocol"}
-                </button>
-                <button
-                  disabled={isProcessing}
-                  onClick={() => setModal({ ...modal, isOpen: false })}
-                  className="w-full py-5 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Abort
-                </button>
+      <AnimatePresence>
+        {isOpenDelete && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpenDelete(false)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-[#0f172a] border border-white/10 p-8 rounded-[2.5rem] max-w-sm w-full shadow-2xl overflow-hidden"
+            >
+              <div className="relative z-10 text-center">
+                <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
+                  <AlertTriangle size={32} />
+                </div>
+                <h3 className="text-xl font-black italic uppercase mb-2">
+                  Confirm Delete
+                </h3>
+                <p className="text-slate-400 text-xs font-medium leading-relaxed mb-8 px-4">
+                  Are you sure you want to delete this user? This action can not
+                  be undo.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <button
+                    disabled={isProcessing}
+                    onClick={confirmDelete}
+                    className="w-full py-4 bg-red-500 hover:bg-red-600 text-slate-950 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all shadow-lg shadow-red-500/20 disabled:opacity-50"
+                  >
+                    {isProcessing ? "Processing" : "Confirm Deletion"}
+                  </button>
+                  <button
+                    disabled={isProcessing}
+                    onClick={() => setIsOpenDelete(false)}
+                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -350,4 +440,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Students;

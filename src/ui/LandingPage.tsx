@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, ArrowRight, ShieldCheck } from "lucide-react";
 import { userApi } from "../api/userApi";
@@ -6,11 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 import { useUser } from "../hooks/useUser";
 import SEO from "../components/SEO";
+import { collabsApi, type Collabs } from "../api/collabsApi";
 
 const LandingPage = () => {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [generatedToken, setGeneratedToken] = useState("");
   const [inputToken, setInputToken] = useState("");
   const [copied, setCopied] = useState(false);
@@ -18,6 +20,46 @@ const LandingPage = () => {
 
   const { login, user, updateUser } = useUser();
   const navigate = useNavigate();
+
+  const [query, setQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [filteredOptions, setFilteredOptions] = useState<Collabs[]>([]);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [options, setOptions] = useState<Collabs[]>([]);
+  const [optionId, setOptionId] = useState("");
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const res = await collabsApi.getAllCollabs();
+      setOptions(res.data.data);
+    };
+    fetchOptions();
+  }, []);
+
+  // Filter options when query changes
+  useEffect(() => {
+    const filtered = options.filter((option) =>
+      option.name.toLowerCase().includes(query.toLowerCase()),
+    );
+    setFilteredOptions(filtered);
+    setIsOpen(query.length > 0 && filtered.length > 0);
+  }, [query, options]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        event.target instanceof Node &&
+        !wrapperRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [wrapperRef]);
 
   const generateToken = () => {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -34,8 +76,13 @@ const LandingPage = () => {
     if (!name || !generatedToken) return;
     setIsProcessing(true);
     try {
-      const res = await userApi.createUser(name, generatedToken);
-      login(res.data.data);
+      const data = {
+        name,
+        email,
+        token: generatedToken,
+      };
+      await userApi.createGuest(data);
+      await login({ email, token: generatedToken });
       setStep(2);
     } catch (err) {
       console.error(err);
@@ -54,11 +101,33 @@ const LandingPage = () => {
     try {
       await userApi.updateUser(user!._id!, lvl);
       updateUser({ level: lvl });
-      navigate("/test");
+      setStep(4);
     } catch (err) {
       console.error(err);
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const takeoff = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!optionId && user) {
+      console.warn("No option selected");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      if (user) {
+        await collabsApi.addUserToCollab(optionId, user._id);
+        console.log("Success");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+    } finally {
+      setIsProcessing(false);
+      navigate("/test");
     }
   };
 
@@ -132,10 +201,19 @@ const LandingPage = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <input
-                    placeholder={t("name_placeholder")}
+                    placeholder={t("name_label")}
                     className="mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2 mb-5">
+                  <input
+                    placeholder={t("email")}
+                    className="mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
@@ -177,7 +255,13 @@ const LandingPage = () => {
                       onClick={handleCreateUser}
                       className="w-full py-5 bg-sky-600 font-black rounded-2xl flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(14,165,233,0.3)] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isProcessing ? "Processing..." : <>{t("proceed")} <ArrowRight size={20} /></>}
+                      {isProcessing ? (
+                        "Processing..."
+                      ) : (
+                        <>
+                          {t("proceed")} <ArrowRight size={20} />
+                        </>
+                      )}
                     </button>
                   </motion.div>
                 )}
@@ -258,6 +342,78 @@ const LandingPage = () => {
                     </span>
                   </button>
                 ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* STEP 4: CHECK MENTOR */}
+          {step === 4 && (
+            <motion.div
+              key="s3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col"
+            >
+              <form onSubmit={takeoff}>
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl md:text-3xl font-black mb-2 leading-[1.6]">
+                    {t("association_ask")}
+                  </h2>
+                  <p className="text-sky-500/60 text-sm leading-[1.6]">
+                    {t("association_ask_desc")}
+                  </p>
+                </div>
+
+                <div className="relative" ref={wrapperRef}>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Search..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => query && setIsOpen(true)}
+                  />
+
+                  {isOpen && (
+                    <ul className="absolute z-10 w-full mt-1 bg-sky-950 border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                      {filteredOptions.map((option, index) => (
+                        <li
+                          key={index}
+                          className="px-4 py-2 cursor-pointer hover:bg-sky-800"
+                          onClick={() => {
+                            setQuery(option.name);
+                            setOptionId(option._id);
+                            setIsOpen(false);
+                          }}
+                        >
+                          {option.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <button
+                  disabled={isProcessing}
+                  type="submit"
+                  className="w-full my-5 py-5 bg-slate-800 font-black rounded-2xl flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(0,0,0,0.3)] active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? "Processing..." : <>{t("proceed")}</>}
+                </button>
+              </form>
+              <div className="w-full flex flex-col my-5 gap-5 justify-center items-center">
+                <>
+                  <span className="text-sky-500 font-black">OR</span>
+                </>
+                <>
+                  <button
+                    disabled={isProcessing}
+                    onClick={() => navigate("/test")}
+                    className="cursor-pointer hover:text-sky-500 transition-colors"
+                  >
+                    {t("no_association")}
+                  </button>
+                </>
               </div>
             </motion.div>
           )}

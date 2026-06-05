@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Lock, User, ChevronRight, Zap } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 import axios from "axios";
+import { useTranslation } from "../hooks/useTranslation";
 
 interface ValidationError {
   message: string;
@@ -11,12 +12,13 @@ interface ValidationError {
 }
 
 const Login = () => {
-  const [name, setName] = useState("");
-  const [token, setToken] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { login } = useUser();
+  const { loginCollabs } = useUser();
+  const { t } = useTranslation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,9 +26,15 @@ const Login = () => {
     setError("");
 
     try {
-      await login({ name, token });
-
-      navigate("/admin");
+      const user = await loginCollabs({ email, password });
+      const isAdmin = ["admin", "s-admin"].some((role) =>
+        user.data?.role?.includes(role),
+      );
+      if (isAdmin) {
+        navigate("/admin");
+      } else {
+        navigate("/test");
+      }
     } catch (error) {
       if (axios.isAxiosError<ValidationError>(error)) {
         console.error("API Error:", error.response);
@@ -56,7 +64,7 @@ const Login = () => {
               <Zap size={28} className="animate-pulse" />
             </div>
             <h1 className="text-3xl font-black italic uppercase tracking-tighter">
-              Terminal <span className="text-sky-500">Access</span>
+              User <span className="text-sky-500">Access</span>
             </h1>
           </div>
 
@@ -64,7 +72,7 @@ const Login = () => {
             {/* Name Field */}
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">
-                Identifier (Name)
+                {t("email")}
               </label>
               <div className="relative group">
                 <User
@@ -73,10 +81,9 @@ const Login = () => {
                 />
                 <input
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:bg-white/10 transition-all"
-                  placeholder="Your Name ..."
                 />
               </div>
             </div>
@@ -84,7 +91,7 @@ const Login = () => {
             {/* Token Field */}
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">
-                Access Key
+                {t("password")}
               </label>
               <div className="relative group">
                 <Lock
@@ -92,12 +99,11 @@ const Login = () => {
                   size={18}
                 />
                 <input
-                  type="Access Token"
                   required
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 focus:bg-white/10 transition-all"
-                  placeholder="••••••••"
+                  placeholder="******"
                 />
               </div>
             </div>
@@ -116,7 +122,7 @@ const Login = () => {
               disabled={loading}
               className="w-full py-4 bg-sky-500 text-slate-950 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-white transition-all active:scale-95 shadow-lg shadow-sky-500/20"
             >
-              {loading ? "Decrypting..." : "Login"} <ChevronRight size={16} />
+              {loading ? "Processing..." : "Login"} <ChevronRight size={16} />
             </button>
           </form>
         </div>

@@ -14,6 +14,8 @@ import {
   Activity,
   BarChart3,
   Megaphone,
+  BriefcaseBusiness,
+  UserStarIcon,
 } from "lucide-react";
 
 import { useUser } from "../hooks/useUser";
@@ -42,6 +44,18 @@ const DashboardLayout = () => {
       name: "Users",
       path: "/admin/users",
       icon: <UserIcon size={18} />,
+      visible: isSuperAdmin ? true : false,
+    },
+    {
+      name: "Students",
+      path: "/admin/students",
+      icon: <UserStarIcon size={18} />,
+      visible: true,
+    },
+    {
+      name: "Collabs",
+      path: "/admin/collabs",
+      icon: <BriefcaseBusiness size={18} />,
       visible: isSuperAdmin ? true : false,
     },
     {
@@ -92,9 +106,7 @@ const DashboardLayout = () => {
       icon: <Megaphone size={18} />,
       visible: isSuperAdmin ? true : false,
     },
-
   ];
-
 
   return (
     <div className="flex h-screen bg-[#020617] text-slate-200 font-sans overflow-hidden">
@@ -167,10 +179,11 @@ const DashboardLayout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`relative group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${isActive
+                  className={`relative group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
+                    isActive
                       ? "bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-[inset_0_0_20px_rgba(14,165,233,0.05)]"
                       : "hover:bg-white/5 text-slate-500 hover:text-slate-200 border border-transparent"
-                    }`}
+                  }`}
                 >
                   {isActive && (
                     <motion.div
@@ -183,9 +196,7 @@ const DashboardLayout = () => {
                   >
                     {item.icon}
                   </span>
-                  <span className="text-[11px] font-black uppercase tracking-widest italic">
-                    {item.name}
-                  </span>
+                  <span className="text-[16px]">{item.name}</span>
                 </Link>
               );
             })}

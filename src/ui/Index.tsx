@@ -6,7 +6,14 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Zap, Globe, Lock, UserStar, ExternalLink } from "lucide-react";
+import {
+  Zap,
+  Globe,
+  Lock,
+  UserStar,
+  ExternalLink,
+  BriefcaseBusiness,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LangToggler } from "../components/LangToggler";
 import { useTranslation } from "../hooks/useTranslation";
@@ -116,6 +123,20 @@ const Index = () => {
               <LangToggler />
             </div>
           </motion.div>
+
+          <motion.button
+            whileHover={{
+              scale: 1.02,
+              backgroundColor: "rgba(255,255,255,0.08)",
+            }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-sky-500/10 text-white px-4 py-2.5 md:px-6 md:py-2 rounded-2xl font-bold text-sm md:text-base shadow-2xl hover:border-sky-400/40 transition-all"
+            onClick={() => navigate("/collabs")}
+          >
+            <span className="bg-sky-500/20 text-sky-400 p-1 rounded-lg">
+              <BriefcaseBusiness size={18} />
+            </span>
+          </motion.button>
 
           <motion.button
             whileHover={{

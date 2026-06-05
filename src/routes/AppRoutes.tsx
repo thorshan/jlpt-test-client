@@ -12,7 +12,6 @@ import Logs from "../admin/Logs";
 import AdsInsights from "../admin/AdsInsights";
 import Ads from "../admin/Ads";
 
-
 // UI Imports
 import Index from "../ui/Index";
 import Home from "../ui/Home";
@@ -28,6 +27,10 @@ import Login from "../ui/Login";
 import AdminResults from "../admin/Results";
 import ResultDetail from "../admin/ResultDetail";
 import Redirect from "../ui/Redirect";
+import CollaborationClient from "../ui/Collaboration";
+import Collaboration from "../admin/Collaboration";
+import CollabLanding from "../ui/CollabLanding";
+import Students from "../admin/Students";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
@@ -44,6 +47,8 @@ const AppRoutes = () => {
         element={user ? <Navigate to="/test" replace /> : <Index />}
       />
       <Route path="/get-started" element={<LandingPage />} />
+      <Route path="/collabs" element={<CollabLanding />} />
+      <Route path="/collabs/get-started" element={<CollaborationClient />} />
       <Route path="/manual" element={<UserManual />} />
       <Route path="/results" element={<Results />} />
       <Route path="/auth" element={<Login />} />
@@ -85,6 +90,22 @@ const AppRoutes = () => {
           }
         />
         <Route
+          path="students"
+          element={
+            <ProtectedRoutes allowedRoles={["s-admin", "admin"]}>
+              <Students />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="collabs"
+          element={
+            <ProtectedRoutes allowedRoles={["s-admin"]}>
+              <Collaboration />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
           path="requests"
           element={
             <ProtectedRoutes allowedRoles={["s-admin"]}>
@@ -117,7 +138,6 @@ const AppRoutes = () => {
           }
         />
         <Route path="results">
-
           <Route index element={<AdminResults />} />
           <Route path=":id" element={<ResultDetail />} />
         </Route>

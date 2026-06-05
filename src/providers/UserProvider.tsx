@@ -6,7 +6,7 @@ import { UserContext } from "../context/UserContext";
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
     try {
-      const saved = localStorage.getItem("jlpt_user");
+      const saved = localStorage.getItem("user");
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -17,7 +17,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem("jlpt_user");
+    localStorage.removeItem("user");
     localStorage.removeItem("token");
   }, []);
 
@@ -37,7 +37,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           const freshUser = res.data.data;
 
           setUser(freshUser);
-          localStorage.setItem("jlpt_user", JSON.stringify(freshUser));
+          localStorage.setItem("user", JSON.stringify(freshUser));
         } catch (error) {
           if (
             axios.isAxiosError(error) &&
@@ -62,7 +62,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const sessionJwt = res.data.token;
 
       setUser(userData);
-      localStorage.setItem("jlpt_user", JSON.stringify(userData));
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", sessionJwt);
+
+      return res.data;
+    } catch (err) {
+      console.error("Login failed:", err);
+      throw err;
+    }
+  };
+
+  const loginCollabs = async (formData: UserForm) => {
+    try {
+      const res = await userApi.loginCollab(formData);
+      const userData = res.data.data;
+      const sessionJwt = res.data.token;
+
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("token", sessionJwt);
 
       return res.data;
@@ -76,14 +93,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setUser((prev) => {
       if (!prev) return null;
       const newData = { ...prev, ...updates };
-      localStorage.setItem("jlpt_user", JSON.stringify(newData));
+      localStorage.setItem("user", JSON.stringify(newData));
       return newData;
     });
   };
 
   return (
     <UserContext.Provider
-      value={{ user, isVerifying, login, logout, updateUser }}
+      value={{ user, isVerifying, login, logout, updateUser, loginCollabs }}
     >
       {children}
     </UserContext.Provider>

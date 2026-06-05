@@ -5,6 +5,7 @@ interface UserContextType {
   user: User | null;
   isVerifying: boolean;
   login: (data: UserForm) => Promise<ApiResponse<User>>;
+  loginCollabs: (data: UserForm) => Promise<ApiResponse<User>>;
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
 }

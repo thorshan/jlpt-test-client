@@ -1,4 +1,10 @@
-import { useEffect, useState, useMemo, useCallback, type FormEvent } from "react";
+import {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  type FormEvent,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlusCircle,
@@ -589,29 +595,34 @@ const Exams = () => {
                         </h3>
                       </div>
                       <p className="text-[10px] text-slate-500 mt-2 font-black uppercase tracking-wider italic flex items-center gap-2">
-                        <span>{exam.sections.length} Modules • {exam.passingScore}% • {exam.category}</span>
+                        <span>
+                          {exam.sections.length} Modules • {exam.passingScore}%
+                          • {exam.category}
+                        </span>
                         <span className="text-sky-500/30">|</span>
                         <span className="text-sky-500 flex items-center gap-1">
                           <Database size={10} />
                           {(() => {
-                            const totalPoints = exam.sections.reduce((acc, s) => {
-                              const sectionObj = typeof s === 'string' 
-                                ? availableSections.find(as => as._id === s)
-                                : s;
-                              if (!sectionObj) return acc;
-                              
-                              // Check if questions are populated or need lookup
-                              const sectionPoints = sectionObj.questions.reduce((qAcc, q) => {
-                                // In availableSections, questions might be populated or just IDs
-                                // Actually, availableSections comes from sectionApi.getSections(true)
-                                // Let's check how Question objects are retrieved in Exams.tsx
-                                // If they aren't populated here, this might be tricky.
-                                // But sectionApi.getSections(true) usually populates them if the backend supports it.
-                                return qAcc + (typeof q === 'object' ? (q as any).point || 0 : 0);
-                              }, 0);
-                              
-                              return acc + sectionPoints;
-                            }, 0);
+                            const totalPoints = exam.sections.reduce(
+                              (acc, s) => {
+                                const sectionObj =
+                                  typeof s === "string"
+                                    ? availableSections.find(
+                                        (as) => as._id === s,
+                                      )
+                                    : s;
+                                if (!sectionObj) return acc;
+
+                                const sectionPoints =
+                                  sectionObj.questions.reduce((qAcc, q) => {
+                                    const question = q as { point?: number };
+                                    return qAcc + (question.point || 0);
+                                  }, 0);
+
+                                return acc + sectionPoints;
+                              },
+                              0,
+                            );
                             return `${totalPoints} PTS`;
                           })()}
                         </span>
