@@ -12,7 +12,11 @@ import {
   Loader2,
 } from "lucide-react";
 import { examApi, type Exam, type Section } from "../api/examApi";
-import { resultApi, type ResultFormData, type SectionDetail } from "../api/resultApi";
+import {
+  resultApi,
+  type ResultFormData,
+  type SectionDetail,
+} from "../api/resultApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import { type Question } from "../api/questionApi";
 import { useUser } from "../hooks/useUser";
@@ -21,38 +25,61 @@ import { useTranslation } from "../hooks/useTranslation";
 // Local interfaces removed in favor of shared ones from API layer
 
 const toFullWidth = (num: number) => {
-  return num.toString().replace(/[0-9]/g, (s) => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
+  return num
+    .toString()
+    .replace(/[0-9]/g, (s) => String.fromCharCode(s.charCodeAt(0) + 0xfee0));
 };
 
 const title = {
   moji_goi: {
-    kanji_reading: "＿＿＿＿＿　の　ことばは　どう　よみますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    orthography: "＿＿＿＿＿　の　ことばは　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    word_formation: "＿＿＿＿＿  に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    contextually_defined_expression: "＿＿＿＿＿  に　なにが　はいりますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    paraphrases: "＿＿＿＿＿　の　ぷんと　だいたい　おなじ　いみの　ぷんが　あります。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    usage: "つぎの　ことばの　つかいかたで　いちばん　いいものを\n１・２・３・４　から　ひとつ　えらんでください。",
+    kanji_reading:
+      "＿＿＿＿＿　の　ことばは　どう　よみますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    orthography:
+      "＿＿＿＿＿　の　ことばは　どう　かきますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    word_formation:
+      "＿＿＿＿＿  に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    contextually_defined_expression:
+      "＿＿＿＿＿  に　なにが　はいりますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    paraphrases:
+      "＿＿＿＿＿　の　ぷんと　だいたい　おなじ　いみの　ぷんが　あります。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    usage:
+      "つぎの　ことばの　つかいかたで　いちばん　いいものを\n１・２・３・４　から　ひとつ　えらんでください。",
   },
   grammar: {
-    selecting_grammar_form: "＿＿＿＿＿　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    sentence_composition: "＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    text_grammar: "（　番　）から（　番　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    selecting_grammar_form:
+      "＿＿＿＿＿　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    sentence_composition:
+      "＿＿★＿＿　に　いれる　ものは　どれ　ですか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    text_grammar:
+      "（　番　）から（　番　）　に　なにを　いれますか。\n１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   reading: {
-    short_passage: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    mid_passage: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    long_passage: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    information_retrieval: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    thematic_comprehension: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
-    integrated_reading_comprehension: "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    short_passage:
+      "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    mid_passage:
+      "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    long_passage:
+      "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    information_retrieval:
+      "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    thematic_comprehension:
+      "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
+    integrated_reading_comprehension:
+      "つぎの　ぶんを　読んで　しつもんに　こたえてください。\nこたえは　１・２・３・４　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
   listening: {
-    task_based_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    keypoints_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    general_outline_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    verbal_expression: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    quick_response: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
-    integrated_listening_comprehension: "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    task_based_comprehension:
+      "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    keypoints_comprehension:
+      "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    general_outline_comprehension:
+      "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    verbal_expression:
+      "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    quick_response:
+      "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
+    integrated_listening_comprehension:
+      "はじめに　しつもんを　きいて　ください。\nそれから　はなしを　きいて　もんだいようしの　１　から　４の　なか　から　いちばん　いいものを　ひとつ　えらんでください。",
   },
 };
 
@@ -87,9 +114,9 @@ const ExamScreen = () => {
   const jlptModuleConfig: Record<string, Record<string, number>> = {
     N5: {
       "Kanji Reading": 1,
-      "Orthography": 2,
+      Orthography: 2,
       "Contextually Defined Expression": 3,
-      "Paraphrases": 4,
+      Paraphrases: 4,
       "Selecting Grammar Form": 1,
       "Sentence Composition": 2,
       "Text Grammar": 3,
@@ -103,10 +130,10 @@ const ExamScreen = () => {
     },
     N4: {
       "Kanji Reading": 1,
-      "Orthography": 2,
+      Orthography: 2,
       "Contextually Defined Expression": 3,
-      "Paraphrases": 4,
-      "Usage": 5,
+      Paraphrases: 4,
+      Usage: 5,
       "Selecting Grammar Form": 1,
       "Sentence Composition": 2,
       "Text Grammar": 3,
@@ -120,10 +147,10 @@ const ExamScreen = () => {
     },
     N3: {
       "Kanji Reading": 1,
-      "Orthography": 2,
+      Orthography: 2,
       "Contextually Defined Expression": 3,
-      "Paraphrases": 4,
-      "Usage": 5,
+      Paraphrases: 4,
+      Usage: 5,
       "Selecting Grammar Form": 1,
       "Sentence Composition": 2,
       "Text Grammar": 3,
@@ -139,11 +166,11 @@ const ExamScreen = () => {
     },
     N2: {
       "Kanji Reading": 1,
-      "Orthography": 2,
+      Orthography: 2,
       "Word Formation": 3,
       "Contextually Defined Expression": 4,
-      "Paraphrases": 5,
-      "Usage": 6,
+      Paraphrases: 5,
+      Usage: 6,
       "Selecting Grammar Form": 7,
       "Sentence Composition": 8,
       "Text Grammar": 9,
@@ -161,8 +188,8 @@ const ExamScreen = () => {
     N1: {
       "Kanji Reading": 1,
       "Contextually Defined Expression": 2,
-      "Paraphrases": 3,
-      "Usage": 4,
+      Paraphrases: 3,
+      Usage: 4,
       "Selecting Grammar Form": 5,
       "Sentence Composition": 6,
       "Text Grammar": 7,
@@ -177,7 +204,7 @@ const ExamScreen = () => {
       "General Outline Comprehension": 3,
       "Quick Response": 4,
       "Integrated Listening Comprehension": 5,
-    }
+    },
   };
 
   const getModuleNumber = (level: string, mod: string) => {
@@ -196,7 +223,12 @@ const ExamScreen = () => {
           if (data.sections) {
             const getCategoryPriority = (cat: string) => {
               const norm = cat.toLowerCase();
-              if (norm.includes("moji_goi") || norm.includes("vocab") || norm.includes("kanji")) return 1;
+              if (
+                norm.includes("moji_goi") ||
+                norm.includes("vocab") ||
+                norm.includes("kanji")
+              )
+                return 1;
               if (norm.includes("grammar")) return 2;
               if (norm.includes("reading")) return 3;
               if (norm.includes("listening")) return 4;
@@ -209,7 +241,10 @@ const ExamScreen = () => {
                   const pA = getCategoryPriority(a.category);
                   const pB = getCategoryPriority(b.category);
                   if (pA !== pB) return pA - pB;
-                  return getModuleNumber(data.level || "N5", a.module) - getModuleNumber(data.level || "N5", b.module);
+                  return (
+                    getModuleNumber(data.level || "N5", a.module) -
+                    getModuleNumber(data.level || "N5", b.module)
+                  );
                 });
               }
             });
@@ -277,7 +312,12 @@ const ExamScreen = () => {
       window.clearTimeout(playTimeout);
       if (audioRef.current) audioRef.current.pause();
     };
-  }, [currentQuestionIdx, currentSectionIdx, status, currentQuestion?.refAudio]);
+  }, [
+    currentQuestionIdx,
+    currentSectionIdx,
+    status,
+    currentQuestion?.refAudio,
+  ]);
 
   // --- 4. CALCULATION & SUBMISSION ---
   const submitExam = async (finalAnswers: Record<string, number>) => {
@@ -290,35 +330,36 @@ const ExamScreen = () => {
       const sectionResults: SectionDetail[] = [];
 
       exam.sections.forEach((sec) => {
-        let sectionTotalPoints = 0;
         let sectionEarnedPoints = 0;
+        const pointsPerQuestion = sec.point / sec.questions.length;
 
         sec.questions.forEach((q) => {
-          const pointValue = Number(q.point) || 0;
-          sectionTotalPoints += pointValue;
-
           const userAnswer = finalAnswers[q._id];
           if (
             userAnswer !== undefined &&
             String(userAnswer) === String(q.correctOptionIndex)
           ) {
-            sectionEarnedPoints += pointValue;
+            sectionEarnedPoints += pointsPerQuestion;
           }
         });
 
-        const sectionPercentage =
-          sectionTotalPoints > 0
-            ? (sectionEarnedPoints / sectionTotalPoints) * 100
-            : 0;
-        totalPossiblePoints += sectionTotalPoints;
+        // Accumulate totals
         totalEarnedPoints += sectionEarnedPoints;
+        totalPossiblePoints += sec.point;
+
+        const sectionPercentage =
+          sec.point > 0 ? sectionEarnedPoints / sec.point : 0;
 
         sectionResults.push({
           sectionTitle: sec.title,
           earnedPoints: sectionEarnedPoints,
-          totalPoints: sectionTotalPoints,
+          totalPoints: sec.point,
           gradeJLPT:
-            sectionPercentage >= 67 ? "A" : sectionPercentage >= 34 ? "B" : "C",
+            sectionPercentage >= 0.67
+              ? "A"
+              : sectionPercentage >= 0.34
+                ? "B"
+                : "C",
           passed: sectionEarnedPoints >= sec.minPassedMark,
         });
       });
@@ -430,11 +471,20 @@ const ExamScreen = () => {
   const formatTime = (s: number) =>
     `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
-  const getQuestionTitle = (category: string, module: string, level: string) => {
+  const getQuestionTitle = (
+    category: string,
+    module: string,
+    level: string,
+  ) => {
     const normalizedCat = category.toLowerCase();
     let catKey = "";
 
-    if (normalizedCat.includes("moji_goi") || normalizedCat.includes("vocab") || normalizedCat.includes("kanji")) catKey = "moji_goi";
+    if (
+      normalizedCat.includes("moji_goi") ||
+      normalizedCat.includes("vocab") ||
+      normalizedCat.includes("kanji")
+    )
+      catKey = "moji_goi";
     else if (normalizedCat.includes("grammar")) catKey = "grammar";
     else if (normalizedCat.includes("reading")) catKey = "reading";
     else if (normalizedCat.includes("listening")) catKey = "listening";
@@ -458,7 +508,9 @@ const ExamScreen = () => {
   const formatText = (text: string) => {
     if (!text) return null;
     const processedText = text.replace(/\\n/g, "\n");
-    const parts = processedText.split(/(\*[\s\S]*?\*|（[\s\S]*?）|#=[\s\S]*?=#|\n)/g);
+    const parts = processedText.split(
+      /(\*[\s\S]*?\*|（[\s\S]*?）|#=[\s\S]*?=#|\n)/g,
+    );
 
     return parts.map((part, i) => {
       if (part === "\n") {
@@ -533,7 +585,8 @@ const ExamScreen = () => {
           onClick={() => setShowExitModal(true)}
           className="text-neutral-500 hover:text-red-400 text-[10px] md:text-xs font-black uppercase flex items-center gap-1.5 md:gap-2 transition-colors px-2 md:px-3 py-1.5 md:py-2 rounded-lg hover:bg-red-500/5"
         >
-          <span className="hidden sm:inline">{t("exit")}</span> <LogOut size={14} className="md:w-4 md:h-4" />
+          <span className="hidden sm:inline">{t("exit")}</span>{" "}
+          <LogOut size={14} className="md:w-4 md:h-4" />
         </button>
       </nav>
 
@@ -547,12 +600,13 @@ const ExamScreen = () => {
                 ref={(el) => {
                   questionRefs.current[idx] = el;
                 }}
-                className={`min-w-[36px] h-[36px] md:min-w-[42px] md:h-[42px] rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black transition-all border snap-center shrink-0 ${currentQuestionIdx === idx
-                  ? "bg-sky-500 border-sky-400 text-slate-950 scale-110 shadow-[0_0_20px_rgba(14,165,233,0.4)]"
-                  : userAnswers[q._id] !== undefined
-                    ? "bg-sky-500/20 border-sky-500/40 text-sky-400"
-                    : "bg-white/5 border-white/10 text-slate-500"
-                  }`}
+                className={`min-w-[36px] h-[36px] md:min-w-[42px] md:h-[42px] rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black transition-all border snap-center shrink-0 ${
+                  currentQuestionIdx === idx
+                    ? "bg-sky-500 border-sky-400 text-slate-950 scale-110 shadow-[0_0_20px_rgba(14,165,233,0.4)]"
+                    : userAnswers[q._id] !== undefined
+                      ? "bg-sky-500/20 border-sky-500/40 text-sky-400"
+                      : "bg-white/5 border-white/10 text-slate-500"
+                }`}
               >
                 {idx + 1}
               </button>
@@ -599,7 +653,7 @@ const ExamScreen = () => {
                         {getQuestionTitle(
                           currentQuestion.category,
                           currentQuestion.module,
-                          exam?.level || "N5"
+                          exam?.level || "N5",
                         )}
                       </h2>
                     </div>
@@ -633,17 +687,19 @@ const ExamScreen = () => {
                       <button
                         key={i}
                         onClick={() => setSelectedOption(i)}
-                        className={`w-full text-left p-4 md:p-6 rounded-2xl md:rounded-3xl border-2 transition-all flex items-center justify-between backdrop-blur-md ${selectedOption === i
-                          ? "bg-sky-500/10 border-sky-500 text-sky-400 shadow-lg"
-                          : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
-                          }`}
+                        className={`w-full text-left p-4 md:p-6 rounded-2xl md:rounded-3xl border-2 transition-all flex items-center justify-between backdrop-blur-md ${
+                          selectedOption === i
+                            ? "bg-sky-500/10 border-sky-500 text-sky-400 shadow-lg"
+                            : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
+                        }`}
                       >
                         <div className="flex gap-3 md:gap-4 items-center">
                           <span
-                            className={`flex justify-center items-center w-7 h-7 md:w-9 md:h-9 border-2 rounded-lg md:rounded-2xl font-black text-xs md:text-sm transition-colors ${selectedOption === i
-                              ? "bg-sky-500 border-sky-500 text-slate-950"
-                              : "border-white/10 text-slate-500"
-                              }`}
+                            className={`flex justify-center items-center w-7 h-7 md:w-9 md:h-9 border-2 rounded-lg md:rounded-2xl font-black text-xs md:text-sm transition-colors ${
+                              selectedOption === i
+                                ? "bg-sky-500 border-sky-500 text-slate-950"
+                                : "border-white/10 text-slate-500"
+                            }`}
                           >
                             {i + 1}
                           </span>
@@ -757,14 +813,17 @@ const ExamScreen = () => {
             <button
               disabled={selectedOption === null || isSubmitting}
               onClick={handleNextQuestion}
-              className={`flex-1 sm:flex-none px-6 md:px-10 py-3 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 md:gap-3 ${selectedOption !== null && !isSubmitting
-                ? "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95"
-                : "bg-white/5 text-slate-600 opacity-50 cursor-not-allowed border border-white/5"
-                }`}
+              className={`flex-1 sm:flex-none px-6 md:px-10 py-3 md:py-4 rounded-xl md:rounded-2xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 md:gap-3 ${
+                selectedOption !== null && !isSubmitting
+                  ? "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95"
+                  : "bg-white/5 text-slate-600 opacity-50 cursor-not-allowed border border-white/5"
+              }`}
             >
               {isSubmitting ? (
                 <>
-                  <span className="text-xs md:text-sm">{t("processing")}...</span>{" "}
+                  <span className="text-xs md:text-sm">
+                    {t("processing")}...
+                  </span>{" "}
                   <Loader2 size={18} className="animate-spin md:w-5 md:h-5" />
                 </>
               ) : (

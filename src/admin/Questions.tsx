@@ -27,7 +27,6 @@ interface QuestionForm {
   correctOptionIndex: number;
   module: QuestionModule;
   category: QuestionCategory;
-  point: number;
   refImage?: string;
   refAudio?: string;
   tags: string[];
@@ -117,7 +116,6 @@ const Questions = () => {
     correctOptionIndex: 0,
     module: QuestionModule.kanji_reading,
     category: QuestionCategory.Moji_Goi,
-    point: 1,
     refImage: "",
     refAudio: "",
     tags: [],
@@ -184,7 +182,6 @@ const Questions = () => {
       correctOptionIndex: 0,
       module: QuestionModule.kanji_reading,
       category: QuestionCategory.Moji_Goi,
-      point: 1,
       refImage: "",
       refAudio: "",
       tags: [],
@@ -316,10 +313,11 @@ const Questions = () => {
                   {form.options.map((opt, i) => (
                     <div
                       key={i}
-                      className={`relative rounded-2xl border transition-all ${form.correctOptionIndex === i
-                        ? "border-sky-500 bg-sky-500/5"
-                        : "border-white/5 bg-slate-950/50"
-                        }`}
+                      className={`relative rounded-2xl border transition-all ${
+                        form.correctOptionIndex === i
+                          ? "border-sky-500 bg-sky-500/5"
+                          : "border-white/5 bg-slate-950/50"
+                      }`}
                     >
                       <input
                         className="w-full bg-transparent p-3 pr-10 outline-none text-sm font-bold text-white"
@@ -337,50 +335,33 @@ const Questions = () => {
                         onClick={() =>
                           setForm({ ...form, correctOptionIndex: i })
                         }
-                        className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 transition-all ${form.correctOptionIndex === i
-                          ? "bg-sky-500 border-sky-400 scale-110 shadow-[0_0_8px_#0ea5e9]"
-                          : "border-slate-700"
-                          }`}
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 transition-all ${
+                          form.correctOptionIndex === i
+                            ? "bg-sky-500 border-sky-400 scale-110 shadow-[0_0_8px_#0ea5e9]"
+                            : "border-slate-700"
+                        }`}
                       />
                     </div>
                   ))}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
-                      Point
-                    </label>
-                    <input
-                      type="number"
-                      className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-white"
-                      placeholder="Enter point..."
-                      value={form.point}
-                      onChange={(e) =>
-                        setForm({ ...form, point: Number(e.target.value) })
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
-                      Tags (Comma separated)
-                    </label>
-                    <input
-                      className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-white"
-                      placeholder="e.g., N5, Kanji"
-                      value={tagsInput}
-                      onChange={(e) => {
-                        setTagsInput(e.target.value);
-                        const tags = e.target.value
-                          .split(",")
-                          .map((t) => t.trim())
-                          .filter((t) => t !== "");
-                        setForm({ ...form, tags });
-                      }}
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-2">
+                    Tags (Comma separated)
+                  </label>
+                  <input
+                    className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-medium text-white"
+                    placeholder="e.g., N5, Kanji"
+                    value={tagsInput}
+                    onChange={(e) => {
+                      setTagsInput(e.target.value);
+                      const tags = e.target.value
+                        .split(",")
+                        .map((t) => t.trim())
+                        .filter((t) => t !== "");
+                      setForm({ ...form, tags });
+                    }}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -452,13 +433,18 @@ const Questions = () => {
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className={`mt-4 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 ${editingId
-                    ? "bg-white text-slate-950"
-                    : "bg-sky-500 text-slate-950 hover:bg-sky-400 shadow-lg shadow-sky-500/20"
-                    }`}
+                  className={`mt-4 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 ${
+                    editingId
+                      ? "bg-white text-slate-950"
+                      : "bg-sky-500 text-slate-950 hover:bg-sky-400 shadow-lg shadow-sky-500/20"
+                  }`}
                 >
                   <Save size={18} />
-                  {isProcessing ? "Processing" : editingId ? "Update Registry" : "Commit to Bank"}
+                  {isProcessing
+                    ? "Processing"
+                    : editingId
+                      ? "Update Registry"
+                      : "Commit to Bank"}
                 </button>
 
                 {editingId && (
@@ -540,7 +526,9 @@ const Questions = () => {
                       <option value="ALL">All Modules</option>
                       {(selectedCategory === "ALL"
                         ? Object.values(QuestionModule)
-                        : CATEGORY_TO_MODULES[selectedCategory as QuestionCategory]
+                        : CATEGORY_TO_MODULES[
+                            selectedCategory as QuestionCategory
+                          ]
                       ).map((m) => (
                         <option key={m} value={m}>
                           {m}
@@ -602,7 +590,7 @@ const Questions = () => {
                           </div>
                         )}
                         <p className="text-[10px] font-black text-slate-500 mt-1">
-                          {q.point} Point(s) • Correct Option: {q.correctOptionIndex + 1}
+                          Correct Option: {q.correctOptionIndex + 1}
                           {" • "}
                           {(q.tags || []).length > 0
                             ? q.tags.join(", ")

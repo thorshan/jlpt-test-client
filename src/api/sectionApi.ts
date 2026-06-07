@@ -6,6 +6,7 @@ export interface Section {
   desc: string;
   duration: number;
   questions: string[];
+  point: number;
   minPassedMark: number;
   tag?: string;
 }

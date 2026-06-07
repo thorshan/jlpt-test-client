@@ -39,7 +39,6 @@ export interface Question {
   correctOptionIndex: number;
   module: QuestionModule;
   category: QuestionCategory;
-  point: number;
   refImage?: string;
   refAudio?: string;
   tags: string[];

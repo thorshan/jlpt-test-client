@@ -17,6 +17,7 @@ import {
   Minimize2,
   Search,
   X,
+  Sigma,
 } from "lucide-react";
 import { sectionApi, type Section } from "../api/sectionApi";
 import { questionApi, type Question } from "../api/questionApi";
@@ -123,6 +124,7 @@ const Sections = () => {
     title: "",
     desc: "",
     duration: 30,
+    point: 60,
     minPassedMark: 38,
     questions: [] as string[],
     tag: "",
@@ -187,7 +189,7 @@ const Sections = () => {
     const matchesSearch =
       s.title.toLowerCase().includes(searchLower) ||
       (s.tag && s.tag.toLowerCase().includes(searchLower));
-    
+
     const matchesTag =
       sectionsFilterTag === "All" || s.tag === sectionsFilterTag;
 
@@ -253,6 +255,7 @@ const Sections = () => {
       title: "",
       desc: "",
       duration: 30,
+      point: 60,
       minPassedMark: 38,
       questions: [],
       tag: "",
@@ -269,6 +272,7 @@ const Sections = () => {
     setForm({
       title: section.title,
       desc: section.desc || "",
+      point: section.point,
       duration: section.duration,
       minPassedMark: section.minPassedMark,
       questions: questionIds,
@@ -387,7 +391,7 @@ const Sections = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 shrink-0">
+                <div className="grid grid-cols-3 gap-4 shrink-0">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase text-slate-500 ml-2 text-sky-500/80 flex items-center gap-1">
                       <Clock size={10} /> Duration (M)
@@ -398,6 +402,19 @@ const Sections = () => {
                       value={form.duration}
                       onChange={(e) =>
                         setForm({ ...form, duration: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-2 text-sky-500/80 flex items-center gap-1">
+                      <Sigma size={10} /> Point (60 / 120)
+                    </label>
+                    <input
+                      className="w-full bg-slate-950/50 p-4 rounded-2xl border border-white/5 outline-none focus:border-sky-500/50 transition-all text-sm font-bold text-sky-400"
+                      type="number"
+                      value={form.point}
+                      onChange={(e) =>
+                        setForm({ ...form, point: Number(e.target.value) })
                       }
                     />
                   </div>
@@ -520,10 +537,11 @@ const Sections = () => {
                         <div
                           key={q._id}
                           onClick={() => toggleQuestionSelection(q._id)}
-                          className={`p-3 rounded-xl cursor-pointer text-xs flex justify-between items-start transition-all ${form.questions.includes(q._id)
-                            ? "bg-sky-500/10 border border-sky-500/50"
-                            : "bg-white/5 border border-transparent hover:bg-white/10"
-                            }`}
+                          className={`p-3 rounded-xl cursor-pointer text-xs flex justify-between items-start transition-all ${
+                            form.questions.includes(q._id)
+                              ? "bg-sky-500/10 border border-sky-500/50"
+                              : "bg-white/5 border border-transparent hover:bg-white/10"
+                          }`}
                         >
                           <div className="flex flex-col gap-1 truncate pr-4">
                             <span
@@ -561,13 +579,18 @@ const Sections = () => {
                   <button
                     type="submit"
                     disabled={isProcessing}
-                    className={`py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 ${editingId
-                      ? "bg-white text-slate-950"
-                      : "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20"
-                      }`}
+                    className={`py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 ${
+                      editingId
+                        ? "bg-white text-slate-950"
+                        : "bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20"
+                    }`}
                   >
                     <Save size={18} />
-                    {isProcessing ? "Processing" : editingId ? "Update Section" : "Save Section"}
+                    {isProcessing
+                      ? "Processing"
+                      : editingId
+                        ? "Update Section"
+                        : "Save Section"}
                   </button>
                   {editingId && (
                     <button
@@ -654,8 +677,7 @@ const Sections = () => {
                         {s.title}
                       </h3>
                       {s.desc && (
-                        <p className="text-[10px] text-slate-500 mt-1 line-clamp-1 italic">
-                        </p>
+                        <p className="text-[10px] text-slate-500 mt-1 line-clamp-1 italic"></p>
                       )}
                       {s.tag && (
                         <div className="mt-2">
@@ -680,23 +702,32 @@ const Sections = () => {
                         <div className="flex items-center gap-1.5 text-slate-500">
                           <Target size={12} className="text-sky-500/50" />
                           <span className="text-[10px] font-black uppercase">
+                            {s.point} Points
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-500">
+                          <Target size={12} className="text-sky-500/50" />
+                          <span className="text-[10px] font-black uppercase">
                             {s.minPassedMark} Min Mark
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-sky-500">
+
+                        {/*QUESTION POINTS NOLONGER NEEDED */}
+                        {/*<div className="flex items-center gap-1.5 text-sky-500">
                           <div className="w-1 h-1 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.5)]" />
                           <span className="text-[10px] font-black uppercase">
                             {(() => {
                               const total = s.questions.reduce((acc, q) => {
-                                const questionObj = typeof q === 'string' 
-                                  ? allQuestions.find(aq => aq._id === q)
-                                  : q;
+                                const questionObj =
+                                  typeof q === "string"
+                                    ? allQuestions.find((aq) => aq._id === q)
+                                    : q;
                                 return acc + (questionObj?.point || 0);
                               }, 0);
                               return `${total} Total Points`;
                             })()}
                           </span>
-                        </div>
+                        </div>*/}
                       </div>
                     </div>
 
@@ -723,7 +754,7 @@ const Sections = () => {
               {filteredSectionsEntries.length === 0 && (
                 <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-[2.5rem]">
                   <p className="text-slate-600 text-xs font-black uppercase tracking-widest">
-                    No matching sections found 
+                    No matching sections found
                   </p>
                 </div>
               )}
@@ -812,7 +843,8 @@ const Sections = () => {
                     REORDER QUESTIONS
                   </h2>
                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">
-                    Manage entry sequence for: {form.title || "Untitled Section"}
+                    Manage entry sequence for:{" "}
+                    {form.title || "Untitled Section"}
                   </p>
                 </div>
                 <button

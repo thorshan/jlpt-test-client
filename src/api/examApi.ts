@@ -6,6 +6,7 @@ export interface Section<Q = string> {
   title: string;
   desc: string;
   duration: number;
+  point: number;
   minPassedMark: number;
   questions: Q[];
   tag?: string;
@@ -40,9 +41,11 @@ export type ExamFormData = Omit<Exam, "_id">;
 
 export const examApi = {
   getExams: <Q = string>(admin?: boolean) =>
-    apiClient.get<ApiResponse<Exam<Q>[]>>(`/exams${admin ? "?admin=true" : ""}`),
+    apiClient.get<ApiResponse<Exam<Q>[]>>(
+      `/exams${admin ? "?admin=true" : ""}`,
+    ),
 
-  getExam: <Q = Question>(id: string) => 
+  getExam: <Q = Question>(id: string) =>
     apiClient.get<ApiResponse<Exam<Q>>>(`/exams/${id}`),
 
   createExam: <Q = string>(data: ExamFormData) =>
