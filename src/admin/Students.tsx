@@ -19,6 +19,7 @@ interface UserData {
   _id: string;
   name: string;
   token?: string;
+  dob?: Date;
   password?: string;
   email?: string;
   level?: string;
@@ -209,6 +210,9 @@ const Students = () => {
                     Email
                   </th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                    D.O.B
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                     Level
                   </th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">
@@ -246,6 +250,13 @@ const Students = () => {
                       </td>
                       <td className="px-8 py-5">
                         <code className="text-xs font-mono">{user?.email}</code>
+                      </td>
+                      <td className="px-8 py-5">
+                        <code className="text-xs font-mono">
+                          {user?.dob
+                            ? new Date(user.dob).toLocaleDateString()
+                            : "N/A"}
+                        </code>
                       </td>
                       <td className="px-8 py-5">
                         <code className="text-[10px] font-mono text-white bg-sky-500/5 px-2 py-1 rounded-lg border border-sky-500/10">
@@ -339,6 +350,36 @@ const Students = () => {
                   <span className="text-md text-white">{userData?.email}</span>
                 </div>
                 <div className="w-full flex justify-between items-center border border-sky-900 rounded-2xl p-3">
+                  <span className="text-md font-black text-sky-500">
+                    Valid Until
+                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-md text-white">
+                      {userData?.dob
+                        ? new Date(userData?.dob).toLocaleDateString()
+                        : "N/A"}
+                    </span>
+                    <span className="text-[9px] text-sky-500 text-end italic">
+                      {userData?.dob
+                        ? (() => {
+                            const birthDate = new Date(userData.dob);
+                            const today = new Date();
+                            let age =
+                              today.getFullYear() - birthDate.getFullYear();
+                            const m = today.getMonth() - birthDate.getMonth();
+                            if (
+                              m < 0 ||
+                              (m === 0 && today.getDate() < birthDate.getDate())
+                            ) {
+                              age--;
+                            }
+                            return `${age} years old`;
+                          })()
+                        : "N/A"}
+                    </span>
+                  </div>
+                </div>
+                <div className="w-full flex justify-between items-center border border-sky-900 rounded-2xl p-3">
                   <span className="text-md font-black text-sky-500">Level</span>
                   <span className="text-md text-white">{userData?.level}</span>
                 </div>
@@ -350,7 +391,7 @@ const Students = () => {
                     <span className="text-md text-white">
                       {typeof userData?.expireAt === "string"
                         ? new Date(userData?.expireAt).toLocaleDateString()
-                        : ""}
+                        : "N/A"}
                     </span>
                     <span className="text-[9px] text-sky-500 text-end italic">
                       1 Year

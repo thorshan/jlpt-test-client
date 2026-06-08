@@ -176,29 +176,31 @@ const Results: React.FC = () => {
                   </p>
                 </div>
 
-              <div className="grid grid-cols-3 md:grid-cols-3 gap-3 md:gap-6">
-                {data.sectionDetails?.map((sec, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white/5 border border-white/5 p-3 md:p-6 rounded-2xl md:rounded-3xl backdrop-blur-sm flex flex-col items-center justify-center text-center"
-                  >
-                    <p className="text-[7px] md:text-[10px] text-slate-500 font-black uppercase truncate mb-1 md:mb-2 tracking-[0.1em] md:tracking-widest w-full">
-                      {sec.sectionTitle}
-                    </p>
-                    <div className="text-xl md:text-3xl font-black text-sky-400">
-                      <CountUp end={sec.earnedPoints} />
-                      <span className="text-[9px] md:text-sm text-slate-600 font-normal ml-0.5">
-                        / {sec.totalPoints}
-                      </span>
+                <div className="grid grid-cols-3 md:grid-cols-3 gap-3 md:gap-6">
+                  {data.sectionDetails?.map((sec, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white/5 border border-white/5 p-3 md:p-6 rounded-2xl md:rounded-3xl backdrop-blur-sm flex flex-col items-center justify-center text-center"
+                    >
+                      <p className="text-[7px] md:text-[10px] text-slate-500 font-black uppercase truncate mb-1 md:mb-2 tracking-[0.1em] md:tracking-widest w-full">
+                        {sec.sectionTitle}
+                      </p>
+                      <div className="text-xl md:text-3xl font-black text-sky-400">
+                        <CountUp end={sec.earnedPoints} />
+                        <span className="text-[9px] md:text-sm text-slate-600 font-normal ml-0.5">
+                          / {sec.totalPoints}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
               </div>
 
               <div className="bg-white/5 border border-sky-500/20 p-4 md:p-6 rounded-3xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-6 mt-8 mb-4">
                 <div className="text-center sm:text-left space-y-1">
-                  <p className="text-sm font-black text-white">{t("result_id")}</p>
+                  <p className="text-sm font-black text-white">
+                    {t("result_id")}
+                  </p>
                   <p className="text-[10px] text-sky-400 font-bold uppercase tracking-widest leading-relaxed max-w-sm">
                     {t("save_code_warning")}
                   </p>
@@ -266,7 +268,7 @@ const Results: React.FC = () => {
                   {t("exit_home")}
                 </Link>
 
-                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                   {/* Language Toggle */}
                   <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1 shrink-0 h-14">
                     <button
@@ -315,7 +317,9 @@ const Results: React.FC = () => {
                     className="flex items-center justify-center gap-3 bg-sky-500 hover:bg-sky-400 text-slate-950 px-8 py-4 rounded-2xl w-full sm:w-auto font-black transition-all shadow-lg active:scale-95 h-14 disabled:opacity-50"
                   >
                     <Printer size={20} />
-                    <span>{isProcessing ? t("processing") : t("print_cert")}</span>
+                    <span>
+                      {isProcessing ? t("processing") : t("print_cert")}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -378,14 +382,30 @@ const Results: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="text-center py-6">
+                    <div className="flex flex-col justify-center items-center py-3">
                       <p className="text-sky-500 uppercase text-[11px] font-black tracking-[0.5em] mb-4">
                         {certLang === "en" ? "Official Result" : "公式結果"}
                       </p>
-                      <h2 className="text-6xl font-black text-white mb-6 underline decoration-sky-500/20 underline-offset-[12px]">
+                      <h2 className="text-6xl font-black text-white">
                         {user?.name || "Examinee"}
                       </h2>
-                      <p className="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
+                      <div className="max-w-sm flex justify-center items-center my-5 gap-5">
+                        <h6 className="text-sky-500 text-md font-black">
+                          {certLang === "en" ? "Date of Birth" : "生年月日"}
+                        </h6>
+                        <h6 className="text-md">
+                          {typeof data?.user === "object"
+                            ? new Date(data.user.dob)
+                                .toLocaleDateString("en-GB", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })
+                                .replace(/(\d+)\s(\w+)\s(\d+)/, "$1, $2 $3")
+                            : ""}
+                        </h6>
+                      </div>
+                      <p className="text-center text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
                         {certLang === "en"
                           ? "Has successfully demonstrated proficiency in the Japanese language assessment at the level specified below."
                           : "貴殿は、当プログラムが実施した日本語能力アセスメントにおいて、下記の通り優秀な成績を収め、所定のレベルに達したことをここに証します。"}
@@ -410,7 +430,7 @@ const Results: React.FC = () => {
                               {certLang === "en" ? "Total" : "合計"}
                             </span>
                             <span className="text-2xl font-black text-white">
-                              {data.totalEarnedPoints}/
+                              {Math.round(data.totalEarnedPoints)}/
                               {data.totalPossiblePoints}
                             </span>
                           </div>
@@ -459,7 +479,8 @@ const Results: React.FC = () => {
                                   {sec.sectionTitle}
                                 </td>
                                 <td className="py-2.5 text-center text-white">
-                                  {sec.earnedPoints}/{sec.totalPoints}
+                                  {Math.round(sec.earnedPoints)}/
+                                  {sec.totalPoints}
                                 </td>
                                 <td className="py-2.5 text-right text-sky-400 font-black">
                                   {sec.gradeJLPT}

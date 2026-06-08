@@ -161,7 +161,7 @@ const Results = () => {
                       <td className="px-8 py-6 text-center">
                         <div className="inline-flex flex-col items-center px-4 py-2 rounded-2xl bg-white/5 border border-white/5 group-hover:border-sky-500/20 transition-all">
                           <span className="text-xs font-black italic">
-                            {result.totalEarnedPoints}{" "}
+                            {Math.round(result.totalEarnedPoints)}{" "}
                             <span className="text-slate-600 font-normal">
                               / {result.totalPossiblePoints}
                             </span>

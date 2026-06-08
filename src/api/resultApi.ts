@@ -11,7 +11,7 @@ export interface SectionDetail {
 
 export interface Result {
   _id: string;
-  user: string | { _id: string; name: string };
+  user: string | { _id: string; name: string; dob: Date };
   exam: string | { _id: string; title: string };
   level: "N1" | "N2" | "N3" | "N4" | "N5";
 

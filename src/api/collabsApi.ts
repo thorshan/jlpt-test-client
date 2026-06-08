@@ -15,6 +15,7 @@ interface Incharge {
 interface Students {
   _id: string;
   name: string;
+  dob: Date;
   email: string;
   role: string;
   level: string;

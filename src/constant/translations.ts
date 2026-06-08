@@ -129,8 +129,10 @@ export const translations = {
       "If have any please input to search Schools or Consultant.",
     no_association: "Continue without association.",
     incharge_info: "Incharge Informations",
+    dob: "Date of Birth",
   },
   my: {
+    dob: "မွေးသက္ကရာဇ်",
     incharge_info: "တာဝန်ခံ၏အချက်အလက်များ",
     association_ask:
       "ဘာသာစကားကျောင်းတစ်ခုခု (သို့မဟုတ်) အတိုင်ပင်ခံ ရှိပါသလား။",
@@ -242,7 +244,7 @@ export const translations = {
     session_active: "အသုံးပြုနေဆဲ",
     saving: "သိမ်းဆည်းနေသည်...",
     complete_section: "ဤအပိုင်းကို အဆုံးသတ်မည်",
-    next_question: "နောက်တစ်ခွန်း",
+    next_question: "နောက်မေးခွန်း",
     search_placeholder: "ခေါင်းစဉ်ဖြင့် ရှာဖွေပါ...",
     select_category: "အမျိုးအစား ရွေးချယ်ပါ",
     category: "အမျိုးအစား",

@@ -19,6 +19,7 @@ interface UserData {
   _id: string;
   name: string;
   token?: string;
+  dob: string | Date;
   password?: string;
   email?: string;
   level?: string;
@@ -165,7 +166,10 @@ const Users = () => {
                     Identity
                   </th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                    Token
+                    Email
+                  </th>
+                  <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                    D.O.B
                   </th>
                   <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                     Protocol
@@ -199,8 +203,13 @@ const Users = () => {
                         </div>
                       </td>
                       <td className="px-8 py-5">
-                        <code className="text-[10px] font-mono text-sky-400 bg-sky-500/5 px-2 py-1 rounded-lg border border-sky-500/10">
-                          {user.password}
+                        <code className="text-xs font-mono">{user?.email}</code>
+                      </td>
+                      <td className="px-8 py-5">
+                        <code className="text-xs font-mono">
+                          {user?.dob
+                            ? new Date(user.dob).toLocaleDateString()
+                            : "N/A"}
                         </code>
                       </td>
                       <td className="px-8 py-5">

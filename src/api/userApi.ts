@@ -3,6 +3,7 @@ import { apiClient } from "./apiClient";
 export interface User {
   _id: string;
   name: string;
+  dob: Date;
   level?: string;
   role?: string;
   token?: string;
@@ -14,6 +15,7 @@ export interface UserForm {
   name?: string;
   level?: string;
   role?: string;
+  dob?: string | Date;
   token?: string;
   email?: string;
   password?: string;

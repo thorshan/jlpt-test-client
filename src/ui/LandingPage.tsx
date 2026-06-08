@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, ArrowRight, ShieldCheck } from "lucide-react";
-import { userApi } from "../api/userApi";
+import { userApi, type UserForm } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 import { useUser } from "../hooks/useUser";
@@ -11,8 +11,11 @@ import { collabsApi, type Collabs } from "../api/collabsApi";
 const LandingPage = () => {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    dob: null as Date | null,
+  });
   const [generatedToken, setGeneratedToken] = useState("");
   const [inputToken, setInputToken] = useState("");
   const [copied, setCopied] = useState(false);
@@ -73,16 +76,16 @@ const LandingPage = () => {
   };
 
   const handleCreateUser = async () => {
-    if (!name || !generatedToken) return;
+    if (!form.email || !generatedToken) return;
     setIsProcessing(true);
     try {
-      const data = {
-        name,
-        email,
+      const payload: UserForm = {
+        ...form,
+        dob: form.dob?.toISOString(),
         token: generatedToken,
       };
-      await userApi.createGuest(data);
-      await login({ email, token: generatedToken });
+      await userApi.createGuest(payload);
+      await login({ email: form.email, token: generatedToken });
       setStep(2);
     } catch (err) {
       console.error(err);
@@ -203,8 +206,8 @@ const LandingPage = () => {
                   <input
                     placeholder={t("name_label")}
                     className="mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
                   />
                 </div>
 
@@ -212,14 +215,41 @@ const LandingPage = () => {
                   <input
                     placeholder={t("email")}
                     className="mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2 mb-5">
+                  <label className="ml-2 text-sky-500">{t("dob")}</label>
+                  <input
+                    type="date"
+                    className="
+                      mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none
+                      focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all
+                      text-md text-white placeholder:text-sky-900
+                      /* This targets the calendar icon */
+                      [&::-webkit-calendar-picker-indicator]:cursor-pointer
+                      [&::-webkit-calendar-picker-indicator]:invert
+                      [&::-webkit-calendar-picker-indicator]:brightness-0
+                      [&::-webkit-calendar-picker-indicator]:hue-rotate-[180deg]
+                    "
+                    value={form.dob ? form.dob.toISOString().split("T")[0] : ""}
+                    onChange={(e) => {
+                      const dateVal = e.target.value;
+                      setForm({
+                        ...form,
+                        dob: dateVal ? new Date(dateVal) : null,
+                      });
+                    }}
                   />
                 </div>
 
                 {!generatedToken ? (
                   <button
-                    disabled={!name}
+                    disabled={!form.email}
                     onClick={generateToken}
                     className="w-full py-5 bg-white text-black font-black rounded-2xl hover:bg-sky-50 transition-all active:scale-[0.98] disabled:opacity-50"
                   >
