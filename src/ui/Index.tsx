@@ -13,6 +13,11 @@ import {
   UserStar,
   ExternalLink,
   BriefcaseBusiness,
+  Shield,
+  Scale,
+  Copyright,
+  BookOpenText,
+  Signpost,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LangToggler } from "../components/LangToggler";
@@ -372,10 +377,52 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="py-20 border-t border-white/5 text-center relative z-40">
-        <span className="text-[10px] tracking-[0.4em] font-bold text-slate-600 uppercase">
-          &copy; {new Date().getFullYear()} JLPTX
-        </span>
+      <footer className="flex justify-evenly items-center gap-5 bg-sky-950/30 backdrop-blur-sm py-20 border-t border-white/5 relative z-40">
+        <div className="flex flex-col gap-5">
+          <div>
+            <div
+              onClick={() => navigate("/site-map")}
+              className="flex items-center gap-1.5 group cursor-pointer transition-colors hover:text-sky-200"
+            >
+              <Signpost size={15} className="text-sky-500" />
+              <span className="text-sm">{"Site map"}</span>
+            </div>
+            <div
+              onClick={() => navigate("/user-manual")}
+              className="flex items-center gap-1.5 group cursor-pointer transition-colors hover:text-sky-200"
+            >
+              <BookOpenText size={15} className="text-sky-500" />
+              <span className="text-sm">{"User guide"}</span>
+            </div>
+          </div>
+          <div>
+            <div
+              onClick={() => navigate("/legal/privacy")}
+              className="flex items-center gap-1.5 group cursor-pointer transition-colors hover:text-sky-200"
+            >
+              <Shield size={15} className="text-sky-500" />
+              <span className="text-sm">{"Privacy & Policy"}</span>
+            </div>
+            <div
+              onClick={() => navigate("/legal/terms")}
+              className="flex items-center gap-1.5 group cursor-pointer transition-colors hover:text-sky-200"
+            >
+              <Scale size={15} className="text-sky-500" />
+              <span className="text-sm">{"Terms & Conditions"}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-5 items-center">
+          <img
+            src="/JLPTX.png"
+            alt="Logo"
+            className="w-16 h-16 md:w-16 md:h-16 object-contain brightness-125 contrast-125"
+          />
+          <div className="flex items-center gap-1.5">
+            <Copyright size={15} className="text-sky-500" />
+            <span className="text-sm">{`${new Date().getFullYear()} JLPTX`}</span>
+          </div>
+        </div>
       </footer>
 
       {/* --- PROTOCOL NOTIFICATION MODAL --- */}

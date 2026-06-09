@@ -31,6 +31,9 @@ import CollaborationClient from "../ui/Collaboration";
 import Collaboration from "../admin/Collaboration";
 import CollabLanding from "../ui/CollabLanding";
 import Students from "../admin/Students";
+import Terms from "../ui/Terms";
+import Privacy from "../ui/Privacy";
+import SiteMap from "../ui/SiteMap";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
@@ -49,10 +52,13 @@ const AppRoutes = () => {
       <Route path="/get-started" element={<LandingPage />} />
       <Route path="/collabs" element={<CollabLanding />} />
       <Route path="/collabs/get-started" element={<CollaborationClient />} />
-      <Route path="/manual" element={<UserManual />} />
+      <Route path="/user-manual" element={<UserManual />} />
+      <Route path="/site-map" element={<SiteMap />} />
       <Route path="/results" element={<Results />} />
       <Route path="/auth" element={<Login />} />
       <Route path="/redirect" element={<Redirect />} />
+      <Route path="/legal/terms" element={<Terms />} />
+      <Route path="/legal/privacy" element={<Privacy />} />
 
       {/* PROTECTED STUDENT ROUTES */}
       <Route
