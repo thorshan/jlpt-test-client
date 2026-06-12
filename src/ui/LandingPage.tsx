@@ -201,6 +201,14 @@ const LandingPage = () => {
                 </h2>
               </div>
 
+              <div className="mb-5">
+                <q className="text-xs tracking-tighter text-sky-500 leading-tight">
+                  Your privacy is important to us. We do not require your real
+                  legal name or primary email. Feel free to use a nickname or a
+                  secondary email address for your certificate.
+                </q>
+              </div>
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <input

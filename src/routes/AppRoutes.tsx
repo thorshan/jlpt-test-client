@@ -34,6 +34,8 @@ import Students from "../admin/Students";
 import Terms from "../ui/Terms";
 import Privacy from "../ui/Privacy";
 import SiteMap from "../ui/SiteMap";
+import Profile from "../ui/Profile";
+import Download from "../components/Download";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
@@ -59,6 +61,15 @@ const AppRoutes = () => {
       <Route path="/redirect" element={<Redirect />} />
       <Route path="/legal/terms" element={<Terms />} />
       <Route path="/legal/privacy" element={<Privacy />} />
+      <Route path="/download/:id" element={<Download />} />
+      <Route
+        path="/:id/profile"
+        element={
+          <ProtectedRoutes>
+            <Profile />
+          </ProtectedRoutes>
+        }
+      />
 
       {/* PROTECTED STUDENT ROUTES */}
       <Route

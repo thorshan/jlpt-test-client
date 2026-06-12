@@ -17,6 +17,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { resultApi, type Result } from "../api/resultApi";
 import { useUser } from "../hooks/useUser";
 import { useTranslation } from "../hooks/useTranslation";
+import SEO from "../components/SEO";
 
 // --- ANIMATED COUNTER COMPONENT ---
 const CountUp: React.FC<{ end: number; duration?: number }> = ({
@@ -112,6 +113,11 @@ const Results: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex flex-col font-sans overflow-x-hidden relative">
+      <SEO
+        title="Results"
+        description="Join JLPTX and start practicing for your Japanese Language Proficiency Test. Practice N1, N2, N3, N4, and N5 levels."
+        canonical="/"
+      />
       {/* --- SHARED BACKGROUND LAYER --- */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <motion.div

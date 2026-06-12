@@ -81,7 +81,7 @@ const Home = () => {
       <SEO
         title="Student Dashboard - JLPTX"
         description="Access your JLPT mock exams, track your progress, and prepare for your Japanese Language Proficiency Test."
-        canonical="/test"
+        canonical="/"
       />
       {/* 1. ANIMATED GRID BACKGROUND */}
       <motion.div
@@ -160,7 +160,10 @@ const Home = () => {
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     className="absolute right-0 mt-4 w-60 bg-[#0f172a] border border-sky-500/20 rounded-[2rem] shadow-2xl p-3 z-[110] backdrop-blur-xl"
                   >
-                    <div className="px-4 py-4 border-b border-sky-500/10 mb-2 bg-sky-500/5 rounded-t-[1.5rem]">
+                    <div
+                      onClick={() => navigate(`/${user?._id}/profile`)}
+                      className="px-4 py-4 border-b border-sky-500/10 mb-2 bg-sky-500/5 rounded-t-[1.5rem] cursor-pointer hover:bg-sky-500/20"
+                    >
                       <p className="text-[9px] text-sky-500 font-black mb-2">
                         {t("name_label")}
                       </p>

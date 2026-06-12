@@ -54,7 +54,7 @@ const Collaboration: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#020617] text-white flex items-center justify-center p-4 md:p-6 overflow-hidden relative">
       <SEO
-        title="Get Started - Join JLPTX"
+        title="Get Started - Collaborate with JLPTX"
         description="Join JLPTX and start practicing for your Japanese Language Proficiency Test. Practice N1, N2, N3, N4, and N5 levels."
         canonical="/collabs"
       />

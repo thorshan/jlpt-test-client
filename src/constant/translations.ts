@@ -130,8 +130,101 @@ export const translations = {
     no_association: "Continue without association.",
     incharge_info: "Incharge Informations",
     dob: "Date of Birth",
+    account_activity: "Account Activity",
+    profile: "Profile",
+    valid_until: "Valid until",
+    logout_session: "Logout Session",
+    account_control: "Account Control",
+    delete_account: "Delete Account",
+    delete: "Delete",
+    terms: "Terms & Conditions",
+    privacy: "Privacy & Policy",
+    site_map: "Site map",
+    account_info: "Account Info",
+    download: "Download",
+    account_deletion: "Account Deletion",
+    delete_confirm:
+      "This action is CRITICAL and if you confirmed to delete then your data will be permanently deleted and this action can not be UNDO.",
+    confirm_text:
+      "If you wish to delete your data. Please write 'confirm_deletion' in the box.",
+    registration: "Registration",
+    process: "Process",
+    proc_1_txt: "Input your name, email, and date of birth.",
+    proc_2_txt: "Paste the code which is copied from the step 1.",
+    proc_3_txt:
+      "Input school/association name if any. If not click the 'Continue without association' below.",
+    level_select: "Level Selection",
+    lvl_sel_txt:
+      "Select your desire level to proceed to test your exams according to your level.",
+    home_page: "Home Page",
+    home_page_txt:
+      "The Test Home Page where you can choose the available exams.",
+    test_res: "Test Results",
+    test_q: "Test Question",
+    test_q_1_txt:
+      "Question will assemble according to module index and also separate into sections (Vocabulary, Grammar, Reading, Listening) as in real JLPT exam.",
+    test_q_2_txt: "Simply choose the correct answer and then submit it.",
+    test_res_txt:
+      "Scores will be calculated as soon as test finished. Scores will shows your result by separating down into sections.",
+    certifications: "Certifications",
+    cert_txt:
+      "Instant certificate will be generated after test finished whether passed or failed.",
+    user_acc: "User Account",
+    profile_txt: "You can find the tab to your profile on the navigation bar.",
+    info_act_txt:
+      "Information of you and your activity (Completed exam records).",
+    info_act: "Info & Activity",
+    acc_ctrl_txt:
+      "Sessions and the control of your data (Account deletion & Logout session).",
   },
   my: {
+    registration: "မှတ်ပုံတင်ခြင်း",
+    process: "လုပ်ငန်းစဉ်",
+    proc_1_txt: "သင့်အမည်၊ အီးမေးလ်နှင့် မွေးသက္ကရာဇ်ကို ရိုက်ထည့်ပါ။",
+    proc_2_txt: "အဆင့် ၁ မှ ကူးယူထားသော ကုဒ်ကို ကူးထည့်ပါ။",
+    proc_3_txt:
+      "ကျောင်း/အသင်းအဖွဲ့အမည်ရှိပါက ရိုက်ထည့်ပါ။ မရှိပါက အောက်ဖော်ပြပါ 'ဆက်စပ်မှုမပါဘဲ ဆက်သွာရန်' ကို နှိပ်ပါ။",
+    level_select: "အဆင့်ရွေးချယ်မှု",
+    lvl_sel_txt:
+      "သင့်အဆင့်အလိုက် စာမေးပွဲများကို ဆက်လက်ဖြေဆိုရန် သင်နှစ်သက်ရာအဆင့်ကို ရွေးချယ်ပါ။",
+    home_page: "ပင်မစာမျက်နှာ",
+    home_page_txt:
+      "ရရှိနိုင်သော စာမေးပွဲများကို ရွေးချယ်နိုင်သည့် စာမေးပွဲ ပင်မစာမျက်နှာ။",
+    test_res: "စမ်းသပ်မှုရလဒ်များ",
+    test_q: "စမ်းသပ်မေးခွန်း",
+    test_q_1_txt:
+      "မေးခွန်းကို module အညွှန်းကိန်းအရ စုစည်းပြီး JLPT စာမေးပွဲကဲ့သို့ အပိုင်းများ (ဝေါဟာရ၊ သဒ္ဒါ၊ စာဖတ်ခြင်း၊ နားထောင်ခြင်း) အဖြစ် ခွဲခြားပါမည်။",
+    test_q_2_txt: "မှန်ကန်တဲ့အဖြေကို ရွေးချယ်ပြီး submit လုပ်လိုက်ရုံပါပဲ။",
+    test_res_txt:
+      "စာမေးပွဲပြီးဆုံးသည်နှင့် ရမှတ်များကို တွက်ချက်ပါမည်။ ရမှတ်များသည် သင့်ရလဒ်ကို အပိုင်းများအဖြစ် ခွဲခြားပြသပါမည်။",
+    certifications: "အသိအမှတ်ပြုလက်မှတ်များ",
+    cert_txt:
+      "အောင်မြင်သည်ဖြစ်စေ ကျရှုံးသည်ဖြစ်စေ စာမေးပွဲပြီးဆုံးပြီးနောက် ချက်ချင်းလက်မှတ်ထုတ်ပေးပါမည်။",
+    user_acc: "အသုံးပြုသူအကောင့်",
+    profile_txt:
+      "သင့်ပရိုဖိုင်၏ tab ကို navigation bar တွင် ရှာတွေ့နိုင်ပါသည်။",
+    info_act_txt:
+      "သင်နှင့် သင့်လှုပ်ရှားမှုဆိုင်ရာ အချက်အလက် (ပြီးမြောက်သော စာမေးပွဲမှတ်တမ်းများ)။",
+    info_act: "အချက်အလက်နှင့် လှုပ်ရှားမှု",
+    acc_ctrl_txt:
+      "ဆက်ရှင်နှင့် သင့်ဒေတာကို ထိန်းချုပ်ခြင်း (အကောင့်ဖျက်ခြင်းနှင့် ထွက်ခြင်း)။",
+    account_deletion: "အကောင့်ဖျက်ခြင်း",
+    delete_confirm:
+      "ဤလုပ်ဆောင်ချက်သည် အရေးကြီးပြီး ဖျက်ရန် အတည်ပြုပါက သင်၏ဒေတာကို အပြီးအပိုင် ဖျက်လိုက်မည်ဖြစ်ပြီး ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်၍မရပါ။",
+    confirm_text:
+      "သင့်ဒေတာကို ဖျက်လိုပါက။ ကျေးဇူးပြု၍ ဘောက်စ်ထဲတွင် 'confirm_deletion' ဟု ရေးပါ။",
+    download: "ဒေါင်းလုဒ်လုပ်ရန်",
+    account_info: "အကောင့်အချက်အလက်",
+    delete_account: "အကောင့်ကို ဖျက်ပါ",
+    delete: "ဖျက်ရန်",
+    terms: "စည်းကမ်းသတ်မှတ်ချက်များ",
+    privacy: "ကိုယ်ရေးအချက်အလက်မူဝါဒ",
+    site_map: "ဆိုက်မြေပုံ",
+    account_activity: "အကောင့်လုပ်ဆောင်ချက်",
+    profile: "ပရိုဖိုင်",
+    valid_until: "အကျုံးဝင်သည့်သက်တမ်း",
+    logout_session: "ဆက်ရှင် ထွက်ခွာရန်",
+    account_control: "အကောင့်ထိန်းချုပ်မှု",
     dob: "မွေးသက္ကရာဇ်",
     incharge_info: "တာဝန်ခံ၏အချက်အလက်များ",
     association_ask:

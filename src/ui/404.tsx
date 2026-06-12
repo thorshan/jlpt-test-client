@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "../hooks/useTranslation";
+import SEO from "../components/SEO";
 
 const STAR_DATA = [...Array(30)].map((_, i) => ({
   id: i,
@@ -18,6 +19,7 @@ const NotFound: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-6 text-center overflow-hidden relative font-sans">
+      <SEO title="Page not found" description="" canonical="" />
       {/* 1. ANIMATED GRID BACKGROUND */}
       <motion.div
         className="fixed inset-0 pointer-events-none z-0"

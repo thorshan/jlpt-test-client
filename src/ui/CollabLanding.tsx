@@ -47,9 +47,9 @@ const CollabLanding: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#020617] text-white selection:bg-sky-500/30 overflow-x-hidden relative font-sans">
       <SEO
-        title="JLPT Mock Exams - Practice N1 to N5"
-        description="Take free Japanese Language Proficiency Test (JLPT) mock exams online. Practice for N1, N2, N3, N4, and N5 with real questions and instant results."
-        canonical="/"
+        title="Collaborate with JLPTX"
+        description="Collaborate with JLPTX"
+        canonical="/collabs/get-started"
       />
       <motion.div
         className="fixed top-0 left-0 w-[400px] h-[400px] bg-sky-500/10 rounded-full blur-[100px] pointer-events-none z-30 translate-x-[-50%] translate-y-[-50%]"

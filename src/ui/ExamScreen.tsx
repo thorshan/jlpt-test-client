@@ -21,6 +21,7 @@ import { LoadingScreen } from "../components/LoadingScreen";
 import { type Question } from "../api/questionApi";
 import { useUser } from "../hooks/useUser";
 import { useTranslation } from "../hooks/useTranslation";
+import SEO from "../components/SEO";
 
 // Local interfaces removed in favor of shared ones from API layer
 
@@ -547,6 +548,11 @@ const ExamScreen = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex flex-col font-sans overflow-hidden relative">
+      <SEO
+        title="Exam"
+        description="Join JLPTX and start practicing for your Japanese Language Proficiency Test. Practice N1, N2, N3, N4, and N5 levels."
+        canonical="/"
+      />
       {/* --- BACKGROUND LAYER --- */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <motion.div

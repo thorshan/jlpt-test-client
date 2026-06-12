@@ -5,6 +5,7 @@ import { Lock, User, ChevronRight, Zap } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 import axios from "axios";
 import { useTranslation } from "../hooks/useTranslation";
+import SEO from "../components/SEO";
 
 interface ValidationError {
   message: string;
@@ -48,6 +49,11 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] text-white flex items-center justify-center p-6 relative overflow-hidden font-sans">
+      <SEO
+        title="Auth"
+        description="Join JLPTX and start practicing for your Japanese Language Proficiency Test. Practice N1, N2, N3, N4, and N5 levels."
+        canonical="/auth"
+      />
       {/* Background Glows */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-sky-500/10 blur-[120px] rounded-full" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full" />
