@@ -2,11 +2,115 @@ import { ArrowLeft, Signpost } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 import SEO from "../components/SEO";
-import { AnimatePresence, motion } from "framer-motion";
+import PageNode, { type Page } from "../components/PageNode";
 
 const SiteMap = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  //
+  const pages = [
+    {
+      id: 1,
+      path: "/",
+      text: "Home Page",
+      child: [],
+      description: "The main landing page for JLPTX.",
+      image: "/img/Index.png",
+    },
+    {
+      id: 2,
+      text: "Collabs Page",
+      description: "The main page for Collabs.",
+      image: "/img/Collabs.png",
+      child: [
+        {
+          text: "Collabs",
+          path: "/collabs",
+          description: "Welcome page for collabs",
+          image: "/img/Collabs.png",
+        },
+        {
+          text: "Start New Collab",
+          path: "/collabs/get-started",
+          description: "Get start page for creating new collab",
+          image: "/img/Collab-1.png",
+        },
+      ],
+    },
+    {
+      id: 3,
+      path: "/auth",
+      text: "Authentication Page",
+      child: [],
+      description: "The main page for authentication.",
+      image: "/img/Login.png",
+    },
+    {
+      id: 4,
+      path: "/user-manual",
+      text: "User Manual Page",
+      child: [],
+      description: "The main page for user manual.",
+      image: "/img/Manual.png",
+    },
+    {
+      id: 5,
+      text: "User Page",
+      description: "The main landing page for JLPTX.",
+      image: "/img/Home-page.png",
+      child: [
+        {
+          text: "Dashboard",
+          path: "/test",
+          description: "Dashboard page for user",
+          image: "/img/Home-page.png",
+        },
+        {
+          text: "Profile",
+          path: "/test",
+          description: "User profile page",
+          image: "/img/Profile-1.png",
+        },
+        {
+          text: "Exams",
+          path: "/test",
+          description: "Exam screen page",
+          image: "/img/Q-1.png",
+        },
+        {
+          text: "Results",
+          path: "/test",
+          description: "Results after finishing an exam",
+          image: "/img/Result.png",
+        },
+        {
+          text: "Certifications",
+          path: "/test",
+          description: "Certificate after finishing an exam",
+          image: "/img/Certificate.png",
+        },
+      ],
+    },
+    {
+      id: 6,
+      text: "Legal Page",
+      description: "Legal pages (Privacy, Policy, Terms, Conditions).",
+      child: [
+        {
+          text: "Privacy & Policy",
+          path: "/legal/privacy",
+          description: "Privacy and policy page.",
+          image: "/img/Privacy.png",
+        },
+        {
+          text: "Terms & Conditions",
+          path: "/legal/terms",
+          description: "Terms and conditions page.",
+          image: "/img/Terms.png",
+        },
+      ],
+    },
+  ];
   return (
     <div className="min-h-screen bg-[#020617] text-white p-6 md:p-12 selection:bg-sky-500/30 relative overflow-x-hidden flex flex-col gap-5">
       <SEO
@@ -43,72 +147,15 @@ const SiteMap = () => {
             </p>
           </div>
         </section>
-        <section>
-          <div className="w-full flex flex-col items-center justify-center">
-            <AnimatePresence>
-              <div className="flex gap-5 w-full max-w-fit">
-                <div className="w-1/2">
-                  <div>
-                    <h1>Registrations</h1>
-                    <h5>Registrations - 1</h5>
-                    <h5>Registrations - 2</h5>
-                    <h5>Registrations - 3</h5>
-                  </div>
-                </div>
-                <motion.img
-                  src="/img/Register-1.png"
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                  transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
-                  className="object-fit w-1/2 rounded-3xl border border-slate-700/50 flex flex-row justify-center items-center"
-                  style={{
-                    WebkitMaskImage:
-                      "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-                    maskImage:
-                      "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-                  }}
-                />
-              </div>
-              <div className="flex items-center gap-5 w-full max-w-fit">
-                <motion.img
-                  src="/img/Register-2.png"
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                  transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
-                  className="object-fit w-1/2 rounded-3xl border border-slate-700/50 flex flex-row justify-center items-center"
-                  style={{
-                    WebkitMaskImage:
-                      "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-                    maskImage:
-                      "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-                  }}
-                />
-                <motion.img
-                  src="/img/Register-3.png"
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                  transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
-                  className="object-fit w-1/2 rounded-3xl border border-slate-700/50 flex flex-row justify-center items-center"
-                  style={{
-                    WebkitMaskImage:
-                      "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-                    maskImage:
-                      "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-                  }}
-                />
-              </div>
-            </AnimatePresence>
-          </div>
-          <div className="text-center my-10 text-4xl text-sky-600/30">•</div>
-          <footer>
-            <div className="text-center text-xs text-slate-400">
-              &copy; JLPTX
-            </div>
-          </footer>
+        <section className="w-full mx-auto">
+          {pages.map((page) => (
+            <PageNode key={page.id} page={page as unknown as Page} />
+          ))}
         </section>
+        <div className="text-center my-10 text-4xl text-sky-600/30">•</div>
+        <footer>
+          <div className="text-center text-xs text-slate-400">&copy; JLPTX</div>
+        </footer>
       </main>
     </div>
   );
