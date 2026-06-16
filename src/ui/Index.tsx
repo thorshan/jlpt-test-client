@@ -222,7 +222,8 @@ const Index = () => {
               }}
               whileTap={{ scale: 0.98 }}
               className="w-fit sm:w-2/5 bg-sky-500 text-white px-8 md:px-8 py-4 md:py-5 rounded-2xl font-black text-base transition-all duration-300 flex items-center justify-center shadow-[0_10px_30px_-10px_rgba(14,165,233,0.5)]"
-              onClick={() => navigate("/get-started")}
+              // onClick={() => navigate("/get-started")
+              onClick={() => navigate("/coming-soon")}
             >
               {t("start_test")}
             </motion.button>

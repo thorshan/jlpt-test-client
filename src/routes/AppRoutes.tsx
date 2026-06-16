@@ -36,6 +36,7 @@ import Privacy from "../ui/Privacy";
 import SiteMap from "../ui/SiteMap";
 import Profile from "../ui/Profile";
 import Download from "../components/Download";
+import Soon from "../ui/Soon";
 
 const AppRoutes = () => {
   const { user, isVerifying } = useUser();
@@ -51,6 +52,7 @@ const AppRoutes = () => {
         path="/"
         element={user ? <Navigate to="/test" replace /> : <Index />}
       />
+      <Route path="/coming-soon" element={<Soon />} />
       <Route path="/get-started" element={<LandingPage />} />
       <Route path="/collabs" element={<CollabLanding />} />
       <Route path="/collabs/get-started" element={<CollaborationClient />} />
