@@ -1,45 +1,54 @@
 @import "tailwindcss";
 
-.certificate-container {
-    --color-white: 255, 255, 255;
-    --color-sky-500: 14, 165, 233;
-    /* Add other colors used in your certificate here */
+@font-face {
+    font-family: "Padauk";
+    src: url("/fonts/Padauk-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
 }
 
-.force-legacy-colors * {
-    /* Force a fallback to non-oklab colors during the snapshot */
-    color: #fff !important;
+@font-face {
+    font-family: "Padauk";
+    src: url("/fonts/Padauk-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
 }
-
 @theme {
-    --font-sans: "Inter", ui-sans-serif, system-ui;
+    /* Define fonts */
+
+    --font-en: "Google Sans", sans-serif;
+    --font-mm: "Paduak", sans-serif;
+
+    --font-sans: var(--current-font, var(--font-en));
+
+    /* Define your theme colors */
     --color-primary: #3b82f6;
-}
-
-@layer utilities {
-    .scrollbar-hide {
-        /* IE and Edge */
-        -ms-overflow-style: none;
-        /* Firefox */
-        scrollbar-width: none;
-    }
-
-    /* Chrome, Safari and Opera */
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
 }
 
 @layer base {
     body {
         background-color: #020617;
-        @apply text-slate-300 antialiased;
+        @apply text-slate-300 antialiased font-sans;
+    }
+
+    /* This is the magic: when <html> has the class .lang-mm,
+     it overrides the default font-family */
+    html.lang-mm {
+        @apply font-sans leading-relaxed;
+        --current-font: var(--font-mm);
+    }
+}
+
+@layer utilities {
+    .scrollbar-hide {
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 
     .bg-clip-text {
-        -webkit-background-clip: text;
         background-clip: text;
         box-decoration-break: clone;
-        -webkit-box-decoration-break: clone;
     }
 }

@@ -9,6 +9,7 @@ export interface User {
   token?: string;
   email?: string;
   password?: string;
+  association?: string | { _id: string; name: string };
 }
 
 export interface UserForm {
@@ -27,6 +28,16 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface UpdateForm {
+  name: string;
+  lastNameChanged: string | Date;
+}
+
+export interface UpdateLvlForm {
+  level: string;
+  lastLevelChanged?: string | Date;
+}
+
 export type UserFormData = Omit<User, "_id">;
 
 export const userApi = {
@@ -36,11 +47,14 @@ export const userApi = {
   createUser: (data: UserForm) =>
     apiClient.post<ApiResponse<UserForm>>("/users", data),
 
-  updateUser: (id: string, level: string) =>
-    apiClient.put<ApiResponse<User>>(`/users/${id}`, { level }),
+  updateUser: (id: string, data: UpdateLvlForm) =>
+    apiClient.put<ApiResponse<User>>(`/users/${id}`, data),
 
   updateRole: (id: string) =>
     apiClient.put<ApiResponse<User>>(`/users/${id}/role`),
+
+  updateName: (id: string, data: UpdateForm) =>
+    apiClient.put<ApiResponse<User>>(`/users/${id}/update-name`, data),
 
   getUser: (id: string) => apiClient.get<ApiResponse<User>>(`/users/${id}`),
 

@@ -10,7 +10,6 @@ import {
   Trophy,
   CheckCircle2,
   AlertCircle,
-  Award,
 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -245,14 +244,14 @@ const Results: React.FC = () => {
                 disabled={isProcessing}
                 onClick={async () => {
                   setIsProcessing(true);
-                  navigate(
-                    `/redirect?to=/results?step=1&type=cert&id=${data._id}`,
-                  );
+                  navigate("/test");
+                  // navigate(
+                  //   `/redirect?to=/results?step=1&type=cert&id=${data._id}`,
+                  // );
                 }}
                 className="group relative inline-flex items-center gap-3 bg-white text-slate-950 px-12 py-5 rounded-[2rem] font-black text-xl hover:bg-sky-500 transition-all active:scale-95 shadow-xl disabled:opacity-50"
               >
-                <Award size={24} />
-                {isProcessing ? t("processing") : t("print_cert")}
+                {isProcessing ? t("processing") : t("exit_home")}
               </button>
             </motion.div>
           ) : (

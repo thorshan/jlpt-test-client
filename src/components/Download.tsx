@@ -254,8 +254,20 @@ const Download = () => {
                 <Trophy size={14} className="text-sky-500" />
                 <span className="text-[9px] font-black uppercase tracking-widest">
                   {certLang === "en"
-                    ? "Validated via JLPTX"
-                    : "JLPTXによる承認"}
+                    ? `Validated via ${
+                        typeof data?.user === "object" &&
+                        data.user !== null &&
+                        typeof data.user.association === "object"
+                          ? data.user.association?.name
+                          : "JLPTX"
+                      }`
+                    : `${
+                        typeof data?.user === "object" &&
+                        data.user !== null &&
+                        typeof data.user.association === "object"
+                          ? data.user.association?.name
+                          : "JLPTX"
+                      }による承認`}
                 </span>
               </div>
             </div>

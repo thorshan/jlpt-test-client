@@ -176,8 +176,22 @@ export const translations = {
     info_act: "Info & Activity",
     acc_ctrl_txt:
       "Sessions and the control of your data (Account deletion & Logout session).",
+    copy_code_save:
+      "Copy and save this code in a safe place. This code will be used to login to your account as password.",
+    jlpt_old: "JLPT Old Questions",
+    All: "All",
+    custom_test: "Custom Test",
+    level_test: "Level Test",
+    association: "Association",
   },
   my: {
+    association: "အသင်းအဖွဲ့",
+    jlpt_old: "မေးခွန်းဟောင်းများ",
+    All: "အးလုံး",
+    custom_test: "စိတ်ကြိုက်စမ်းသပ်မှု",
+    level_test: "အဆင့်စစ်ဆေးမှု",
+    copy_code_save:
+      "ဒီကုဒ်ကို ကူးယူပြီး လုံခြုံတဲ့နေရာမှာ သိမ်းဆည်းပါ။ ဒီကုဒ်ကို သင့်အကောင့်ကို စကားဝှက်အဖြစ် ဝင်ရောက်ဖို့အတွက် အသုံးပြုပါလိမ့်မယ်။",
     registration: "မှတ်ပုံတင်ခြင်း",
     process: "လုပ်ငန်းစဉ်",
     proc_1_txt: "သင့်အမည်၊ အီးမေးလ်နှင့် မွေးသက္ကရာဇ်ကို ရိုက်ထည့်ပါ။",

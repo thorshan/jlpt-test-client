@@ -5,13 +5,12 @@ import {
   AlertTriangle,
   ArrowLeft,
   Download,
-  Edit,
-  Info,
   ShieldUser,
+  SquarePen,
   User,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { userApi } from "../api/userApi";
+import { userApi, type UpdateForm, type UpdateLvlForm } from "../api/userApi";
 import { LoadingScreen } from "../components/LoadingScreen";
 import { resultApi, type Result } from "../api/resultApi";
 import { useUser } from "../hooks/useUser";
@@ -29,6 +28,10 @@ interface UserData {
   role?: string;
   expireAt?: Date;
   createdAt?: string;
+  finishedExams?: string;
+  association?: string | { _id: string; name: string };
+  lastNameChanged?: string | Date;
+  lastLevelChanged?: string | Date;
 }
 
 const Profile = () => {
@@ -44,6 +47,9 @@ const Profile = () => {
   const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [openLevel, setOpenLevel] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [openName, setOpenName] = useState(false);
+  const [name, setName] = useState("");
 
   const fetchUser = async () => {
     try {
@@ -105,19 +111,68 @@ const Profile = () => {
     }
   };
 
-  const selectLevel = async (lvl: string) => {
-    setIsProcessing(true);
-    try {
-      await userApi.updateUser(user!._id!, lvl);
-      updateUser({ level: lvl });
-      fetchUser();
-      setOpenLevel(false);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsProcessing(false);
-    }
+  const canChangeData = (lastChanged: Date | string | undefined) => {
+    if (!lastChanged) return true;
+
+    const diffInDays = Math.floor(
+      (Date.now() - new Date(lastChanged).getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    return diffInDays >= 30;
   };
+
+  const selectLevel = async (lvl: string) => {
+    if (!canChangeData(user?.lastLevelChanged)) {
+      return;
+    }
+    setIsProcessing(true);
+    const payload: UpdateLvlForm = {
+      level: lvl,
+      lastLevelChanged: new Date(),
+    };
+    if (
+      lvl.trim() &&
+      canChangeData(user?.lastLevelChanged ? user?.lastLevelChanged : undefined)
+    )
+      try {
+        await userApi.updateUser(user!._id!, payload);
+        updateUser({ level: lvl });
+        fetchUser();
+        setOpenLevel(false);
+        setIsMenuOpen(false);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsProcessing(false);
+      }
+  };
+
+  const handleNameChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    const payload: UpdateForm = {
+      name: name,
+      lastNameChanged: new Date(),
+    };
+    if (name.trim())
+      try {
+        await userApi.updateName(user!._id!, payload);
+        updateUser(payload);
+        fetchUser();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setName("");
+        setIsProcessing(false);
+        setIsMenuOpen(false);
+        setOpenName(false);
+        setOpenLevel(false);
+      }
+  };
+
+  const isDownloadable = user?.finishedExams
+    ? user?.finishedExams.length >= 3
+    : false;
 
   if (loading) return <LoadingScreen />;
 
@@ -145,11 +200,26 @@ const Profile = () => {
       <main className="mt-24 max-w-7xl mx-auto space-y-10">
         {/* SECTION 1: PROFILE HEADER */}
         <section>
-          <div className="flex items-center gap-5 mb-8">
-            <div className="w-20 h-20 bg-sky-950/50 backdrop-blur-sm rounded-full flex items-center justify-center text-sky-50 font-black text-4xl">
-              {user?.name?.charAt(0).toUpperCase()}
+          <div className="flex justify-between items-center bg-sky-950/50 backdrop-blur-sm border border-sky-800 rounded mb-8 p-5">
+            <div className="flex items-center gap-5">
+              <div className="w-12 h-12 md:w-20 md:h-20 bg-sky-950/50 backdrop-blur-sm rounded-full flex items-center justify-center text-sky-50 font-black text-4xl">
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex flex-col">
+                <h1 className="text-lg md:text-3xl font-black text-sky-50">
+                  {user?.name}
+                </h1>
+                <span className="italic text-[10px] text-sky-500/50">
+                  {"ID"}: {user?._id.slice(0, 10).toUpperCase()}
+                </span>
+              </div>
             </div>
-            <h1 className="text-3xl font-black text-sky-50">{user?.name}</h1>
+            <div onClick={() => setIsMenuOpen(true)}>
+              <SquarePen
+                size={24}
+                className="text-slate-50/70 hover:text-sky-500 transition-colors cursor-pointer"
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2.5 mb-3">
@@ -165,26 +235,26 @@ const Profile = () => {
               </span>{" "}
               {user?.email}
             </p>
-            <div className="flex items-center gap-5">
-              <p>
-                <span className="text-sky-500 font-black mr-4">
-                  {t("level")}:
-                </span>{" "}
-                {user?.level}
-              </p>
-              <div
-                onClick={() => setOpenLevel(true)}
-                className="hover:text-sky-500 transition-colors"
-              >
-                <Edit size={18} />
-              </div>
-            </div>
+            <p>
+              <span className="text-sky-500 font-black mr-4">
+                {t("level")}:
+              </span>{" "}
+              {user?.level}
+            </p>
             <p>
               <span className="text-sky-500 font-black mr-4">
                 {t("valid_until")}:
               </span>
               {user?.expireAt
                 ? new Date(user.expireAt).toLocaleDateString()
+                : "N/A"}
+            </p>
+            <p>
+              <span className="text-sky-500 font-black mr-4">
+                {t("association")}:
+              </span>{" "}
+              {typeof user?.association === "object"
+                ? user?.association?.name
                 : "N/A"}
             </p>
           </div>
@@ -268,7 +338,10 @@ const Profile = () => {
                       >
                         {res.status ? "SUCCESS" : "FAILED"}
                       </div>
-                      <div onClick={() => handleDownload(res._id as string)}>
+                      <div
+                        className={`${isDownloadable ? "block" : "hidden"}`}
+                        onClick={() => handleDownload(res._id as string)}
+                      >
                         <Download
                           className="text-sky-500 cursor-pointer"
                           size={24}
@@ -385,14 +458,19 @@ const Profile = () => {
           </div>
         )}
       </AnimatePresence>
+
       <AnimatePresence>
-        {openLevel && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        {isMenuOpen && (
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsOpenDelete(false)}
+              onClick={() => {
+                setIsMenuOpen(false);
+                setOpenLevel(false);
+                setOpenName(false);
+              }}
               className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
             />
             <motion.div
@@ -403,17 +481,54 @@ const Profile = () => {
             >
               <div className="relative z-10 text-center">
                 <div className="w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-sky-500">
-                  <Info size={32} />
+                  <User size={32} />
                 </div>
-                <h3 className="text-xl text-sky-500 font-black italic uppercase mb-2">
-                  {t("select_level")}
-                </h3>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-1">
-                  {["N1", "N2", "N3", "N4", "N5"].map((lvl, index) => (
+
+                {/* MAIN MENU: Show only if no sub-menus are open */}
+                <div
+                  className={`${!openLevel && !openName ? "grid" : "hidden"} gap-3 sm:grid-cols-1`}
+                >
+                  {["Name", "Level"].map((lvl, index) => (
                     <button
                       key={lvl}
                       disabled={isProcessing}
-                      onClick={() => selectLevel(lvl)}
+                      onClick={
+                        lvl === "Level"
+                          ? () => setOpenLevel(true)
+                          : lvl === "Name"
+                            ? () => setOpenName(true)
+                            : () => setIsMenuOpen(false)
+                      }
+                      className={`group w-full p-4 md:p-5 bg-sky-950/40 border border-sky-900/40 rounded-2xl font-black text-lg transition-all active:scale-[0.96] hover:bg-sky-600 hover:border-sky-400 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 disabled:opacity-50 disabled:cursor-not-allowed ${
+                        index === 4 ? "col-span-2 sm:col-span-1" : ""
+                      }`}
+                    >
+                      <span className="text-sky-500 group-hover:text-white transition-colors">
+                        Edit {lvl}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* LEVEL SELECT MENU: Show only when openLevel is true */}
+                <div
+                  className={`${openLevel ? "grid" : "hidden"} grid-cols-2 gap-3 sm:grid-cols-1`}
+                >
+                  {!canChangeData(user?.lastLevelChanged) && (
+                    <span className="text-xs text-red-500 mb-2">
+                      You can only change your level once every 30 days.
+                    </span>
+                  )}
+                  {["N1", "N2", "N3", "N4", "N5"].map((lvl, index) => (
+                    <button
+                      key={lvl}
+                      disabled={
+                        !canChangeData(user?.lastLevelChanged) || isProcessing
+                      }
+                      onClick={() => {
+                        selectLevel(lvl);
+                        setOpenLevel(false);
+                      }}
                       className={`group w-full p-4 md:p-5 bg-sky-950/40 border border-sky-900/40 rounded-2xl font-black text-lg transition-all active:scale-[0.96] hover:bg-sky-600 hover:border-sky-400 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 disabled:opacity-50 disabled:cursor-not-allowed ${
                         index === 4 ? "col-span-2 sm:col-span-1" : ""
                       }`}
@@ -426,7 +541,58 @@ const Profile = () => {
                       </span>
                     </button>
                   ))}
+
+                  <button
+                    onClick={() => setOpenLevel(false)}
+                    className="col-span-2 sm:col-span-1 text-sm text-slate-400 hover:text-white mt-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    {t("back")}
+                  </button>
                 </div>
+
+                <form onSubmit={handleNameChange}>
+                  <div
+                    className={`${openName ? "grid" : "hidden"} gap-3 grid-cols-1`}
+                  >
+                    <div className="flex flex-col items-start">
+                      <input
+                        value={name}
+                        type="text"
+                        placeholder={t("name_placeholder")}
+                        className="w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
+                        onChange={(e) => setName(e.target.value)}
+                      />
+
+                      {!canChangeData(user?.lastNameChanged) && (
+                        <span className="text-xs text-red-500 mt-2">
+                          You can only change your name once every 30 days.
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      disabled={
+                        !canChangeData(user?.lastNameChanged) ||
+                        !name ||
+                        isProcessing
+                      }
+                      type="submit"
+                      className="col-span-2 sm:col-span-1 text-sm text-slate-950 mt-2 p-3 rounded-2xl bg-sky-500 hover:bg-sky-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isProcessing ? t("processing") : t("proceed")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenName(false);
+                        setOpenLevel(false);
+                        setName("");
+                      }}
+                      className="col-span-2 sm:col-span-1 text-sm text-slate-400 hover:text-white mt-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                      {t("back")}
+                    </button>
+                  </div>
+                </form>
               </div>
             </motion.div>
           </div>

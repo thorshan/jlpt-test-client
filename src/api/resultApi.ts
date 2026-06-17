@@ -9,9 +9,21 @@ export interface SectionDetail {
   passed: boolean;
 }
 
+interface User {
+  _id: string;
+  name: string;
+  dob: Date;
+  level?: string;
+  role?: string;
+  token?: string;
+  email?: string;
+  password?: string;
+  association?: string | { _id: string; name: string };
+}
+
 export interface Result {
   _id: string;
-  user: string | { _id: string; name: string; dob: Date };
+  user: string | User;
   exam: string | { _id: string; title: string };
   level: "N1" | "N2" | "N3" | "N4" | "N5";
 

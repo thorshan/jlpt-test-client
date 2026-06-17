@@ -100,7 +100,7 @@ const Home = () => {
       />
 
       {/* 2. DYNAMIC SKY ORBS */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      {/*<div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
@@ -116,7 +116,7 @@ const Home = () => {
           }}
           className="absolute bottom-0 -right-[10%] w-[60%] h-[60%] bg-blue-900/20 blur-[160px] rounded-full"
         />
-      </div>
+      </div> */}
 
       {/* --- NAVBAR --- */}
       <nav className="fixed top-0 left-0 right-0 z-[100] bg-[#020617]/60 backdrop-blur-2xl border-b border-sky-500/10 h-16 md:h-20">
@@ -164,9 +164,9 @@ const Home = () => {
                       onClick={() => navigate(`/${user?._id}/profile`)}
                       className="px-4 py-4 border-b border-sky-500/10 mb-2 bg-sky-500/5 rounded-t-[1.5rem] cursor-pointer hover:bg-sky-500/20"
                     >
-                      <p className="text-[9px] text-sky-500 font-black mb-2">
+                      {/*<p className="text-[9px] text-sky-500 font-black mb-2">
                         {t("name_label")}
-                      </p>
+                      </p>*/}
                       <p className="text-sm font-black text-white truncate leading-none mb-2">
                         {user?.name}
                       </p>
@@ -205,7 +205,7 @@ const Home = () => {
 
           {/* SEARCH COMPONENT */}
           <div className="mt-10 relative group">
-            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-sky-400 transition-colors">
+            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-sky-500 group-focus-within:text-sky-400 transition-colors z-10">
               <Search size={22} strokeWidth={2.5} />
             </div>
             <input
@@ -237,7 +237,15 @@ const Home = () => {
                     : "bg-sky-950/30 border-sky-500/10 text-slate-500 hover:border-sky-500/30 hover:text-sky-400"
                 }`}
               >
-                {cat === "JLPT Old Questions" ? "Past Papers" : cat}
+                {cat === "JLPT Old Questions"
+                  ? t("jlpt_old")
+                  : cat === "Level Test"
+                    ? t("level_test")
+                    : cat === "Custom Test"
+                      ? t("custom_test")
+                      : cat === "All"
+                        ? t("All")
+                        : cat}
               </button>
             ))}
           </div>
@@ -249,7 +257,16 @@ const Home = () => {
             <div className="flex items-center gap-2">
               <Filter size={14} className="text-sky-500" />
               <h3 className="text-[10px] md:text-xs font-black text-slate-400">
-                {activeCategory} {t("results")}
+                {activeCategory === "JLPT Old Questions"
+                  ? t("jlpt_old")
+                  : activeCategory === "Level Test"
+                    ? t("level_test")
+                    : activeCategory === "Custom Test"
+                      ? t("custom_test")
+                      : activeCategory === "All"
+                        ? t("All")
+                        : activeCategory}{" "}
+                {t("results")}
               </h3>
             </div>
             <span className="text-[10px] text-sky-500/60 font-black bg-sky-500/5 px-3 py-1 rounded-full border border-sky-500/10">

@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, ArrowRight, ShieldCheck } from "lucide-react";
+import {
+  Copy,
+  Check,
+  ArrowRight,
+  ShieldCheck,
+  CircleX,
+  CheckCircle2,
+} from "lucide-react";
 import { userApi, type UserForm } from "../api/userApi";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
@@ -30,6 +37,11 @@ const LandingPage = () => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [options, setOptions] = useState<Collabs[]>([]);
   const [optionId, setOptionId] = useState("");
+
+  const [error, setError] = useState("");
+  const [isExist, setIsExist] = useState(true);
+  const [isSafe, setIsSafe] = useState(false);
+  const [isPermitted, setIsPermitted] = useState(false);
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -102,7 +114,7 @@ const LandingPage = () => {
   const selectLevel = async (lvl: string) => {
     setIsProcessing(true);
     try {
-      await userApi.updateUser(user!._id!, lvl);
+      await userApi.updateUser(user!._id!, { level: lvl });
       updateUser({ level: lvl });
       setStep(4);
     } catch (err) {
@@ -132,6 +144,30 @@ const LandingPage = () => {
       setIsProcessing(false);
       navigate("/test");
     }
+  };
+
+  // Email Validation
+  const checkEmail = async (email: string) => {
+    const res = await userApi.getAllUsers();
+    const resData = res.data?.data || [];
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmailValid = emailRegex.test(email);
+    setIsSafe(isEmailValid);
+
+    const checkExisting = resData.some((u) => u.email === email);
+    setIsExist(checkExisting);
+  };
+
+  const checkDOB = (date: string | Date) => {
+    const current = new Date().getFullYear();
+    const paramDate = new Date(date).getFullYear();
+    const notPermitted = current - paramDate <= 13;
+    setIsPermitted(current - paramDate <= 13);
+    if (notPermitted)
+      setError(
+        `You are not allowed to create an account on your own.\nYou must older than 13.`,
+      );
   };
 
   return (
@@ -201,17 +237,18 @@ const LandingPage = () => {
                 </h2>
               </div>
 
-              <div className="mb-5">
+              {/*<div className="mb-5">
                 <q className="text-xs tracking-tighter text-sky-500 leading-tight">
                   Your privacy is important to us. We do not require your real
                   legal name or primary email. Feel free to use a nickname or a
                   secondary email address for your certificate.
                 </q>
-              </div>
+              </div>*/}
 
               <div className="space-y-4">
                 <div className="space-y-2">
                   <input
+                    required
                     placeholder={t("name_label")}
                     className="mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
                     value={form.name}
@@ -221,19 +258,51 @@ const LandingPage = () => {
 
                 <div className="space-y-2 mb-5">
                   <input
+                    type="email"
+                    required
                     placeholder={t("email")}
                     className="mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all text-base text-white placeholder:text-sky-900"
                     value={form.email}
-                    onChange={(e) =>
-                      setForm({ ...form, email: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setForm({ ...form, email: e.target.value });
+                      checkEmail(e.target.value);
+                    }}
                   />
+                  <div
+                    className={`${form.email.trim() ? "block" : "hidden"} flex justify-between px-3`}
+                  >
+                    <>
+                      {isExist ? (
+                        <span className="text-red-500 text-xs">
+                          User already exists with this email.
+                        </span>
+                      ) : isSafe ? (
+                        <span className="text-sky-500 text-xs">
+                          Provided email address is available.
+                        </span>
+                      ) : (
+                        <span className="text-red-500 text-xs whitespace-pre-line">
+                          {`Email address must contain '@domain.com' \n(eg: @gmail.com, @outlook.com, etc.)`}
+                        </span>
+                      )}
+                    </>
+                    <>
+                      {isExist ? (
+                        <CircleX size={15} className="text-red-500" />
+                      ) : !isSafe ? (
+                        <CircleX size={15} className="text-red-500" />
+                      ) : (
+                        <CheckCircle2 size={15} className="text-emerald-500" />
+                      )}
+                    </>
+                  </div>
                 </div>
 
                 <div className="space-y-2 mb-5">
                   <label className="ml-2 text-sky-500">{t("dob")}</label>
                   <input
                     type="date"
+                    required
                     className="
                       mt-3 w-full bg-black/40 border border-sky-900/50 p-4 rounded-2xl outline-none
                       focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all
@@ -251,13 +320,28 @@ const LandingPage = () => {
                         ...form,
                         dob: dateVal ? new Date(dateVal) : null,
                       });
+                      checkDOB(e.target.value);
                     }}
                   />
+                  <>
+                    {error && (
+                      <span className="text-xs text-red-500 whitespace-pre-line">
+                        {error}
+                      </span>
+                    )}
+                  </>
                 </div>
 
                 {!generatedToken ? (
                   <button
-                    disabled={!form.email}
+                    disabled={
+                      !form.email ||
+                      isPermitted ||
+                      !form.dob ||
+                      !form.email ||
+                      isExist ||
+                      !isSafe
+                    }
                     onClick={generateToken}
                     className="w-full py-5 bg-white text-black font-black rounded-2xl hover:bg-sky-50 transition-all active:scale-[0.98] disabled:opacity-50"
                   >
@@ -269,6 +353,11 @@ const LandingPage = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     className="space-y-4"
                   >
+                    <div className="px-3">
+                      <span className="text-sm text-slate-400">
+                        {t("copy_code_save")}
+                      </span>
+                    </div>
                     <div className="w-full flex items-center justify-between bg-black/60 p-5 rounded-2xl border border-sky-500/30">
                       <span className="text-2xl font-mono font-black tracking-[0.3em] text-sky-400">
                         {generatedToken}
@@ -288,6 +377,7 @@ const LandingPage = () => {
                         )}
                       </button>
                     </div>
+
                     <button
                       disabled={isProcessing}
                       onClick={handleCreateUser}
@@ -405,7 +495,7 @@ const LandingPage = () => {
                 <div className="relative" ref={wrapperRef}>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-sky-950 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-900"
                     placeholder="Search..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -413,7 +503,7 @@ const LandingPage = () => {
                   />
 
                   {isOpen && (
-                    <ul className="absolute z-10 w-full mt-1 bg-sky-950 border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                    <ul className="absolute z-10 w-full mt-1 bg-sky-950 border border-sky-900 rounded-lg shadow-lg max-h-60 overflow-auto">
                       {filteredOptions.map((option, index) => (
                         <li
                           key={index}

@@ -21,6 +21,18 @@ export const LanguageProvider = ({
   const [lang, setLang] = useState<LanguageCode>(getInitialLanguage);
 
   useEffect(() => {
+    const root = document.documentElement;
+
+    // Remove both to ensure a clean state
+    root.classList.remove("lang-en", "lang-mm");
+
+    // Apply the class based on current state
+    if (lang === "my") {
+      root.classList.add("lang-mm");
+    } else {
+      root.classList.add("lang-en");
+    }
+
     localStorage.setItem("app_lang", lang);
   }, [lang]);
 

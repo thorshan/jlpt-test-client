@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Volume2,
   Loader2,
+  CircleAlert,
 } from "lucide-react";
 import { examApi, type Exam, type Section } from "../api/examApi";
 import {
@@ -91,6 +92,8 @@ const ExamScreen = () => {
   const { user } = useUser();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const questionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const isInitialLoad = useRef(true);
+  const [isAlertOpen, setIsAlertOpen] = useState(true);
 
   // --- STATE ---
   const [exam, setExam] = useState<Exam<Question> | null>(null);
@@ -544,6 +547,26 @@ const ExamScreen = () => {
     });
   };
 
+  useEffect(() => {
+    if (isAlertOpen) return;
+    const handleVisibilityChange = () => {
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        return;
+      }
+
+      if (document.visibilityState === "visible") {
+        window.location.reload();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isAlertOpen]);
+
   if (loading || !exam) return <LoadingScreen />;
 
   return (
@@ -572,7 +595,6 @@ const ExamScreen = () => {
         <div className="absolute top-[-15%] right-[-10%] w-[50%] h-[50%] bg-sky-500/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-[-15%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 blur-[120px] rounded-full" />
       </div>
-
       {/* --- NAVBAR --- */}
       <nav className="h-16 md:h-20 border-b border-white/5 bg-[#020617]/60 backdrop-blur-2xl flex items-center justify-between px-4 md:px-8 sticky top-0 z-[60]">
         <div className="flex items-center gap-2 md:gap-4">
@@ -595,7 +617,6 @@ const ExamScreen = () => {
           <LogOut size={14} className="md:w-4 md:h-4" />
         </button>
       </nav>
-
       {/* --- PROGRESS BAR --- */}
       {status === "exam" && (
         <div className="w-full bg-[#020617]/40 border-b border-white/5 py-3 md:py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory sticky top-16 md:top-20 z-[60] backdrop-blur-xl">
@@ -620,7 +641,6 @@ const ExamScreen = () => {
           </div>
         </div>
       )}
-
       {/* --- MAIN CONTENT --- */}
       <main className="relative z-10 flex-1 flex flex-col items-center p-4 md:p-10 overflow-y-auto">
         <AnimatePresence mode="wait">
@@ -761,7 +781,6 @@ const ExamScreen = () => {
           )}
         </AnimatePresence>
       </main>
-
       {/* --- EXIT MODAL --- */}
       <AnimatePresence>
         {showExitModal && (
@@ -806,7 +825,46 @@ const ExamScreen = () => {
           </div>
         )}
       </AnimatePresence>
-
+      <AnimatePresence>
+        {isAlertOpen && (
+          <AnimatePresence>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowExitModal(false)}
+                className="absolute inset-0 bg-[#020617]/90 backdrop-blur-xl"
+              />
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                className="relative w-full max-w-sm bg-[#0f172a] border border-white/10 p-10 rounded-[2.5rem] shadow-2xl text-center"
+              >
+                <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+                  <CircleAlert size={32} />
+                </div>
+                <h3 className="text-2xl font-black mb-2 tracking-tight">
+                  Important Notice
+                </h3>
+                <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+                  If you switch to another tab or minimizes the browser your
+                  answer will be cleared and refershed.
+                </p>
+                <div className="grid grid-cols-1 gap-3">
+                  <button
+                    onClick={() => setIsAlertOpen(false)}
+                    className="py-4 bg-white/5 text-white font-bold rounded-2xl hover:bg-white/10 transition-colors border border-white/5"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </AnimatePresence>
+        )}
+      </AnimatePresence>
       {/* --- FOOTER --- */}
       {status === "exam" && (
         <footer className="h-20 md:h-24 border-t border-white/5 bg-[#020617]/80 backdrop-blur-2xl px-4 md:px-10 flex items-center justify-center fixed bottom-0 left-0 right-0 z-50">
